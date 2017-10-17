@@ -1,0 +1,146 @@
+fileFormatVersion: 2
+guid: a3b6de1a014f8644798dd7119bd61013
+timeCreated: 1505562226
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: player-attack-1-hd_0
+    21300002: player-attack-1-hd_1
+    21300004: player-attack-1-hd_2
+    21300006: player-attack-1-hd_3
+    21300008: player-attack-1-hd_4
+  serializedVersion: 4
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: 0
+    aniso: -1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: player-attack-1-hd_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 117
+        width: 1465
+        height: 1225
+      alignment: 9
+      pivot: {x: 0.61, y: 0.58}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: player-attack-1-hd_1
+      rect:
+        serializedVersion: 2
+        x: 1597
+        y: 127
+        width: 1450
+        height: 1240
+      alignment: 9
+      pivot: {x: 0.62, y: 0.6}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: player-attack-1-hd_2
+      rect:
+        serializedVersion: 2
+        x: 3257
+        y: 146
+        width: 2309
+        height: 1338
+      alignment: 9
+      pivot: {x: 0.13, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: player-attack-1-hd_3
+      rect:
+        serializedVersion: 2
+        x: 5615
+        y: 148
+        width: 2617
+        height: 1191
+      alignment: 9
+      pivot: {x: 0.39, y: 0.64}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: player-attack-1-hd_4
+      rect:
+        serializedVersion: 2
+        x: 8380
+        y: 234
+        width: 1509
+        height: 1079
+      alignment: 9
+      pivot: {x: 0.5636416, y: 0.62115437}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
