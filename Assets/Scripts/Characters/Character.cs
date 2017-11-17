@@ -7,7 +7,7 @@ public abstract class Character : MonoBehaviour {
     public Stat health;
     public float maxHealth = 100;
     public float speed = 10;
-
+    public Transform Target { get; set; }
     protected Vector2 velocity;
     protected Rigidbody2D rigid;
     protected Animator animator;

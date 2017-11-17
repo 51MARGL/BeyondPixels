@@ -22,7 +22,7 @@ public class Player : Character {
     }
 
     void FixedUpdate () {
-        if (!base.animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
             velocity = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized * speed;
             rigid.transform.Translate(velocity * Time.deltaTime);
         }
@@ -34,7 +34,7 @@ public class Player : Character {
         } else if (Input.GetKeyDown(KeyCode.KeypadMinus)) {
             health.CurrentValue -= 10;
         }
-        if (Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Space)) {
             if (animator.GetCurrentAnimatorStateInfo(0).IsName("player-attack-1")) {
                 velocity = Vector2.zero;                
                 animator.SetBool("inCombo", true);

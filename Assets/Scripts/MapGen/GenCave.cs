@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GenCave : MonoBehaviour {
 
@@ -49,11 +50,11 @@ public class GenCave : MonoBehaviour {
         board = new int[width, height];
         RandomFillMap();
         if (CheckOnFreeSpace()) {
-            SmoothMap(5);
+            SmoothMap(3);
             ProcessMap();
-            SmoothMap(5);
+            SmoothMap(3);
             RemoveThinWalls();
-            SmoothMap(1);
+            SmoothMap(3);
             CloseBorders();
         } else {
             randomFillPercent -= 5;
@@ -117,7 +118,7 @@ public class GenCave : MonoBehaviour {
     }
     void ProcessMap () {
         List<List<TCoord>> wallRegions = GetRegions(1);
-        int wallThresholdSize = 5;
+        int wallThresholdSize = 3;
 
         foreach (List<TCoord> wallRegion in wallRegions) {
             if (wallRegion.Count < wallThresholdSize) {
@@ -128,7 +129,7 @@ public class GenCave : MonoBehaviour {
         }
 
         List<List<TCoord>> roomRegions = GetRegions(0);
-        int roomThresholdSize = 10;
+        int roomThresholdSize = 2;
         List<Room> finalRooms = new List<Room>();
 
         foreach (List<TCoord> roomRegion in roomRegions) {
@@ -149,10 +150,25 @@ public class GenCave : MonoBehaviour {
             finalRooms[0].isAccessibleFromMainRoom = true;
 
             ConnectClosestRooms(finalRooms);
+            ConnectRandomRooms(finalRooms);
             isNotGenerated = false;
         }
     }
 
+    void ConnectRandomRooms(List<Room> allRooms)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            foreach (var room in allRooms)
+            {
+                if (Random.Range(0, 100) < 50)
+                {
+                    room.isAccessibleFromMainRoom = false;
+                }
+            }
+            ConnectClosestRooms(allRooms); 
+        }
+    }
     void ConnectClosestRooms (List<Room> allRooms, bool forceAccessibility = false) {
 
         List<Room> roomListA = new List<Room>();
@@ -336,7 +352,6 @@ public class GenCave : MonoBehaviour {
                 }
             }
         }
-
         return tiles;
     }
 

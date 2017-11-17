@@ -5,13 +5,10 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour {
 
-    public List<GameObject> enemyPrefabs;
-    [Range(0, 500)]
+    public List<GameObject> enemyPrefabs;    
     public GameObject Player;
     private int enemiesCount;
     private int enemiesSpawned;
-    private bool playerSpawned;
-
     GenCave generator;
     int[,] board;
     int width;
@@ -20,7 +17,6 @@ public class Spawner : MonoBehaviour {
     // Use this for initialization
     void Start () {
         enemiesSpawned = 0;
-        playerSpawned = false;
         generator = FindObjectOfType<GenCave>();
         generator.boardIsReady += SpawnObjects;
     }
@@ -45,7 +41,7 @@ public class Spawner : MonoBehaviour {
             for (int j = height - 2; j >= 0; j--) {
                 if (board[i, j] == 0) {
                     Instantiate(Player, new Vector2(i, j), Quaternion.identity, transform);
-                    playerSpawned = true;
+                    GameManager.Player = FindObjectOfType<Player>();
                     return;
                 }
             }
