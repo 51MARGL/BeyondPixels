@@ -7,8 +7,7 @@ using UnityEngine.Experimental.UIElements;
 public class GameManager : MonoBehaviour
 {
 
-    public static Player Player { get; set; }    
-    private Transform lastPlayersTarget;
+    public static Player Player { get; set; }
 
     // Use this for initialization
     void Start()
@@ -35,37 +34,37 @@ public class GameManager : MonoBehaviour
                 {
                     if (c.transform.tag == "Enemy")
                     {
-                        if (lastPlayersTarget != null)
+                        if (Player.Target != null)
                         {
-                            lastPlayersTarget.SendMessage("IsNotTargetting");
-                            lastPlayersTarget = null;
+                            Player.Target.SendMessage("IsNotTargetting");
                         }
                         Player.Target = c.transform;
-                        lastPlayersTarget = c.transform;
                         c.transform.SendMessage("IsTargetting");
                     }
                     else
                     {
-                        Player.Target = null;
-
-                        if (lastPlayersTarget != null)
+                        if (Player.Target != null)
                         {
-                            lastPlayersTarget.SendMessage("IsNotTargetting");
-                            lastPlayersTarget = null;
+                            Player.Target.SendMessage("IsNotTargetting");
                         }
+                        Player.Target = null;
                     }
                 }
             }
             else
             {
-                Player.Target = null;
-
-                if (lastPlayersTarget != null)
+                if (Player.Target != null)
                 {
-                    lastPlayersTarget.SendMessage("IsNotTargetting");
-                    lastPlayersTarget = null;
+                    Player.Target.SendMessage("IsNotTargetting");
                 }
+                Player.Target = null;
             }
+        }
+        else if (Player.Target != null &&
+                 (Vector2.Distance(Player.transform.position, Player.Target.position) > Player.FieldOfView))
+        {
+            Player.Target.SendMessage("IsNotTargetting");
+            Player.Target = null;
         }
     }
 }

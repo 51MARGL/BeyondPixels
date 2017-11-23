@@ -7,17 +7,13 @@ public class Enemy : Character
 {
 
     public float fireRate = 2;
-    private float attackCast;
     public float attackRange = 1f;
     private float tChange; // force new direction in the first Update
     private float randomX;
     private float randomY;
 
-    [Range(0f, 100f)]
-    public float FieldOfView;
-
     public Canvas ownCanvas;
-
+    
     // Use this for initialization
     protected override void Start()
     {
@@ -29,16 +25,16 @@ public class Enemy : Character
     protected override void Update()
     {
         base.Update();
-        FlipHorizontal();        
+        FlipHorizontal();
 
-        if (health.CurrentValue == 0)
+        if (Health.CurrentValue == 0)
         {
             DestroyObject(gameObject);
         }
     }
 
     void FixedUpdate()
-    {                
+    {
         MovementHandle();
     }
 
@@ -56,32 +52,34 @@ public class Enemy : Character
 
         if (Target != null)
         {
-            if (Vector2.Distance(Target.position, transform.position) < attackRange)
+            if (Vector2.Distance(Target.position, transform.position) < attackRange && spellRoutine == null)
             {
-                Attack();
+                spellRoutine = StartCoroutine(Attack());
             }
             else
-            {            
-                var targetDir = Target.position - transform.position;
-                velocity = targetDir.normalized * speed;
-                rigid.transform.Translate(velocity * Time.deltaTime);
+            {
+                FollowTarget();
             }
         }
         else
-        {
+        {            
             MoveAtRandom();
         }
     }
 
-    private void Attack()
+    private void FollowTarget()
     {
-        if (Time.time >= attackCast)
-        {
-            animator.SetTrigger("Attack");
-            attackCast = Time.time + Random.Range(fireRate - 0.5f, fireRate + 0.5f);
-        }
+        direction = Target.position - transform.position;
     }
 
+    private IEnumerator Attack()
+    {
+        yield return new WaitForSeconds(Random.Range(fireRate, fireRate + 0.5f));
+        animator.SetTrigger("Attack");
+        StopSpellCast();
+    }
+
+    
     void MoveAtRandom()
     {
         if (Time.time >= tChange)
@@ -90,8 +88,7 @@ public class Enemy : Character
             randomY = Random.Range(-100, 100);
             tChange = Time.time + Random.Range(0.5f, 1.5f);
         }
-        velocity = new Vector2(randomX, randomY).normalized * speed;
-        rigid.transform.Translate(velocity * Time.deltaTime);
+        direction = new Vector2(randomX, randomY);
     }
 
     void OnTriggerEnter2D(Collider2D other)
