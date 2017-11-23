@@ -15,7 +15,7 @@ class Room : IComparable<Room> {
     public Room () {
     }
 
-    public Room (List<GenCave.TCoord> roomTiles, int[,] board) {
+    public Room (List<GenCave.TCoord> roomTiles, byte[,] board) {
         tiles = roomTiles;
         roomSize = tiles.Count;
         connectedRooms = new List<Room>();

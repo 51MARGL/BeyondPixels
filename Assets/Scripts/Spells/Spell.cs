@@ -1,51 +1,128 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spell : MonoBehaviour
+[Serializable]
+public class Spell
 {
-    public int CastTime;
-    public int Damage;
-    public float DurationTime;
+    /// <summary>
+    /// The Spell's name
+    /// </summary>
+    [SerializeField]
+    private string name;
 
-    private float totalTime;
+    /// <summary>
+    /// The spell's damage
+    /// </summary>
+    [SerializeField]
+    private int damage;
 
-    public Transform Target;
-    // Use this for initialization
-    void Start()
+    /// <summary>
+    /// The spell's icon
+    /// </summary>
+    [SerializeField]
+    private Sprite icon;
+
+    /// <summary>
+    /// The spell's duration time
+    /// </summary>
+    [SerializeField]
+    private float duration;
+
+    /// <summary>
+    /// The spell's cast time
+    /// </summary>
+    [SerializeField]
+    private float castTime;
+
+    /// <summary>
+    /// The spell's prefab
+    /// </summary>
+    [SerializeField]
+    private GameObject spellPrefab;
+
+    /// <summary>
+    /// The spell's color
+    /// </summary>
+    [SerializeField]
+    private Color barColor;
+
+    /// <summary>
+    /// Property for accessing the spell's name
+    /// </summary>
+    public string Name
     {
-        StartCoroutine(DestroyOnTimeEnd());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Target != null)
+        get
         {
-            transform.position = Target.position;
+            return name;
         }
-        else
+    }
+
+    /// <summary>
+    /// Property for reading the damage
+    /// </summary>
+    public int Damage
+    {
+        get
         {
-            DestroyObject(gameObject);
+            return damage;
+        }
+
+    }
+
+    /// <summary>
+    /// Property for reading the icon
+    /// </summary>
+    public Sprite Icon
+    {
+        get
+        {
+            return icon;
         }
     }
 
-    private IEnumerator DestroyOnTimeEnd()
+    /// <summary>
+    /// Property for reading the speed
+    /// </summary>
+    public float Duration
     {
-        yield return new WaitForSeconds(DurationTime);
-        DestroyObject(gameObject);
+        get
+        {
+            return duration;
+        }
     }
 
-    void OnTriggerStay2D(Collider2D other)
+    /// <summary>
+    /// Property for reading the cast time
+    /// </summary>
+    public float CastTime
     {
-        if (other.tag == "Enemy")
+        get
         {
-            totalTime += Time.deltaTime;
-            if (totalTime > 1)
-            {
-                other.SendMessage("TakeDamage", Damage);
-                totalTime = 0;
-            }
+            return castTime;
+        }
+    }
+
+    /// <summary>
+    /// Property for reading the spell's prefab
+    /// </summary>
+    public GameObject SpellPrefab
+    {
+        get
+        {
+            return spellPrefab;
+        }
+    }
+
+    /// <summary>
+    /// Property for reading the color
+    /// </summary>
+    public Color BarColor
+    {
+        get
+        {
+            return barColor;
         }
     }
 }

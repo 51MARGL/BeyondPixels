@@ -26,7 +26,6 @@ public class MainCamera : CameaVirtual
 
     private void SetLimits()
     {
-        var board = generator.GetBoard();
         float camHeight = Camera.main.orthographicSize;
         float camWidth = camHeight * Camera.main.aspect;
 
@@ -38,6 +37,5 @@ public class MainCamera : CameaVirtual
 
         yMin = minTile.y + camHeight / CameraCoef;
         yMax = maxTile.y - camHeight / CameraCoef;
-
     }
 }

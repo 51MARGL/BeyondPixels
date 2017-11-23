@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 public class Player : Character
@@ -8,7 +9,7 @@ public class Player : Character
     private bool attackStart = false;
 
     private SpellBook spellBook;
-    
+
     // Use this for initialization
     protected override void Start()
     {
@@ -21,7 +22,7 @@ public class Player : Character
     protected override void Update()
     {
         base.Update();
-        InputHandler();        
+        InputHandler();
         AnimationHandler();
         AttackHandler();
         FlipHorizontal();
@@ -29,7 +30,7 @@ public class Player : Character
 
     void InputHandler()
     {
-        direction = Vector2.zero;        
+        direction = Vector2.zero;
         if (Input.GetKey(KeyCode.A))
         {
             direction += Vector2.left;
@@ -59,31 +60,38 @@ public class Player : Character
             StopSpellCast();
             AttackComboHandle();
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            if (Target != null && spellRoutine == null)
-            {
-                spellRoutine = StartCoroutine(SpellCast(0)); 
-            }
-        }
     }
 
+    public void StartSpellCast(int spellIndex)
+    {
+        if (Target != null && spellRoutine == null)
+        {
+            spellRoutine = StartCoroutine(SpellCast(spellIndex));
+        }
+    }
     private IEnumerator SpellCast(int spellIndex)
     {
         animator.SetBool("spellCasting", true);
-        var spellPrefab = spellBook.SpellPrefabs[spellIndex];
-        Spell spell = spellPrefab.GetComponent<Spell>();
-        spell.Target = Target;
+        Spell spell = spellBook.CastSpell(spellIndex);
+        var spellTarger = Target;
         yield return new WaitForSeconds(spell.CastTime);
-        if (spell.Target != null)
+        if (spellTarger != null)
         {
-            var targetRenderer = spell.Target.GetComponent<Renderer>();
-            var obj = Instantiate(spellPrefab, spell.Target.position, Quaternion.identity);
-            obj.GetComponent<Renderer>().bounds.SetMinMax(targetRenderer.bounds.min * targetRenderer.bounds.size.x, targetRenderer.bounds.max * targetRenderer.bounds.size.y); 
+            var castedSpell = Instantiate(spell.SpellPrefab, spellTarger.position, Quaternion.identity);
+            var spellScript = castedSpell.GetComponent<SpellScript>();
+            spellScript.Initialize(spellTarger.transform, spell);
+            var targetRenderer = spellScript.Target.GetComponent<Renderer>();
+            castedSpell.GetComponent<Renderer>().bounds.SetMinMax(targetRenderer.bounds.min * targetRenderer.bounds.size.x, targetRenderer.bounds.max * targetRenderer.bounds.size.y);
         }
         StopSpellCast();
     }
-    
+
+    protected override void StopSpellCast()
+    {
+        spellBook.StopCasting();
+        base.StopSpellCast();
+    }
+
     private void AttackComboHandle()
     {
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("player-attack-1"))
@@ -134,7 +142,7 @@ public class Player : Character
     {
         if (other.tag == "Enemy")
         {
-            other.SendMessage("TakeDamage", 10);
+            other.SendMessage("TakeDamage", MeleeDamage);
         }
     }
 

@@ -7,7 +7,7 @@ public class Spawner : MonoBehaviour
 {
 
     public List<GameObject> enemyPrefabs;
-    public GameObject Player;
+    private Player Player;
     private int enemiesCount;
     private int enemiesSpawned;
     GenCave generator;
@@ -19,6 +19,7 @@ public class Spawner : MonoBehaviour
     {
         enemiesSpawned = 0;
         generator = FindObjectOfType<GenCave>();
+        Player = FindObjectOfType<Player>();
         generator.boardIsReady += SpawnObjects;
     }
 
@@ -33,11 +34,11 @@ public class Spawner : MonoBehaviour
         freeTiles = generator.FreeTilesList;
         enemiesCount = freeTiles.Count / 100 * 2;
         Debug.Log("Enemies-Count:" + enemiesCount);
-        SpawnPlayer();
+        MovePlayer();
         SpawnEnemies();
     }
 
-    void SpawnPlayer()
+    void MovePlayer()
     {
         GenCave.TCoord mostLeft = freeTiles[0];
         foreach (var freeTile in freeTiles)
@@ -45,8 +46,7 @@ public class Spawner : MonoBehaviour
             if (freeTile.x < mostLeft.x && freeTile.y < mostLeft.y)
                 mostLeft = freeTile;
         }
-        Instantiate(Player, new Vector2(mostLeft.x, mostLeft.y), Quaternion.identity, transform);
-        GameManager.Player = FindObjectOfType<Player>();
+        Player.transform.position = new Vector2(mostLeft.x, mostLeft.y);        
         return;
     }
 

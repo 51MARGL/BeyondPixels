@@ -8,7 +8,7 @@ public abstract class Character : MonoBehaviour
     public Stat Health;
     public float MaxHealth;
     public float Speed;
-
+    public float MeleeDamage;
     [Range(0f, 100f)]
     public float FieldOfView;
     public Transform Target { get; set; }
@@ -44,7 +44,7 @@ public abstract class Character : MonoBehaviour
         Health.CurrentValue -= damage;
     }
 
-    protected void StopSpellCast()
+    protected virtual void StopSpellCast()
     {
         if (spellRoutine != null)
         {
@@ -58,7 +58,7 @@ public abstract class Character : MonoBehaviour
     {
         velocity = direction.normalized * Speed;
         transform.Translate(velocity * Time.deltaTime);
-        if ((Mathf.Abs(velocity.x) > 0 || Mathf.Abs(velocity.y) > 0) && this.tag == "Player")
+        if ((Mathf.Abs(velocity.x) > 0 || Mathf.Abs(velocity.y) > 0))
         {
             StopSpellCast();
         }

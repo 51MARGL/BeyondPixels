@@ -13,7 +13,7 @@ public class Enemy : Character
     private float randomY;
 
     public Canvas ownCanvas;
-    
+
     // Use this for initialization
     protected override void Start()
     {
@@ -52,17 +52,21 @@ public class Enemy : Character
 
         if (Target != null)
         {
-            if (Vector2.Distance(Target.position, transform.position) < attackRange && spellRoutine == null)
+            if (Target != null 
+                && Vector2.Distance(Target.position, transform.position) < attackRange
+                && spellRoutine == null)
             {
+                direction = Vector2.zero;
                 spellRoutine = StartCoroutine(Attack());
             }
-            else
+            else if (Target != null 
+                && Vector2.Distance(Target.position, transform.position) > attackRange)
             {
                 FollowTarget();
             }
         }
         else
-        {            
+        {
             MoveAtRandom();
         }
     }
@@ -79,7 +83,7 @@ public class Enemy : Character
         StopSpellCast();
     }
 
-    
+
     void MoveAtRandom()
     {
         if (Time.time >= tChange)
@@ -95,7 +99,7 @@ public class Enemy : Character
     {
         if (other.tag == "Player" && animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
         {
-            other.SendMessage("TakeDamage", 5);
+            other.SendMessage("TakeDamage", MeleeDamage);
         }
     }
 

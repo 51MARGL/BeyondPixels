@@ -28,13 +28,13 @@ public class GenCave : MonoBehaviour
     public int randomFillPercent;
     public int passRadius;
 
-    int[,] board;
+    byte[,] board;
 
     bool isNotGenerated = true;
 
     public List<TCoord> FreeTilesList { get; private set; }
 
-    public int[,] GetBoard()
+    public byte[,] GetBoard()
     {
         return board;
     }
@@ -58,7 +58,7 @@ public class GenCave : MonoBehaviour
 
     void GenerateMap()
     {
-        board = new int[width, height];
+        board = new byte[width, height];
         RandomFillMap();
         if (CheckOnFreeSpace())
         {
@@ -485,7 +485,7 @@ public class GenCave : MonoBehaviour
                 }
                 else
                 {
-                    board[x, y] = (pseudoRandom.Next(0, 100) < randomFillPercent) ? 1 : 0;
+                    board[x, y] = (byte)((pseudoRandom.Next(0, 100) < randomFillPercent) ? 1 : 0);
                 }
             }
         }
