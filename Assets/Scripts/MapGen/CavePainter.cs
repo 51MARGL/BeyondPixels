@@ -31,11 +31,11 @@ public class CavePainter : MonoBehaviour
     public GameObject wallVoidPrefab;
     public GameObject wallVoid2Prefab;
 
-    int width;
-    int height;
+    private int width;
+    private int height;
 
-    GenCave generator;
-    byte[,] board;
+    private GenCave generator;
+    private byte[,] board;
 
     // Use this for initialization
     void Start()
@@ -50,12 +50,12 @@ public class CavePainter : MonoBehaviour
 
     }
 
-    bool NotOnBorder(int x, int y)
+    private bool NotOnBorder(int x, int y)
     {
         return y != 0 && x != 0 && y != height - 1 && x != width - 1;
     }
 
-    void PaintCave()
+    private void PaintCave()
     {
         DateTime start = DateTime.UtcNow;
 
@@ -203,9 +203,10 @@ public class CavePainter : MonoBehaviour
     {
         Debug.Log("InconsistentTileDetected: " + x + ":"+ y);
         board[x, y] = 0;
-        var children = new List<GameObject>();
-        foreach (Transform child in transform) children.Add(child.gameObject);
-        children.ForEach(DestroyObject);
+        var childrensList = new List<GameObject>();
+        foreach (Transform child in transform)
+            childrensList.Add(child.gameObject);
+        childrensList.ForEach(DestroyObject);        
         PaintCave();
     }
     void DrawElementOfCase(string caseName, int x, int y)
@@ -323,8 +324,6 @@ public class CavePainter : MonoBehaviour
                 {
                     Instantiate(floorGreenPrefab, new Vector2(x, y), Quaternion.Euler(Vector3.forward * 90 * (UnityEngine.Random.Range(0, 10) % 4)), transform);
                 }
-                break;
-            default:
                 break;
         }
     }

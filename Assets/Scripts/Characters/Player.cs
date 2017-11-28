@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Player : Character
 {
-
     private bool attackStart = false;
 
     private SpellBook spellBook;
@@ -13,7 +12,6 @@ public class Player : Character
     // Use this for initialization
     protected override void Start()
     {
-        Health = GameObject.FindGameObjectWithTag("PlayerHealth").GetComponent<Stat>();
         base.Start();
         spellBook = FindObjectOfType<SpellBook>();
     }
@@ -119,11 +117,8 @@ public class Player : Character
         {
             return;
         }
-        else
-        {
-            animator.SetBool("inCombo", false);
-            animator.SetBool("inRepeat", false);
-        }
+        animator.SetBool("inCombo", false);
+        animator.SetBool("inRepeat", false);
         if (attackStart)
         {
             animator.SetTrigger("combo-start");
