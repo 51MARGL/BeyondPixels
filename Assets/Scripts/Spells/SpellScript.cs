@@ -41,7 +41,7 @@ public class SpellScript : MonoBehaviour
     {
         if (other.tag == "Enemy")
         {
-            other.SendMessage("TakeDamage", damage);
+            other.transform.GetComponent<Character>().TakeDamage(damage, FindObjectOfType<Player>().transform);
         }
     }
     void OnTriggerStay2D(Collider2D other)
@@ -51,7 +51,7 @@ public class SpellScript : MonoBehaviour
             totalTime += Time.deltaTime;
             if (totalTime > 1)
             {
-                other.SendMessage("TakeDamage", damage);
+                other.transform.GetComponent<Character>().TakeDamage(damage, FindObjectOfType<Player>().transform);
                 totalTime = 0;
             }
         }

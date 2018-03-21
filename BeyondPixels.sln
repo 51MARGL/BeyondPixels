@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeyondPixels", "BeyondPixels.csproj", "{DEF57805-BF45-8AFA-343B-2399BB9550F7}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeyondPixels", "Assembly-CSharp.csproj", "{21749267-9C53-6B89-C368-29FF0DE45DDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,12 +9,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DEF57805-BF45-8AFA-343B-2399BB9550F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEF57805-BF45-8AFA-343B-2399BB9550F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEF57805-BF45-8AFA-343B-2399BB9550F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEF57805-BF45-8AFA-343B-2399BB9550F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21749267-9C53-6B89-C368-29FF0DE45DDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21749267-9C53-6B89-C368-29FF0DE45DDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21749267-9C53-6B89-C368-29FF0DE45DDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21749267-9C53-6B89-C368-29FF0DE45DDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal

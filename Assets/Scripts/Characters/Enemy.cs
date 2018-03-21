@@ -5,27 +5,71 @@ using UnityEngine.UI;
 
 public class Enemy : Character
 {
-
-    public float fireRate = 2;
-    public float attackRange = 1f;
-    private float tChange; // force new direction in the first Update
-    private float randomX;
-    private float randomY;
-
+    /// <summary>
+    /// A canvas for the target circle
+    /// </summary>
     public Canvas ownCanvas;
+
+    /// <summary>
+    /// The enemys current state
+    /// </summary>
+    private IState currentState;
+
+    /// <summary>
+    /// The enemys attack range
+    /// </summary>
+    public float AttackRange { get; set; }
+
+    /// <summary>
+    /// How much time has passed since the last attack
+    /// </summary>
+    public float AttackTime { get; set; }
+
+    public Vector3 StartPosition { get; set; }
+
+    [SerializeField]
+    private float initAggroRange;
+
+    public float AggroRange { get; set; }
+
+    public bool InRange
+    {
+        get
+        {
+            return Vector2.Distance(transform.position, Target.position) < AggroRange;
+        }
+    }
 
     // Use this for initialization
     protected override void Start()
     {
         base.Start();
         ownCanvas = GetComponentInChildren<Canvas>();
+
+        StartPosition = transform.position;
+        AggroRange = initAggroRange;
+        AttackRange = 1;
+        ChangeState(new IdleState());
     }
 
     // Update is called once per frame
     protected override void Update()
     {
+        FlipHorizontal(1f);
+
+        if (!IsAttacking)
+        {
+            AttackTime += Time.deltaTime;
+        }
+
+        currentState.Update();
+
         base.Update();
-        FlipHorizontal();
+    }
+
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
 
         if (Health.CurrentValue == 0)
         {
@@ -33,95 +77,56 @@ public class Enemy : Character
         }
     }
 
-    void FixedUpdate()
-    {
-        MovementHandle();
-    }
 
-
-    private void MovementHandle()
+    /// <summary>
+    /// Changes the enemys state
+    /// </summary>
+    /// <param name="newState">The new state</param>
+    public void ChangeState(IState newState)
     {
-        if (Vector2.Distance(this.transform.position, GameManager.Player.transform.position) < FieldOfView)
+        if (currentState != null) //Makes sure we have a state before we call exit
         {
-            Target = GameManager.Player.transform;
-        }
-        else
-        {
-            Target = null;
+            currentState.Exit();
         }
 
-        if (Target != null)
+        //Sets the new state
+        currentState = newState;
+
+        //Calls enter on the new state
+        currentState.Enter(this);
+    }
+
+    /// <summary>
+    /// Makes the enemy take damage when hit and sets target
+    /// </summary>
+    /// <param name="damage"></param>
+    public override void TakeDamage(float damage, Transform source)
+    {
+        if (!(currentState is EvadeState))
         {
-            if (Target != null 
-                && Vector2.Distance(Target.position, transform.position) < attackRange
-                && spellRoutine == null)
-            {
-                direction = Vector2.zero;
-                spellRoutine = StartCoroutine(Attack());
-            }
-            else if (Target != null 
-                && Vector2.Distance(Target.position, transform.position) > attackRange)
-            {
-                FollowTarget();
-            }
+            SetTarget(source);
+
+            base.TakeDamage(damage, source);
         }
-        else
+
+    }
+
+    public void SetTarget(Transform target)
+    {
+        if (Target == null && !(currentState is EvadeState))
         {
-            MoveAtRandom();
-        }
-    }
-
-    private void FollowTarget()
-    {
-        direction = Target.position - transform.position;
-    }
-
-    private IEnumerator Attack()
-    {
-        yield return new WaitForSeconds(Random.Range(fireRate, fireRate + 0.5f));
-        animator.SetTrigger("Attack");
-        StopSpellCast();
-    }
-
-
-    void MoveAtRandom()
-    {
-        if (Time.time >= tChange)
-        {
-            randomX = Random.Range(-100, 100);
-            randomY = Random.Range(-100, 100);
-            tChange = Time.time + Random.Range(0.5f, 1.5f);
-        }
-        direction = new Vector2(randomX, randomY);
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.tag == "Player" && animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
-        {
-            other.SendMessage("TakeDamage", MeleeDamage);
+            float distance = Vector2.Distance(transform.position, target.position);
+            AggroRange = initAggroRange;
+            AggroRange += distance;
+            Target = target;
         }
     }
 
-    void OnCollisionEnter2D(Collision2D coll)
+    public void Reset()
     {
-        if (coll.gameObject.tag == "Wall")
-        {
-            randomX = -randomX;
-            randomY = -randomY;
-        }
-    }
-
-    protected void FlipHorizontal()
-    {
-        if (velocity.x < 0f)
-        {
-            transform.localScale = new Vector3(-1f, transform.localScale.y, transform.localScale.z);
-        }
-        if (velocity.x > 0f)
-        {
-            transform.localScale = new Vector3(1f, transform.localScale.y, transform.localScale.z);
-        }
+        this.Target = null;
+        this.AggroRange = initAggroRange;
+        this.Health.CurrentValue = this.Health.MaxValue;
     }
 
     public void IsTargetting()

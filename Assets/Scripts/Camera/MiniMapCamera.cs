@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MiniMapCamera : CameaVirtual {
+public class MiniMapCamera : CameraVirtual {
 
     protected override void Start()
     {
         base.Start();
-        generator.boardIsReady += SetLimits;
+        generator.BoardIsReady += SetLimits;
     }
 
     // Update is called once per frame
@@ -22,13 +22,12 @@ public class MiniMapCamera : CameaVirtual {
     }
 
     private void SetLimits()
-    {
-        var board = generator.GetBoard();
+    {        
         float camHeight = Camera.main.orthographicSize;
         float camWidth = camHeight * Camera.main.aspect;
 
         Vector2 minTile = new Vector2(0, 0);
-        Vector2 maxTile = new Vector2(generator.width - 1, generator.height - 1);
+        Vector2 maxTile = new Vector2(generator.Width - 1, generator.Height - 1);
 
         xMin = minTile.x + camWidth / CameraCoef;
         xMax = maxTile.x - camWidth / CameraCoef;

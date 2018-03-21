@@ -77,6 +77,15 @@ public class GameManager : MonoBehaviour
                         Player.Target = c.transform;
                         c.transform.SendMessage("IsTargetting");
                     }
+                    else if (c.transform.tag == "Hitbox" && c.transform.parent.tag == "Enemy")
+                    {
+                        if (Player.Target != null)
+                        {
+                            Player.Target.SendMessage("IsNotTargetting");
+                        }
+                        Player.Target = c.transform.parent;
+                        c.transform.parent.SendMessage("IsTargetting");
+                    }
                     else
                     {
                         if (Player.Target != null)

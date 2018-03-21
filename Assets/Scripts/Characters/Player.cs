@@ -5,15 +5,21 @@ using UnityEngine;
 
 public class Player : Character
 {
-    private bool attackStart = false;
-
     private SpellBook spellBook;
+
+    private string[] comboParams;
+    private int comboIndex = 0;
+    protected float resetAttackTimer;
+    public float FireRate = 1;
 
     // Use this for initialization
     protected override void Start()
     {
         base.Start();
         spellBook = FindObjectOfType<SpellBook>();
+
+        if (comboParams == null || (comboParams != null && comboParams.Length == 0))
+            comboParams = new string[] { "Attack1", "Attack2" };
     }
 
     // Update is called once per frame
@@ -21,29 +27,34 @@ public class Player : Character
     {
         base.Update();
         InputHandler();
-        AnimationHandler();
-        AttackHandler();
-        FlipHorizontal();
+        AttackComboHandle();
+        FlipHorizontal(0.1f);
+
+        // Stop spell casting on move
+        if (IsMoving)
+        {
+            StopSpellCast();
+        }
     }
 
     void InputHandler()
     {
-        direction = Vector2.zero;
+        Direction = Vector2.zero;
         if (Input.GetKey(KeyCode.A))
         {
-            direction += Vector2.left;
+            Direction += Vector2.left;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            direction += Vector2.right;
+            Direction += Vector2.right;
         }
         if (Input.GetKey(KeyCode.W))
         {
-            direction += Vector2.up;
+            Direction += Vector2.up;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            direction += Vector2.down;
+            Direction += Vector2.down;
         }
         if (Input.GetKeyDown(KeyCode.KeypadPlus))
         {
@@ -56,7 +67,7 @@ public class Player : Character
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StopSpellCast();
-            AttackComboHandle();
+            AttackHandle();
         }
     }
 
@@ -67,13 +78,15 @@ public class Player : Character
             spellRoutine = StartCoroutine(SpellCast(spellIndex));
         }
     }
+
     private IEnumerator SpellCast(int spellIndex)
     {
-        animator.SetBool("spellCasting", true);
+        IsCasting = true;
+        Animator.SetBool("spellCasting", IsCasting);
         Spell spell = spellBook.CastSpell(spellIndex);
         var spellTarger = Target;
         yield return new WaitForSeconds(spell.CastTime);
-        if (spellTarger != null)
+        if (spellTarger != null && InLineOfSight())
         {
             var castedSpell = Instantiate(spell.SpellPrefab, spellTarger.position, Quaternion.identity);
             var spellScript = castedSpell.GetComponent<SpellScript>();
@@ -84,72 +97,39 @@ public class Player : Character
         StopSpellCast();
     }
 
-    protected override void StopSpellCast()
+    protected void StopSpellCast()
     {
         spellBook.StopCasting();
-        base.StopSpellCast();
-    }
-
-    private void AttackComboHandle()
-    {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("player-attack-1"))
+        if (spellRoutine != null)
         {
-            velocity = Vector2.zero;
-            animator.SetBool("inCombo", true);
-            animator.SetBool("inRepeat", false);
-        }
-        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("player-attack-2"))
-        {
-            velocity = Vector2.zero;
-            animator.SetBool("inCombo", false);
-            animator.SetBool("inRepeat", true);
-        }
-        else
-        {
-            velocity = Vector2.zero;
-            attackStart = true;
+            StopCoroutine(spellRoutine);
+            spellRoutine = null;
+            IsCasting = false;
+            Animator.SetBool("spellCasting", IsCasting);
         }
     }
 
-    void AttackHandler()
+    private void AttackHandle()
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
-        {
-            return;
-        }
-        animator.SetBool("inCombo", false);
-        animator.SetBool("inRepeat", false);
-        if (attackStart)
-        {
-            animator.SetTrigger("combo-start");
-            attackStart = false;
-        }
+        velocity = Vector2.zero;
+        IsAttacking = true;
+        Animator.SetTrigger(comboParams[comboIndex]);
+
+        // If combo can loop
+        comboIndex = (comboIndex + 1) % comboParams.Length;
+
+        resetAttackTimer = 0f;
     }
 
-    void AnimationHandler()
+    protected void AttackComboHandle()
     {
-        animator.SetFloat("speed", Mathf.Abs(velocity.x) + Mathf.Abs(velocity.y));
-        animator.SetFloat("velocity.x", Mathf.Abs(velocity.x));
-        animator.SetFloat("velocity.y", velocity.y);
-    }
+        // Reset attack
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.tag == "Enemy")
+        resetAttackTimer += Time.deltaTime;
+        if (resetAttackTimer > FireRate)
         {
-            other.SendMessage("TakeDamage", MeleeDamage);
-        }
-    }
-
-    protected void FlipHorizontal()
-    {
-        if (velocity.x < 0f)
-        {
-            transform.localScale = new Vector3(-0.1f, transform.localScale.y, transform.localScale.z);
-        }
-        if (velocity.x > 0f)
-        {
-            transform.localScale = new Vector3(0.1f, transform.localScale.y, transform.localScale.z);
+            IsAttacking = false;
+            comboIndex = 0;
         }
     }
 }
