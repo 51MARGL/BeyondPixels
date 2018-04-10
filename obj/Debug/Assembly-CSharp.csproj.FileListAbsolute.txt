@@ -71,3 +71,4 @@ E:\GitHub\BeyondPixels\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.
 E:\GitHub\BeyondPixels\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
 E:\GitHub\BeyondPixels\obj\Debug\Assembly-CSharp.dll
 E:\GitHub\BeyondPixels\obj\Debug\Assembly-CSharp.pdb
+E:\GitHub\BeyondPixels\obj\Debug\Assembly-CSharp.csproj.CopyComplete

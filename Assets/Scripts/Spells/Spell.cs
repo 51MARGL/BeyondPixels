@@ -1,128 +1,97 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 public class Spell
 {
     /// <summary>
-    /// The Spell's name
+    ///     The spell's color
     /// </summary>
-    [SerializeField]
-    private string name;
+    [SerializeField] private Color barColor;
 
     /// <summary>
-    /// The spell's damage
+    ///     The spell's cast time
     /// </summary>
-    [SerializeField]
-    private int damage;
+    [SerializeField] private float castTime;
 
     /// <summary>
-    /// The spell's icon
+    ///     The spell's damage
     /// </summary>
-    [SerializeField]
-    private Sprite icon;
+    [SerializeField] private int damage;
 
     /// <summary>
-    /// The spell's duration time
+    ///     The spell's duration time
     /// </summary>
-    [SerializeField]
-    private float duration;
+    [SerializeField] private float duration;
 
     /// <summary>
-    /// The spell's cast time
+    ///     The spell's icon
     /// </summary>
-    [SerializeField]
-    private float castTime;
+    [SerializeField] private Sprite icon;
 
     /// <summary>
-    /// The spell's prefab
+    ///     The Spell's name
     /// </summary>
-    [SerializeField]
-    private GameObject spellPrefab;
+    [SerializeField] private string name;
 
     /// <summary>
-    /// The spell's color
+    ///     The spell's prefab
     /// </summary>
-    [SerializeField]
-    private Color barColor;
+    [SerializeField] private GameObject spellPrefab;
 
     /// <summary>
-    /// Property for accessing the spell's name
+    ///     Property for accessing the spell's name
     /// </summary>
     public string Name
     {
-        get
-        {
-            return name;
-        }
+        get { return name; }
     }
 
     /// <summary>
-    /// Property for reading the damage
+    ///     Property for reading the damage
     /// </summary>
     public int Damage
     {
-        get
-        {
-            return damage;
-        }
-
+        get { return damage; }
     }
 
     /// <summary>
-    /// Property for reading the icon
+    ///     Property for reading the icon
     /// </summary>
     public Sprite Icon
     {
-        get
-        {
-            return icon;
-        }
+        get { return icon; }
     }
 
     /// <summary>
-    /// Property for reading the speed
+    ///     Property for reading the speed
     /// </summary>
     public float Duration
     {
-        get
-        {
-            return duration;
-        }
+        get { return duration; }
     }
 
     /// <summary>
-    /// Property for reading the cast time
+    ///     Property for reading the cast time
     /// </summary>
     public float CastTime
     {
-        get
-        {
-            return castTime;
-        }
+        get { return castTime; }
     }
 
     /// <summary>
-    /// Property for reading the spell's prefab
+    ///     Property for reading the spell's prefab
     /// </summary>
     public GameObject SpellPrefab
     {
-        get
-        {
-            return spellPrefab;
-        }
+        get { return spellPrefab; }
     }
 
     /// <summary>
-    /// Property for reading the color
+    ///     Property for reading the color
     /// </summary>
     public Color BarColor
     {
-        get
-        {
-            return barColor;
-        }
+        get { return barColor; }
     }
 }

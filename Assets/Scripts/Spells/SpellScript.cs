@@ -1,34 +1,33 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpellScript : MonoBehaviour
 {
-
-    private float totalTime;
     private float damage;
     private float duration;
+
+    private float totalTime;
+
     public Transform Target { get; private set; }
+
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         StartCoroutine(DestroyOnTimeEnd());
     }
 
     public void Initialize(Transform target, Spell spell)
     {
-        this.Target = target;
-        this.damage = spell.Damage;
-        this.duration = spell.Duration;
+        Target = target;
+        damage = spell.Damage;
+        duration = spell.Duration;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (Target != null)
-        {
             transform.position = Target.position;
-        }
     }
 
     private IEnumerator DestroyOnTimeEnd()
@@ -37,14 +36,13 @@ public class SpellScript : MonoBehaviour
         DestroyObject(gameObject);
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Enemy")
-        {
             other.transform.GetComponent<Character>().TakeDamage(damage, FindObjectOfType<Player>().transform);
-        }
     }
-    void OnTriggerStay2D(Collider2D other)
+
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (other.tag == "Enemy")
         {

@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// The enmy's follow state
+///     The enmy's follow state
 /// </summary>
-class FollowState : IState
+internal class FollowState : IState
 {
     /// <summary>
-    /// A reference to the parent
+    ///     A reference to the parent
     /// </summary>
     private Enemy parent;
 
     /// <summary>
-    /// This is called whenever we enter the state
+    ///     This is called whenever we enter the state
     /// </summary>
     /// <param name="parent">The parent enemy</param>
     public void Enter(Enemy parent)
@@ -20,7 +20,7 @@ class FollowState : IState
     }
 
     /// <summary>
-    /// This is called whenever we exit the state
+    ///     This is called whenever we exit the state
     /// </summary>
     public void Exit()
     {
@@ -28,32 +28,26 @@ class FollowState : IState
     }
 
     /// <summary>
-    /// This is called as long as we are inside the state
+    ///     This is called as long as we are inside the state
     /// </summary>
     public void Update()
     {
-        Debug.Log("Follow");
-
-        if (parent.Target != null)//As long as we have a target, then we need to keep moving
+        if (parent.Target != null) //As long as we have a target, then we need to keep moving
         {
             //Find the target's direction
             parent.Direction = (parent.Target.transform.position - parent.transform.position).normalized;
 
             //Moves the enemy towards the target
-            parent.transform.position = Vector2.MoveTowards(parent.transform.position, parent.Target.position, parent.Speed * Time.deltaTime);
+            parent.transform.position = Vector2.MoveTowards(parent.transform.position, parent.Target.position,
+                parent.Speed * Time.deltaTime);
 
-            float distance = Vector2.Distance(parent.Target.position, parent.transform.position);
+            var distance = Vector2.Distance(parent.Target.position, parent.transform.position);
 
             if (distance <= parent.AttackRange)
-            {
                 parent.ChangeState(new AttackState());
-            }
-
         }
-        if (!parent.InRange)
-        {
+
+        if (!parent.InRange || !parent.InLineOfSight())
             parent.ChangeState(new EvadeState());
-        } //if we don't have a target, then we need to go back to idle.
-       
     }
 }

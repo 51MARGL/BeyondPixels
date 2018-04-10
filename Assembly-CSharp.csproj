@@ -70,8 +70,10 @@
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\MapGeneration\CavePainter.cs" />
      <Compile Include="Assets\Scripts\MapGeneration\DungeonProvider.cs" />
+     <Compile Include="Assets\Scripts\MapGeneration\MapProvider.cs" />
      <Compile Include="Assets\Scripts\MapGeneration\Room.cs" />
      <Compile Include="Assets\Scripts\MapGeneration\SpawnManager.cs" />
+     <Compile Include="Assets\Scripts\MapGeneration\TIle.cs" />
      <Compile Include="Assets\Scripts\Spells\Spell.cs" />
      <Compile Include="Assets\Scripts\Spells\SpellBook.cs" />
      <Compile Include="Assets\Scripts\Spells\SpellScript.cs" />

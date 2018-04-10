@@ -1,38 +1,36 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-
-    public List<GameObject> enemyPrefabs;
-    private Player Player;
     private int enemiesCount;
     private int enemiesSpawned;
-    DungeonProvider generator;
 
-    private List<DungeonProvider.Tcoord> freeTiles;
+    public List<GameObject> enemyPrefabs;
+
+    private List<Tile> freeTilesList;
+    private Player Player;
+
+    public MapProvider MapProvider { get; set; }
 
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         enemiesSpawned = 0;
-        generator = FindObjectOfType<DungeonProvider>();
+
         Player = FindObjectOfType<Player>();
-        generator.BoardIsReady += SpawnObjects;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-
     }
 
-    private void SpawnObjects()
+    public void SpawnObjects()
     {
-        freeTiles = generator.FreeTilesList;
-        enemiesCount = freeTiles.Count / 100 * 2;
+        freeTilesList = MapProvider.GetFreeTiles();
+        enemiesCount = freeTilesList.Count / 100 * 2;
         Debug.Log("Enemies-Count:" + enemiesCount);
         MovePlayer();
         SpawnEnemies();
@@ -40,21 +38,18 @@ public class SpawnManager : MonoBehaviour
 
     private void MovePlayer()
     {
-        DungeonProvider.Tcoord mostLeft = freeTiles[0];
-        foreach (var freeTile in freeTiles)
-        {
+        Tile mostLeft = freeTilesList[0];
+        foreach (var freeTile in freeTilesList)
             if (freeTile.X < mostLeft.X && freeTile.Y < mostLeft.Y)
                 mostLeft = freeTile;
-        }
-        Player.transform.position = new Vector2(mostLeft.X, mostLeft.Y);        
-        return;
+        Player.transform.position = new Vector2(mostLeft.X, mostLeft.Y);
     }
 
     private void SpawnEnemies()
     {
-        while (enemiesSpawned < enemiesCount)
+        while (enemiesSpawned < enemiesCount && enemiesCount < 80)
         {
-            var randomTile = freeTiles[Random.Range(0, freeTiles.Count)];
+            var randomTile = freeTilesList[Random.Range(0, freeTilesList.Count)];
             if (Vector2.Distance(Player.transform.position, new Vector2(randomTile.X, randomTile.Y)) > 10)
             {
                 var randomPrefab = enemyPrefabs.ElementAt(0);
