@@ -20,7 +20,7 @@ public class DungeonProvider : MapProvider
 
     public int PassRadius { get; set; }
 
-    private List<Tile> _freeTileList;
+    private List<MapTile> _freeTileList;
 
     /// <summary>
     ///     Provider Constructor
@@ -83,15 +83,15 @@ public class DungeonProvider : MapProvider
     ///     Counts amount of live cells
     /// </summary>
     /// <returns>List of live cells</returns>
-    public List<Tile> GetFreeTiles()
+    public List<MapTile> GetFreeTiles()
     {
         if (_freeTileList == null)
         {
-            _freeTileList = new List<Tile>();
+            _freeTileList = new List<MapTile>();
             for (var i = 1; i < Width - 1; i++)
                 for (var j = 1; j < Height - 1; j++)
                     if (Map[i, j])
-                        _freeTileList.Add(new Tile(i, j));
+                        _freeTileList.Add(new MapTile(i, j));
         }
 
         return _freeTileList;
@@ -198,8 +198,8 @@ public class DungeonProvider : MapProvider
         }
 
         var bestDistance = 0;
-        var bestTileA = new Tile();
-        var bestTileB = new Tile();
+        var bestTileA = new MapTile();
+        var bestTileB = new MapTile();
         var bestRoomA = new Room();
         var bestRoomB = new Room();
         var possibleConFound = false;
@@ -256,7 +256,7 @@ public class DungeonProvider : MapProvider
     /// <param name="roomB"></param>
     /// <param name="tileA"></param>
     /// <param name="tileB"></param>
-    private void CreatePassage(Room roomA, Room roomB, Tile tileA, Tile tileB)
+    private void CreatePassage(Room roomA, Room roomB, MapTile tileA, MapTile tileB)
     {
         Room.ConnectRooms(roomA, roomB);
         var line = GetLine(tileA, tileB);
@@ -269,7 +269,7 @@ public class DungeonProvider : MapProvider
     /// </summary>
     /// <param name="c"></param>
     /// <param name="r">radius</param>
-    private void ClearPass(Tile c, int r)
+    private void ClearPass(MapTile c, int r)
     {
         for (var x = -r; x <= r; x++)
             for (var y = -r; y <= r; y++)
@@ -288,9 +288,9 @@ public class DungeonProvider : MapProvider
     /// <param name="from"></param>
     /// <param name="to"></param>
     /// <returns></returns>
-    private List<Tile> GetLine(Tile from, Tile to)
+    private List<MapTile> GetLine(MapTile from, MapTile to)
     {
-        var line = new List<Tile>();
+        var line = new List<MapTile>();
 
         var x = from.X;
         var y = from.Y;
@@ -318,7 +318,7 @@ public class DungeonProvider : MapProvider
         var gradientAccumulation = longest / 2;
         for (var i = 0; i < longest; i++)
         {
-            line.Add(new Tile(x, y));
+            line.Add(new MapTile(x, y));
 
             if (inverted)
                 y += step;
@@ -344,9 +344,9 @@ public class DungeonProvider : MapProvider
     /// </summary>
     /// <param name="tileType"></param>
     /// <returns></returns>
-    private List<List<Tile>> GetRegions(bool tileType)
+    private List<List<MapTile>> GetRegions(bool tileType)
     {
-        var regions = new List<List<Tile>>();
+        var regions = new List<List<MapTile>>();
         var boardFlags = new int[Width, Height];
 
         for (var x = 0; x < Width; x++)
@@ -369,14 +369,14 @@ public class DungeonProvider : MapProvider
     /// <param name="startX"></param>
     /// <param name="startY"></param>
     /// <returns></returns>
-    private List<Tile> GetRegionTiles(int startX, int startY)
+    private List<MapTile> GetRegionTiles(int startX, int startY)
     {
-        var tiles = new List<Tile>();
+        var tiles = new List<MapTile>();
         var boardFlags = new int[Width, Height];
         var tileType = Map[startX, startY];
 
-        var queue = new Queue<Tile>();
-        queue.Enqueue(new Tile(startX, startY));
+        var queue = new Queue<MapTile>();
+        queue.Enqueue(new MapTile(startX, startY));
         boardFlags[startX, startY] = 1;
 
         while (queue.Count > 0)
@@ -390,7 +390,7 @@ public class DungeonProvider : MapProvider
                         if (boardFlags[x, y] == 0 && Map[x, y] == tileType)
                         {
                             boardFlags[x, y] = 1;
-                            queue.Enqueue(new Tile(x, y));
+                            queue.Enqueue(new MapTile(x, y));
                         }
         }
 

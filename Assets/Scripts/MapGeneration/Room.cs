@@ -4,23 +4,23 @@ using System.Collections.Generic;
 internal class Room : IComparable<Room>
 {
     public List<Room> connectedRooms;
-    public List<Tile> edgeTiles;
+    public List<MapTile> edgeTiles;
     public bool isAccessibleFromMainRoom;
     public bool isMainRoom;
     public int roomSize;
-    public List<Tile> tiles;
+    public List<MapTile> tiles;
 
     public Room()
     {
     }
 
-    public Room(List<Tile> roomTiles, bool[,] board)
+    public Room(List<MapTile> roomTiles, bool[,] board)
     {
         tiles = roomTiles;
         roomSize = tiles.Count;
         connectedRooms = new List<Room>();
 
-        edgeTiles = new List<Tile>();
+        edgeTiles = new List<MapTile>();
         foreach (var tile in tiles)
             for (var x = tile.X - 1; x <= tile.X + 1; x++)
                 for (var y = tile.Y - 1; y <= tile.Y + 1; y++)

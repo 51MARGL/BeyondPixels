@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,30 +28,29 @@ public class GameManager : MonoBehaviour
         var mapFillPercente = Random.Range(49, 53);
         var mapPassRadius = 1;
         mapProvider = new DungeonProvider(mapHeight, mapWidth, mapFillPercente, mapPassRadius);
-
-        var painter = FindObjectOfType<CavePainter>();
-        painter.MapProvider = mapProvider;
-        mapProvider.MapIsReady += painter.PaintCave;
-
-        var spawner = FindObjectOfType<SpawnManager>();
-        spawner.MapProvider = mapProvider;
-        mapProvider.MapIsReady += spawner.SpawnObjects;
-
-        var mainCamera = FindObjectOfType<MainCamera>();
-        mainCamera.MapProvider = mapProvider;
-        mapProvider.MapIsReady += mainCamera.SetLimits;
-        var miniMapCamera = FindObjectOfType<MiniMapCamera>();
-        miniMapCamera.MapProvider = mapProvider;
-        mapProvider.MapIsReady += miniMapCamera.SetLimits;
-
-
+        mapProvider.MapIsReady += OnMapIsReady;
 
         var start = DateTime.UtcNow;
         mapProvider.GenerateMap();
         print("MapGenerated: " + Math.Abs(start.Subtract(DateTime.UtcNow).TotalSeconds));
 
+    }
+
+    private void OnMapIsReady()
+    {
+        var painter = FindObjectOfType<TileMapProvider>();
+        painter.MapProvider = mapProvider;
+        painter.CreateTileMap();
+
+
+        var spawner = FindObjectOfType<SpawnManager>();
+        spawner.MapProvider = mapProvider;
+        spawner.SpawnObjects();
+
+        var miniMapCamera = FindObjectOfType<MiniMapCamera>();
+        miniMapCamera.MapProvider = mapProvider;
+        miniMapCamera.SetLimits();
         miniMapCamera.Target = this.Player.transform;
-        mainCamera.Target = this.Player.transform;
     }
 
     private void InitializeInputButtons()
@@ -89,16 +89,25 @@ public class GameManager : MonoBehaviour
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             var hit = Physics2D.GetRayIntersection(ray, Mathf.Infinity, 1 << 8); //clickable layer index = 8
-
+            
             if (hit.transform != null)
             {
-                if (hit.transform.tag == "Enemy" || (hit.transform.tag == "Hitbox" && hit.transform.parent.tag == "Enemy"))
+                if (hit.transform.tag == "Enemy")
                 {
                     if (Player.Target != null)
                         Player.Target.SendMessage("IsNotTargetting");
 
                     Player.Target = hit.transform;
                     hit.transform.SendMessage("IsTargetting");
+                }
+                else if (hit.transform.tag == "Hitbox" && hit.transform.parent.tag == "Enemy")
+                {
+                    if (Player.Target != null)
+                    {
+                        Player.Target.SendMessage("IsNotTargetting");
+                    }
+                    Player.Target = hit.transform.parent;
+                    hit.transform.parent.SendMessage("IsTargetting");
                 }
                 else
                 {

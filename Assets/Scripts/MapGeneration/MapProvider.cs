@@ -23,5 +23,5 @@ public interface MapProvider
     ///     Counts amount of live cells
     /// </summary>
     /// <returns>List of live cells</returns>
-    List<Tile> GetFreeTiles();
+    List<MapTile> GetFreeTiles();
 }

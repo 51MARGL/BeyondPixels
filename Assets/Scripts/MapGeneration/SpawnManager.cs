@@ -9,7 +9,7 @@ public class SpawnManager : MonoBehaviour
 
     public List<GameObject> enemyPrefabs;
 
-    private List<Tile> freeTilesList;
+    private List<MapTile> freeTilesList;
     private Player Player;
 
     public MapProvider MapProvider { get; set; }
@@ -38,7 +38,7 @@ public class SpawnManager : MonoBehaviour
 
     private void MovePlayer()
     {
-        Tile mostLeft = freeTilesList[0];
+        MapTile mostLeft = freeTilesList[0];
         foreach (var freeTile in freeTilesList)
             if (freeTile.X < mostLeft.X && freeTile.Y < mostLeft.Y)
                 mostLeft = freeTile;
@@ -47,7 +47,7 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnEnemies()
     {
-        while (enemiesSpawned < enemiesCount && enemiesCount < 80)
+        while (enemiesSpawned < enemiesCount && enemiesSpawned < 80)
         {
             var randomTile = freeTilesList[Random.Range(0, freeTilesList.Count)];
             if (Vector2.Distance(Player.transform.position, new Vector2(randomTile.X, randomTile.Y)) > 10)

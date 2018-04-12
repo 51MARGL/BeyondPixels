@@ -24,22 +24,14 @@ public class LayerSorter : MonoBehaviour
     /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //If we hit a wall
-        if (collision.tag == "Wall") //If we hit an obstacle
-        {
-            //Creates a reference to the obstacle
-            var o = collision.GetComponent<Obstacle>();
-
-            if (o != null) o.FadeOut();
-        }
         //If we hit an obstacle
-        else if (collision.tag == "Obstacle")
+        if (collision.tag == "Obstacle")
         {
             //Creates a reference to the obstacle
             var o = collision.GetComponent<Obstacle>();
 
             if (o != null)
-            {
+            {               
                 //Fades out the tree, so that we can see the player beheind it
                 o.FadeOut();
                 //If we aren't colliding with anything else or we are colliding with something with a less sort order
@@ -58,16 +50,8 @@ public class LayerSorter : MonoBehaviour
     /// <param name="collision"></param>
     private void OnTriggerExit2D(Collider2D collision)
     {
-        //If we stopped colliding with a wall
-        if (collision.tag == "Wall")
-        {
-            //Creates a reference to the obstacle
-            var o = collision.GetComponent<Obstacle>();
-
-            if (o != null) o.FadeIn();
-        }
         //If we stopped colliding with an obstacle
-        else if (collision.tag == "Obstacle")
+        if (collision.tag == "Obstacle" || collision.tag == "Wall")
         {
             //Creates a reference to the obstacle
             var o = collision.GetComponent<Obstacle>();
