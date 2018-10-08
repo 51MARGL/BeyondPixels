@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,17 +22,15 @@ public class GameManager : MonoBehaviour
         Player = FindObjectOfType<Player>();
         InitializeInputButtons();
 
-        var mapWidth = Random.Range(50, 200);
+        var mapWidth = Random.Range(100, 200);
         var mapHeight = Random.Range(50, 100);
         var mapFillPercente = Random.Range(49, 53);
         var mapPassRadius = 1;
         mapProvider = new DungeonProvider(mapHeight, mapWidth, mapFillPercente, mapPassRadius);
         mapProvider.MapIsReady += OnMapIsReady;
 
-        var start = DateTime.UtcNow;
+        
         mapProvider.GenerateMap();
-        print("MapGenerated: " + Math.Abs(start.Subtract(DateTime.UtcNow).TotalSeconds));
-
     }
 
     private void OnMapIsReady()
@@ -41,7 +38,6 @@ public class GameManager : MonoBehaviour
         var painter = FindObjectOfType<TileMapProvider>();
         painter.MapProvider = mapProvider;
         painter.CreateTileMap();
-
 
         var spawner = FindObjectOfType<SpawnManager>();
         spawner.MapProvider = mapProvider;

@@ -39,7 +39,8 @@ internal class Room : IComparable<Room>
         if (!isAccessibleFromMainRoom)
         {
             isAccessibleFromMainRoom = true;
-            foreach (var connectedRoom in connectedRooms) connectedRoom.SetAccessibleFromMainRoom();
+            foreach (var connectedRoom in connectedRooms)
+                connectedRoom.SetAccessibleFromMainRoom();
         }
     }
 
@@ -47,7 +48,8 @@ internal class Room : IComparable<Room>
     {
         if (roomA.isAccessibleFromMainRoom)
             roomB.SetAccessibleFromMainRoom();
-        else if (roomB.isAccessibleFromMainRoom) roomA.SetAccessibleFromMainRoom();
+        else if (roomB.isAccessibleFromMainRoom)
+            roomA.SetAccessibleFromMainRoom();
         roomA.connectedRooms.Add(roomB);
         roomB.connectedRooms.Add(roomA);
     }

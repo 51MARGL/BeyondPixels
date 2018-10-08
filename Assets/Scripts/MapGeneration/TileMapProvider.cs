@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -26,7 +27,7 @@ public class TileMapProvider : MonoBehaviour
                 {
                     TilemapWalls.SetTile(new Vector3Int(x, y, 0), WallTile);
                     TilemapWallsTop.SetTile(new Vector3Int(x, y, 0), WallTileTop);
-                    if (x > 0 && x < MapProvider.Width - 1 && y > 0 && y < MapProvider.Height - 1
+                    if (UsefulUtilities.NotOnBorder(x,y, MapProvider.Map)
                         && MapProvider.Map[x, y - 1] && !MapProvider.Map[x, y + 1]
                         && !MapProvider.Map[x - 1, y] && !MapProvider.Map[x + 1, y]
                         && Random.Range(0, 10) > 7)

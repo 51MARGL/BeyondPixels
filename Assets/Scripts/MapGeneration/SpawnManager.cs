@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -9,7 +10,7 @@ public class SpawnManager : MonoBehaviour
 
     public List<GameObject> enemyPrefabs;
 
-    private List<MapTile> freeTilesList;
+    private IEnumerable<MapTile> freeTilesList;
     private Player Player;
 
     public MapProvider MapProvider { get; set; }
@@ -29,8 +30,10 @@ public class SpawnManager : MonoBehaviour
 
     public void SpawnObjects()
     {
-        freeTilesList = MapProvider.GetFreeTiles();
-        enemiesCount = freeTilesList.Count / 100 * 2;
+        //Spawn only on cells without walls near by 
+        freeTilesList = MapProvider.GetFreeTiles()
+            .Where(tile => UsefulUtilities.GetSurroundingWallCount(tile.X, tile.Y, MapProvider.Map) == 0);
+        enemiesCount = freeTilesList.Count() / 100 * 2;
         Debug.Log("Enemies-Count:" + enemiesCount);
         MovePlayer();
         SpawnEnemies();
@@ -38,7 +41,7 @@ public class SpawnManager : MonoBehaviour
 
     private void MovePlayer()
     {
-        MapTile mostLeft = freeTilesList[0];
+        var mostLeft = freeTilesList.First();
         foreach (var freeTile in freeTilesList)
             if (freeTile.X < mostLeft.X && freeTile.Y < mostLeft.Y)
                 mostLeft = freeTile;
@@ -49,7 +52,7 @@ public class SpawnManager : MonoBehaviour
     {
         while (enemiesSpawned < enemiesCount && enemiesSpawned < 80)
         {
-            var randomTile = freeTilesList[Random.Range(0, freeTilesList.Count)];
+            var randomTile = freeTilesList.ElementAt(Random.Range(0, freeTilesList.Count()));
             if (Vector2.Distance(Player.transform.position, new Vector2(randomTile.X, randomTile.Y)) > 10)
             {
                 var randomPrefab = enemyPrefabs.ElementAt(0);

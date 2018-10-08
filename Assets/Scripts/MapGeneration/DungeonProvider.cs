@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -42,6 +43,7 @@ public class DungeonProvider : MapProvider
     /// </summary>
     public void GenerateMap()
     {
+        var start = DateTime.UtcNow;
         while (true)
         {
             Map = new bool[Width, Height];
@@ -59,7 +61,7 @@ public class DungeonProvider : MapProvider
                 _freeTileList = null;
                 continue;
             }
-
+            Debug.Log("MapGenerated " + Width + "x" + Height +": " + Math.Abs(start.Subtract(DateTime.UtcNow).TotalSeconds));
             MapIsReady();
             break;
         }
@@ -277,7 +279,7 @@ public class DungeonProvider : MapProvider
                 {
                     var drawX = c.X + x;
                     var drawY = c.Y + y;
-                    if (IsOnBoard(drawX, drawY))
+                    if (UsefulUtilities.IsOnBoard(drawX, drawY, Map))
                         Map[drawX, drawY] = true;
                 }
     }
@@ -386,7 +388,7 @@ public class DungeonProvider : MapProvider
 
             for (var x = tile.X - 1; x <= tile.X + 1; x++)
                 for (var y = tile.Y - 1; y <= tile.Y + 1; y++)
-                    if (IsOnBoard(x, y) && (y == tile.Y || x == tile.X))
+                    if (UsefulUtilities.IsOnBoard(x, y, Map) && (y == tile.Y || x == tile.X))
                         if (boardFlags[x, y] == 0 && Map[x, y] == tileType)
                         {
                             boardFlags[x, y] = 1;
@@ -395,18 +397,7 @@ public class DungeonProvider : MapProvider
         }
 
         return tiles;
-    }
-
-    /// <summary>
-    ///     Checks borders of map/array
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns></returns>
-    private bool IsOnBoard(int x, int y)
-    {
-        return x >= 0 && x < Width && y >= 0 && y < Height;
-    }
+    }    
 
     /// <summary>
     ///     Randomly fills map with live and dead cells
@@ -433,7 +424,7 @@ public class DungeonProvider : MapProvider
             for (var x = 0; x < Width; x++)
                 for (var y = 0; y < Height; y++)
                 {
-                    var neighbourWallTiles = GetSurroundingWallCount(x, y);
+                    var neighbourWallTiles = UsefulUtilities.GetSurroundingWallCount(x, y, Map);
 
                     if (neighbourWallTiles > 4)
                         Map[x, y] = false;
@@ -441,31 +432,6 @@ public class DungeonProvider : MapProvider
                         Map[x, y] = true;
                 }
     }
-
-    /// <summary>
-    ///     Moore neighborhood algorithm
-    /// </summary>
-    /// <param name="gridX"></param>
-    /// <param name="gridY"></param>
-    /// <returns></returns>
-    private int GetSurroundingWallCount(int gridX, int gridY)
-    {
-        var wallCount = 0;
-        for (var neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
-            for (var neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
-                if (IsOnBoard(neighbourX, neighbourY))
-                {
-                    if (neighbourX != gridX || neighbourY != gridY)
-                        wallCount += Map[neighbourX, neighbourY] ? 0 : 1;
-                }
-                else
-                {
-                    wallCount++;
-                }
-
-        return wallCount;
-    }
-
 
     // For debug purpose
 
