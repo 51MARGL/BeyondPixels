@@ -1,5 +1,5 @@
-﻿using BeyondPixels.Components.Characters.Spells;
-using Unity.Burst;
+﻿using BeyondPixels.Components.Objects;
+using BeyondPixels.Components.Spells;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;

@@ -25,7 +25,7 @@ namespace BeyondPixels.ColliderEvents
                         new DamageComponent
                         {
                             DamageType = DamageType.Weapon,
-                            DamageValue =
+                            DamageOnImpact =
                                 entityManager.
                                     GetComponentData<WeaponComponent>(this.GetComponentInParent<GameObjectEntity>().Entity).
                                         DamageValue

@@ -1,6 +1,6 @@
 ﻿using BeyondPixels.Components.Characters.Common;
 using BeyondPixels.Components.Characters.Player;
-using BeyondPixels.Components.Characters.Spells;
+using BeyondPixels.Components.Spells;
 using Unity.Entities;
 using UnityEngine;
 using static BeyondPixels.Components.Characters.Common.SpellBookComponent;
@@ -97,7 +97,7 @@ namespace BeyondPixels.Systems.Characters.Player
                     CoolDown = spell.CoolDown
                 });
             PostUpdateCommands.AddComponent(spellEntity,
-                new Components.Characters.Spells.DamageComponent
+                new DamageComponent
                 {
                     DamageOnImpact = spell.DamageOnImpact,
                     DamagePerSecond = spell.DamagePerSecond,

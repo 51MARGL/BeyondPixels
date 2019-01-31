@@ -1,4 +1,5 @@
-﻿using BeyondPixels.Components.Characters.Player;
+﻿using BeyondPixels.Components.Characters.Common;
+using BeyondPixels.Components.Characters.Player;
 using Unity.Entities;
 
 namespace BeyondPixels.Systems.Characters.Player
@@ -9,7 +10,7 @@ namespace BeyondPixels.Systems.Characters.Player
         {
             public readonly int Length;
             public ComponentDataArray<InputComponent> InputComponents;
-            public ComponentArray<PlayerInitializeComponent> PlayerInitComponents;
+            public ComponentDataArray<CharacterComponent> CharacterComponents;
             public EntityArray EntityArray;
         }
         [Inject]
@@ -34,8 +35,7 @@ namespace BeyondPixels.Systems.Characters.Player
                     PostUpdateCommands.SetComponent(_data.EntityArray[i],
                         new AttackComponent
                         {
-                            CurrentComboIndex = (attackComponent.CurrentComboIndex + 1) %
-                                                    _data.PlayerInitComponents[i].AttackComboParams.Length
+                            CurrentComboIndex = (attackComponent.CurrentComboIndex + 1) % 2 // hard coded number of attacks
                         });
                 }
             }

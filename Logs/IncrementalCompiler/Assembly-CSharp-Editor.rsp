@@ -6,28 +6,6 @@
 -nostdlib
 -unsafe
 -r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Assembly-CSharp.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Cinemachine.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Properties.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Codegen.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Collections.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Rendering.Hybrid.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Hybrid.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Mathematics.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.Hybrid.dll
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.AIModule.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.ARModule.dll"
@@ -91,6 +69,28 @@
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.XRModule.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEditor.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/Unity.Locator.dll"
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Cinemachine.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Properties.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Codegen.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Collections.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Rendering.Hybrid.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Hybrid.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Mathematics.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.Hybrid.dll
 -r:"C:/Program Files/Unity/Hub/Editor/2018.2.7f1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2018.2.7f1/Editor/Data/UnityExtensions/Unity/GUISystem/Editor/UnityEditor.UI.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2018.2.7f1/Editor/Data/UnityExtensions/Unity/TestRunner/Editor/UnityEditor.TestRunner.dll"

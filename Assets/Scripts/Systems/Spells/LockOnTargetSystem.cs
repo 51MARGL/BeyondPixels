@@ -1,6 +1,6 @@
 ﻿using BeyondPixels.Components.Characters.Common;
-using BeyondPixels.Components.Characters.Player;
-using BeyondPixels.Components.Characters.Spells;
+using BeyondPixels.Components.Objects;
+using BeyondPixels.Components.Spells;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Jobs;
 
 namespace BeyondPixels.Systems.Spells
-{    
+{
     public class LockOnTargetSystem : JobComponentSystem
     {
         public struct MovementJob : IJobParallelForTransform
@@ -16,12 +16,12 @@ namespace BeyondPixels.Systems.Spells
             [ReadOnly]
             public ComponentDataFromEntity<PositionComponent> PositionComponents;
             [ReadOnly]
-            public ComponentDataArray<TargetRequiredComponent> TargetRequiredComponents;            
+            public ComponentDataArray<TargetRequiredComponent> TargetRequiredComponents;
 
             public void Execute(int index, TransformAccess transform)
             {
                 var position = PositionComponents[TargetRequiredComponents[index].Target].CurrentPosition;
-                transform.position = new Vector3(position.x, position.y, 0f);                
+                transform.position = new Vector3(position.x, position.y, 0f);
             }
         }
         [Inject]

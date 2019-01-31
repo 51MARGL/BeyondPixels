@@ -5,7 +5,8 @@ namespace BeyondPixels.Components.Characters.Common
 {
     public struct DamageComponent : IComponentData
     {
-        public int DamageValue;
+        public int DamageOnImpact;
+        public int DamagePerSecond;
         public DamageType DamageType;
     }
 

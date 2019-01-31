@@ -23,14 +23,14 @@ namespace BeyondPixels.Systems.Characters.AI
                                 [ReadOnly] ref WeaponComponent weaponComponent,
                                 [ReadOnly] ref PositionComponent positionComponent)
             {
-                var targetPosition = Positions[attackComponent.Target];
-                var distance = Vector2.Distance(targetPosition.CurrentPosition, positionComponent.CurrentPosition);
+                //var targetPosition = Positions[attackComponent.Target];
+                //var distance = Vector2.Distance(targetPosition.CurrentPosition, positionComponent.CurrentPosition);
 
-                if (distance > weaponComponent.AttackRange)
-                {
-                    CommandBuffer.RemoveComponent<AttackStateComponent>(entity);
-                    return;
-                }
+                //if (distance > weaponComponent.AttackRange)
+                //{
+                //    CommandBuffer.RemoveComponent<AttackStateComponent>(entity);
+                //    return;
+                //}
 
                 if (CurrentTime - attackComponent.StartedAt < weaponComponent.CoolDown)
                     return;

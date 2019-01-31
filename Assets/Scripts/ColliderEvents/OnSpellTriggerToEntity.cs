@@ -1,4 +1,4 @@
-﻿using BeyondPixels.Components.Characters.Spells;
+﻿using BeyondPixels.Components.Spells;
 using Unity.Entities;
 using UnityEngine;
 
@@ -14,17 +14,20 @@ namespace BeyondPixels.ColliderEvents
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();            
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(SpellCollisionComponent));
+                var spellEntity = GetComponent<GameObjectEntity>().Entity;
+                var caster = entityManager.GetComponentData<SpellComponent>(spellEntity).Caster;
 
                 entityManager.SetComponentData(eventEntity,
                         new CollisionInfo
                         {
-                            Sender = GetComponent<GameObjectEntity>().Entity,
+                            Sender = caster,
                             Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
                             EventType = EventType.TriggerEnter
                         });
                 entityManager.SetComponentData(eventEntity,
                         new SpellCollisionComponent
                         {
+                            SpellEntity = spellEntity,
                             ImpactPoint = this.transform.position,
                             ImpactTime = Time.time
                         });
@@ -41,17 +44,20 @@ namespace BeyondPixels.ColliderEvents
                 {
                     var entityManager = World.Active.GetExistingManager<EntityManager>();            
                     var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(SpellCollisionComponent));
+                    var spellEntity = GetComponent<GameObjectEntity>().Entity;
+                    var caster = entityManager.GetComponentData<SpellComponent>(spellEntity).Caster;
 
                     entityManager.SetComponentData(eventEntity,
                             new CollisionInfo
                             {
-                                Sender = GetComponent<GameObjectEntity>().Entity,
+                                Sender = caster,
                                 Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
                                 EventType = EventType.TriggerStay
                             });
                     entityManager.SetComponentData(eventEntity,
                             new SpellCollisionComponent
                             {
+                                SpellEntity = spellEntity,
                                 ImpactPoint = this.transform.position,
                                 ImpactTime = Time.time
                             });
