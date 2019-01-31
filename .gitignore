@@ -13,6 +13,7 @@ Visual Studio / MonoDevelop generated
 =====================================
 ExportedObj/
 obj/
+.vs/
 *.svd
 *.userprefs
 /*.csproj
