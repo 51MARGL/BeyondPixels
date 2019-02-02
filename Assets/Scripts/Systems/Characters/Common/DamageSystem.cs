@@ -20,7 +20,7 @@ namespace BeyondPixels.Systems.Characters.Common
                                 [ReadOnly] ref DamageComponent damageComponent)
             {
                 var healthComponent = HealthComponents[collisionInfo.Other];
-                healthComponent.CurrentValue -= damageComponent.DamageValue;
+                healthComponent.CurrentValue -= damageComponent.DamageOnImpact;
                 if (healthComponent.CurrentValue < 0)
                     healthComponent.CurrentValue = 0;
                 else if (healthComponent.CurrentValue > healthComponent.MaxValue)

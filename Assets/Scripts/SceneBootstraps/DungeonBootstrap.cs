@@ -6,14 +6,10 @@ using BeyondPixels.UI;
 using Unity.Entities;
 using UnityEngine;
 
-namespace BeyondPixels.Bootstraps
+namespace BeyondPixels.SceneBootstraps
 {
     public class DungeonBootstrap : MonoBehaviour
     {
-        public GameObject EnemyPrefab;
-        public GameObject PlayerPrefab;
-
-
         public int BoardWidth;
         public int BoardHeight;
         public int RoomCount;
@@ -27,11 +23,15 @@ namespace BeyondPixels.Bootstraps
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
 
             #region PlayerEntityArchetype
-            var player = this.PlayerPrefab;
+            var player = PrefabManager.Instance.PlayerPrefab;
             var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
             var playerInitializeComponent = player.GetComponent<PlayerInitializeComponent>();
             entityManager.AddComponent(playerEntity, typeof(InputComponent));
 
+            entityManager.AddComponentData(playerEntity, new CharacterComponent
+            {
+                CharacterType = CharacterType.Player
+            });
             entityManager.AddComponentData(playerEntity, new MovementComponent
             {
                 Direction = Vector2.zero,
@@ -50,14 +50,20 @@ namespace BeyondPixels.Bootstraps
             {
                 InitialPosition = player.transform.position
             });
-
+            GameObject.Destroy(playerInitializeComponent);
+            entityManager.RemoveComponent<PlayerInitializeComponent>(playerEntity);
             #endregion
 
             #region EnemyEntityArchetype
-            var enemy = this.EnemyPrefab;            
+            //var enemy = PrefabManager.Instance.EnemyPrefab;
+            var enemy = GameObject.Instantiate(PrefabManager.Instance.EnemyPrefab, new Vector3(-2, -2, 0), Quaternion.identity);
             var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
             var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
 
+            entityManager.AddComponentData(enemyEntity, new CharacterComponent
+            {
+                CharacterType = CharacterType.Enemy
+            });
             entityManager.AddComponentData(enemyEntity, new MovementComponent
             {
                 Direction = Vector2.zero,
@@ -82,6 +88,8 @@ namespace BeyondPixels.Bootstraps
             {
                 InitialPosition = enemy.transform.position
             });
+            GameObject.Destroy(enemyInitializeComponent);
+            entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
             #endregion
 
 
@@ -111,10 +119,14 @@ namespace BeyondPixels.Bootstraps
                 for (int i = 0; i < 20; i++)
                 {
                     var randomPositon = new Vector2(Random.Range(-50f, 50f), Random.Range(-50f, 50f));
-                    var enemy = GameObject.Instantiate(this.EnemyPrefab, randomPositon, Quaternion.identity);
+                    var enemy = GameObject.Instantiate(PrefabManager.Instance.EnemyPrefab, randomPositon, Quaternion.identity);
                     var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
                     var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
 
+                    entityManager.AddComponentData(enemyEntity, new CharacterComponent
+                    {
+                        CharacterType = CharacterType.Enemy
+                    });
                     entityManager.AddComponentData(enemyEntity, new MovementComponent
                     {
                         Direction = Vector2.zero,
@@ -139,6 +151,8 @@ namespace BeyondPixels.Bootstraps
                     {
                         InitialPosition = enemy.transform.position
                     });
+                    GameObject.Destroy(enemyInitializeComponent);
+                    entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
                 }
             }
 

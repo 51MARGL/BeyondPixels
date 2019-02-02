@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ColliderEvents;
-using BeyondPixels.Components.Characters.Spells;
+using BeyondPixels.Components.Characters.Common;
+using BeyondPixels.Components.Spells;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -14,41 +15,41 @@ namespace BeyondPixels.Systems.Spells
             [ReadOnly]
             public ComponentDataFromEntity<DamageComponent> DamageComponents;
             [ReadOnly]
-            public ComponentDataFromEntity<TargetRequiredComponent> TargetComponents;
+            public ComponentDataFromEntity<CharacterComponent> CharacterComponents;
 
             public void Execute(Entity entity,
                                 int index,
                                 [ReadOnly] ref CollisionInfo collisionInfo,
                                 [ReadOnly] ref SpellCollisionComponent spellCollisionComponent)
             {
-                if (TargetComponents.Exists(collisionInfo.Sender)
-                    && collisionInfo.Other != TargetComponents[collisionInfo.Sender].Target)
+                if (CharacterComponents[collisionInfo.Other].CharacterType 
+                    == CharacterComponents[collisionInfo.Sender].CharacterType)
                 {
                     CommandBuffer.DestroyEntity(entity);
                     return;
                 }
 
-                var damageComponent = DamageComponents[collisionInfo.Sender];
+                var damageComponent = DamageComponents[spellCollisionComponent.SpellEntity];
                 switch (collisionInfo.EventType)
                 {
                     case EventType.TriggerEnter:
                         CommandBuffer.CreateEntity();
                         CommandBuffer.AddComponent(collisionInfo);
                         CommandBuffer.AddComponent(
-                                new Components.Characters.Common.DamageComponent
+                                new DamageComponent
                                 {
                                     DamageType = damageComponent.DamageType,
-                                    DamageValue = damageComponent.DamageOnImpact                                    
+                                    DamageOnImpact = damageComponent.DamageOnImpact                                    
                                 });
                         break;
                     case EventType.TriggerStay:
                         CommandBuffer.CreateEntity();
                         CommandBuffer.AddComponent(collisionInfo);
                         CommandBuffer.AddComponent(
-                                new Components.Characters.Common.DamageComponent
+                                new DamageComponent
                                 {
                                     DamageType = damageComponent.DamageType,
-                                    DamageValue = damageComponent.DamagePerSecond
+                                    DamageOnImpact = damageComponent.DamagePerSecond
                                 });
                         break;
                 }
@@ -60,7 +61,7 @@ namespace BeyondPixels.Systems.Spells
         [Inject]
         private ComponentDataFromEntity<DamageComponent> _damageComponents;
         [Inject]
-        private ComponentDataFromEntity<TargetRequiredComponent> _targetComponents;
+        private ComponentDataFromEntity<CharacterComponent> _characterComponents;
         [Inject]
         private ApplyDamageSystemBarrier _barrier;
 
@@ -70,7 +71,7 @@ namespace BeyondPixels.Systems.Spells
             {
                 CommandBuffer = _barrier.CreateCommandBuffer(),
                 DamageComponents = _damageComponents,
-                TargetComponents = _targetComponents
+                CharacterComponents = _characterComponents
             }.Schedule(this, inputDeps);
         }
 

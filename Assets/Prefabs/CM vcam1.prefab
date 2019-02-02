@@ -37,7 +37,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4846731698647308}
   - component: {fileID: 114874043785460090}
-  - component: {fileID: 114989654422647102}
+  - component: {fileID: 114424034017225860}
   m_Layer: 0
   m_Name: CM vcam1
   m_TagString: Untagged
@@ -65,7 +65,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1772582961675946}
   m_LocalRotation: {x: -0.13052624, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: 4.78, y: -2.618192, z: -9.659258}
+  m_LocalPosition: {x: 4.78, y: -4.2581916, z: -9.659258}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4733679184600660}
@@ -83,6 +83,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114424034017225860
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1772582961675946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea5515f24d66d5f49b6ab5bd79a0dbc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PixelsPerUnit: 32
 --- !u!114 &114795671556946474
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -158,15 +170,3 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
   m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 4733679184600660}
---- !u!114 &114989654422647102
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1772582961675946}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea5515f24d66d5f49b6ab5bd79a0dbc2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_PixelsPerUnit: 32

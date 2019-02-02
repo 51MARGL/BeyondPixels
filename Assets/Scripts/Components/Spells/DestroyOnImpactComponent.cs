@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace BeyondPixels.Components.Characters.Spells
+namespace BeyondPixels.Components.Spells
 {
     public struct DestroyOnImpactComponent : IComponentData { }
 }

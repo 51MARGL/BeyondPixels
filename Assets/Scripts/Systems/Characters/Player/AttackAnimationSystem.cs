@@ -1,4 +1,5 @@
-﻿using BeyondPixels.Components.Characters.Player;
+﻿using BeyondPixels.Components.Characters.Common;
+using BeyondPixels.Components.Characters.Player;
 using Unity.Entities;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace BeyondPixels.Systems.Characters.Player
         {
             public readonly int Length;
             public ComponentArray<Animator> AnimatorComponents;
-            public ComponentArray<PlayerInitializeComponent> PlayerInitComponents;
+            public ComponentDataArray<CharacterComponent> CharacterComponents;
             public ComponentDataArray<AttackComponent> AttackComponents;
             public EntityArray EntityArray;
         }
@@ -27,15 +28,14 @@ namespace BeyondPixels.Systems.Characters.Player
 
                 animatorComponent.ActivateLayer("AttackLayer");
 
-                string attackTriggerName = _data.PlayerInitComponents[i]
-                                                .AttackComboParams[attackComponent.CurrentComboIndex];
+                string attackTriggerName = "Attack" + (attackComponent.CurrentComboIndex + 1);
                 int attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
                 if (!animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsName(attackTriggerName))
                     animatorComponent.SetTrigger(attackTriggerName);
 
                 if (animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsTag("Finish"))
                 {
-                    foreach (var comboName in _data.PlayerInitComponents[i].AttackComboParams)
+                    foreach (var comboName in new[] { "Attack1", "Attack2" })
                         animatorComponent.ResetTrigger(comboName);
                     PostUpdateCommands.RemoveComponent<AttackComponent>(_data.EntityArray[i]);
                 }

@@ -5,28 +5,6 @@
 -out:E:/GitHub/BeyondPixels/Temp/Assembly-CSharp.dll
 -nostdlib
 -unsafe
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Cinemachine.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Properties.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Codegen.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Collections.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Rendering.Hybrid.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Hybrid.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Mathematics.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.Editor.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.dll
--r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.Hybrid.dll
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.AIModule.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.ARModule.dll"
@@ -89,6 +67,28 @@
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEngine/UnityEngine.XRModule.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/UnityEditor.dll"
 -r:"C:\Program Files\Unity\Hub\Editor\2018.2.7f1\Editor\Data\Managed/Unity.Locator.dll"
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Cinemachine.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Properties.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Codegen.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Jobs.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Collections.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Rendering.Hybrid.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Properties.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.Hybrid.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Mathematics.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Entities.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Burst.Editor.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.TextMeshPro.dll
+-r:E:/GitHub/BeyondPixels/Library/ScriptAssemblies/Unity.Transforms.Hybrid.dll
 -r:"C:/Program Files/Unity/Hub/Editor/2018.2.7f1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2018.2.7f1/Editor/Data/UnityExtensions/Unity/Timeline/RuntimeEditor/UnityEngine.Timeline.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2018.2.7f1/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll"
@@ -324,6 +324,7 @@
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/AI/FollowStateComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/AI/IdleStateComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/AI/InspectStateComponent.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Common/CharacterComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Common/DamageComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Common/HealthComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Common/MovementComponent.cs
@@ -335,6 +336,7 @@
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Player/InputComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Player/PlayerInitializeComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Characters/Player/TargetComponent.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Objects/DestroyComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/ProceduralGeneration/Dungeon/DungeonTileMapComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/ProceduralGeneration/Dungeon/Naive/BoardComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/ProceduralGeneration/Dungeon/Naive/BoardReadyComponent.cs
@@ -342,8 +344,6 @@
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/ProceduralGeneration/Dungeon/Naive/RoomComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/ProceduralGeneration/Dungeon/Naive/TileComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/ProceduralGeneration/Dungeon/Naive/TileMapReadyComponent.cs
--i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Spells/DamageComponent.cs
--i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Spells/DestroyComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Spells/DestroyOnImpactComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Spells/DurationComponent.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Components/Spells/LockOnTargetComponent.cs
@@ -355,6 +355,7 @@
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/MinimapCameraShader.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/RoundCameraPosition.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/SceneBootstraps/DungeonBootstrap.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/SceneBootstraps/PrefabManager.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/AI/AggroEventSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/AI/AttackAnimationSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/AI/AttackStateSystem.cs
@@ -364,6 +365,7 @@
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/AI/InspectStateSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Common/CopyTranfromToPosition.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Common/DamageSystem.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Common/HitParticleEffectSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Common/MovementAnimationSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Common/MovementSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Player/AttackAnimationSystem.cs
@@ -374,11 +376,13 @@
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Player/SpellCastSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Player/SpellCoolDownSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Characters/Player/TargettingSystem.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Objects/DestroySystem.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Objects/GOCleanupSystem.cs
+-i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Objects/ParticleDurationSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/ProceduralGeneration/Dungeon/Naive/BoardSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/ProceduralGeneration/Dungeon/Naive/CleanUpSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/ProceduralGeneration/Dungeon/Naive/TileMapSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Spells/ApplyDamageSystem.cs
--i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Spells/DestroySystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Spells/DurationSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/Spells/LockOnTargetSystem.cs
 -i:E:/GitHub/BeyondPixels/Assets/Scripts/Systems/UI/EnemyUISystem.cs
