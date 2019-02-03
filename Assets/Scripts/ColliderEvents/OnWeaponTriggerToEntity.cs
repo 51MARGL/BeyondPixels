@@ -1,4 +1,4 @@
-﻿using BeyondPixels.Components.Characters.Common;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
 using Unity.Entities;
 using UnityEngine;
 

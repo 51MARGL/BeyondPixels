@@ -1,0 +1,16 @@
+{
+    "name": "BeyondPixels.ColliderEvents",
+    "references": [
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "BeyondPixels.ECS.Components"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

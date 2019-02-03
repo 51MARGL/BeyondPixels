@@ -1,5 +1,5 @@
-﻿using BeyondPixels.Components.Characters.Common;
-using BeyondPixels.Components.UI;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
 using UnityEngine;
 

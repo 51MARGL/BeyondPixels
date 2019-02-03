@@ -1,0 +1,16 @@
+{
+    "name": "BeyondPixels.UI",
+    "references": [
+        "BeyondPixels.ECS.Components",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

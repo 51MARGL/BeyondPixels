@@ -1,7 +1,7 @@
-﻿using BeyondPixels.Components.Characters.AI;
-using BeyondPixels.Components.Characters.Common;
-using BeyondPixels.Components.Characters.Player;
-using BeyondPixels.Components.ProceduralGeneration.Dungeon.Naive;
+﻿using BeyondPixels.ECS.Components.Characters.AI;
+using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
 using BeyondPixels.UI;
 using Unity.Entities;
 using UnityEngine;

@@ -1,4 +1,4 @@
-﻿using BeyondPixels.Components.Spells;
+﻿using BeyondPixels.ECS.Components.Spells;
 using Unity.Entities;
 using UnityEngine;
 
