@@ -10,7 +10,7 @@
         "Unity.Mathematics",
         "Unity.Collections",
         "BeyondPixels.Utilities",
-        "BeyondPixels",
+        "BeyondPixels.Tilemap",
         "Unity.Transforms",
         "BeyondPixels.SceneBootstap"
     ],
