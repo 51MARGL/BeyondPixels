@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         public class SpellCastBarrier : BarrierSystem { }
 
         [RequireComponentTag(typeof(SpellBookComponent))]
-        [RequireSubtractiveComponent(typeof(SpellCastingComponent))]
+        [RequireSubtractiveComponent(typeof(SpellCastingComponent), typeof(AttackComponent))]
         private struct SpellCastJob : IJobProcessComponentDataWithEntity<InputComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -25,11 +25,14 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                 [ReadOnly] ref InputComponent inputComponent)
             {
                 if (inputComponent.ActionButtonPressed > 0)
+                {
                     CommandBuffer.AddComponent(index, entity, new SpellCastingComponent
                     {
                         SpellIndex = inputComponent.ActionButtonPressed - 1,
                         StartedAt = CurrentTime
                     });
+                    inputComponent.ActionButtonPressed = 0;
+                }
             }
         }
         [Inject]

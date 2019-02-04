@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Objects;
+using BeyondPixels.ECS.Systems.Objects;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -25,13 +27,20 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             {
                 var healthComponent = HealthComponents[collisionInfo.Other];
                 healthComponent.CurrentValue -= damageComponent.DamageOnImpact;
-                if (healthComponent.CurrentValue <= 0)
+                if (healthComponent.CurrentValue < 0)
                     healthComponent.CurrentValue = 0;
                 else if (healthComponent.CurrentValue > healthComponent.MaxValue)
                     healthComponent.CurrentValue = healthComponent.MaxValue;
                 CommandBuffer.SetComponent(index, collisionInfo.Other, healthComponent);
 
                 CommandBuffer.DestroyEntity(index, entity);
+
+                if (healthComponent.CurrentValue <= 0)
+                {
+                    //healthComponent.CurrentValue = 0;
+                    CommandBuffer.AddComponent(index, collisionInfo.Other, new DestroyComponent());
+                    return;
+                }
             }
         }
         private DamageBarrier _damageBarrier;

@@ -12,12 +12,20 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         {
             public readonly int Length;
             public ComponentDataArray<InputComponent> InputComponents;
+            public SubtractiveComponent<TargetComponent> TargetComponents;
             public EntityArray EntityArray;
         }
         [Inject]
         private Data _data;
+        private struct AddedData
+        {
+            public readonly int Length;
+            public ComponentDataArray<InputComponent> InputComponents;
+            public ComponentDataArray<TargetComponent> TargetComponents;
+            public EntityArray EntityArray;
+        }
         [Inject]
-        private ComponentDataFromEntity<TargetComponent> _targetComponents;
+        private AddedData _addedData;
 
         protected override void OnUpdate()
         {
@@ -34,9 +42,6 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
                     if (raycastHit.transform != null)
                     {
-                        if (_targetComponents.Exists(_data.EntityArray[i]))
-                            PostUpdateCommands.RemoveComponent<TargetComponent>(_data.EntityArray[i]);
-
                         if (raycastHit.transform.CompareTag("Enemy"))
                             PostUpdateCommands.AddComponent(_data.EntityArray[i],
                                 new TargetComponent
@@ -44,9 +49,34 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                     Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
                                 });
                     }
-                    else if(_targetComponents.Exists(_data.EntityArray[i]))
-                        PostUpdateCommands.RemoveComponent<TargetComponent>(_data.EntityArray[i]);
                 }
+            }
+
+            for (int i = 0; i < _addedData.Length; i++)
+            {
+                var inputComponent = _addedData.InputComponents[i];
+
+                if (inputComponent.MouseButtonClicked == 1
+                    && !EventSystem.current.IsPointerOverGameObject())
+                {
+                    var ray = Camera.main.ScreenPointToRay(inputComponent.MousePosition);
+                    var layerMask = LayerMask.GetMask("Clickable");
+                    var raycastHit = Physics2D.GetRayIntersection(ray, 100f, layerMask);
+
+                    if (raycastHit.transform != null)
+                    {
+                        if (raycastHit.transform.CompareTag("Enemy"))
+                            PostUpdateCommands.SetComponent(_addedData.EntityArray[i],
+                                new TargetComponent
+                                {
+                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                });
+                    }
+                    else
+                        PostUpdateCommands.RemoveComponent<TargetComponent>(_addedData.EntityArray[i]);
+                }
+                else if (!EntityManager.Exists(_addedData.TargetComponents[i].Target))
+                    PostUpdateCommands.RemoveComponent<TargetComponent>(_addedData.EntityArray[i]);
             }
         }
     }

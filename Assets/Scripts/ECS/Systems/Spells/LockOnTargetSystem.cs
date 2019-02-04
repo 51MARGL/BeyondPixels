@@ -11,7 +11,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class LockOnTargetSystem : JobComponentSystem
     {
-        public struct MovementJob : IJobParallelForTransform
+        public struct LockOnTargetJob : IJobParallelForTransform
         {
             [ReadOnly]
             public ComponentDataFromEntity<PositionComponent> PositionComponents;
@@ -20,6 +20,9 @@ namespace BeyondPixels.ECS.Systems.Spells
 
             public void Execute(int index, TransformAccess transform)
             {
+                if (!PositionComponents.Exists(TargetRequiredComponents[index].Target))
+                    return;
+
                 var position = PositionComponents[TargetRequiredComponents[index].Target].CurrentPosition;
                 transform.position = new Vector3(position.x, position.y, 0f);
             }
@@ -41,7 +44,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new MovementJob
+            return new LockOnTargetJob
             {
                 TargetRequiredComponents = _group.GetComponentDataArray<TargetRequiredComponent>(),
                 PositionComponents = _positionComponents

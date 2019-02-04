@@ -20,12 +20,15 @@ namespace BeyondPixels.ECS.Systems.Objects
         protected override void OnUpdate()
         {
             var count = _data.Length;
-            var objectsToDestroy = new GameObject[count];
+            var objectsToDestroy = new (GameObject gameObject, Entity entity)[count];
             for (int i = 0; i < count; i++)
-                objectsToDestroy[i] = _data.TransformComponents[i].gameObject;
+                objectsToDestroy[i] = (_data.TransformComponents[i].gameObject, _data.EntityArray[i]);
 
             for (int i = 0; i < count; i++)
-                GameObject.Destroy(objectsToDestroy[i].gameObject);
+            {
+                EntityManager.DestroyEntity(objectsToDestroy[i].entity);
+                GameObject.Destroy(objectsToDestroy[i].gameObject, 0.01f);
+            }
 
             objectsToDestroy = null;
         }

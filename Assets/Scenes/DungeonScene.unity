@@ -56188,11 +56188,6 @@ PrefabInstance:
       propertyPath: SpellButtonsGroup.ActionButtons.Array.data[2]
       value: 
       objectReference: {fileID: 1447603530}
-    - target: {fileID: 114867925024508442, guid: 2114688a494587a4cbd70b5fb17aafd2,
-        type: 3}
-      propertyPath: MaxHealth
-      value: 125
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2114688a494587a4cbd70b5fb17aafd2, type: 3}
 --- !u!1 &592520473 stripped

@@ -29,7 +29,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 inputComponent.MouseButtonClicked = MouseClicked;
                 inputComponent.MousePosition = MousePosition;
 
-                inputComponent.ActionButtonPressed = ActionButtonPressed;
+                if (ActionButtonPressed > 0)
+                    inputComponent.ActionButtonPressed = ActionButtonPressed;
             }
         }
 
