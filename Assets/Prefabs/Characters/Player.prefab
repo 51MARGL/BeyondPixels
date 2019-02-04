@@ -57,7 +57,7 @@ Camera:
   far clip plane: 5
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 13
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -430,7 +430,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementSpeed: 5
-  MaxHealth: 100
+  MaxHealth: 125
   WeaponDamage: 10
 --- !u!114 &114278645838488866
 MonoBehaviour:

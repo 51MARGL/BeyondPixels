@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,6 +9,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class DamageSystem : JobComponentSystem
     {
+        [DisableAutoCreation]
+        public class DamageBarrier : BarrierSystem { }
+
         private struct DamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, DamageComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -21,7 +25,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             {
                 var healthComponent = HealthComponents[collisionInfo.Other];
                 healthComponent.CurrentValue -= damageComponent.DamageOnImpact;
-                if (healthComponent.CurrentValue < 0)
+                if (healthComponent.CurrentValue <= 0)
                     healthComponent.CurrentValue = 0;
                 else if (healthComponent.CurrentValue > healthComponent.MaxValue)
                     healthComponent.CurrentValue = healthComponent.MaxValue;
@@ -30,20 +34,25 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 CommandBuffer.DestroyEntity(index, entity);
             }
         }
-        [Inject]
-        private DamageBarrier _barrier;
+        private DamageBarrier _damageBarrier;
+
         [Inject]
         private ComponentDataFromEntity<HealthComponent> _healthComponents;
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnCreateManager()
         {
-            return new DamageJob
-            {
-                CommandBuffer = _barrier.CreateCommandBuffer().ToConcurrent(),
-                HealthComponents = _healthComponents,
-            }.Schedule(this, inputDeps);
+            _damageBarrier = World.Active.GetOrCreateManager<DamageBarrier>();
         }
 
-        public class DamageBarrier : BarrierSystem { }
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            var handle = new DamageJob
+            {
+                CommandBuffer = _damageBarrier.CreateCommandBuffer().ToConcurrent(),
+                HealthComponents = _healthComponents,
+            }.Schedule(this, inputDeps);
+            _damageBarrier.AddJobHandleForProducer(handle);
+            return handle;
+        }
     }
 }

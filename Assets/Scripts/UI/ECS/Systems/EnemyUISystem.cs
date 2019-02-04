@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Systems.UI
@@ -52,21 +53,19 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                     //Canvas scale
                     var currentLocalScale = enemyUIComponent.Canvas.transform.localScale;
                     if (enemyUIComponent.transform.localScale.x < 0 && enemyUIComponent.Canvas.transform.localScale.x > 0)
-                        enemyUIComponent.Canvas.transform.localScale = new Vector3(-Mathf.Abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
+                        enemyUIComponent.Canvas.transform.localScale = new Vector3(-math.abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
                     else if (enemyUIComponent.transform.localScale.x > 0 && enemyUIComponent.Canvas.transform.localScale.x < 0)
-                        enemyUIComponent.Canvas.transform.localScale = new Vector3(Mathf.Abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
+                        enemyUIComponent.Canvas.transform.localScale = new Vector3(math.abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
 
                     // Heatlh 
                     var currentHealth = _data.HealthComponents[i].CurrentValue;
                     var maxHealth = _data.HealthComponents[i].MaxValue;
                     var currentFill = (float)currentHealth / maxHealth;
-                    if (enemyUIComponent.HealthImage.fillAmount != currentFill)
-                    {
-                        enemyUIComponent.HealthImage.fillAmount
-                            = Mathf.Lerp(enemyUIComponent.HealthImage.fillAmount, currentFill, deltaTime * 10f);
-                        var displayedValue = currentHealth < 0 ? 0 : currentHealth;
-                        enemyUIComponent.HealthText.text = displayedValue + " / " + maxHealth;
-                    }
+
+                    enemyUIComponent.HealthImage.fillAmount
+                        = math.lerp(enemyUIComponent.HealthImage.fillAmount, currentFill, deltaTime * 10f);
+                    var displayedValue = currentHealth < 0 ? 0 : currentHealth;
+                    enemyUIComponent.HealthText.text = displayedValue + " / " + maxHealth;
 
                     //Targetting image
                     if (_playerData.Length > 0)

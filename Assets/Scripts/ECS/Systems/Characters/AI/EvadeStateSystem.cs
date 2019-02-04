@@ -1,8 +1,10 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
@@ -10,6 +12,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     [UpdateBefore(typeof(FollowStateSystem))]
     public class EvadeStateSystem : JobComponentSystem
     {
+        [DisableAutoCreation]
+        private class EvadeStateBarrier : BarrierSystem { }
+
         [RequireSubtractiveComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
         private struct EvadeStateJob :
             IJobProcessComponentDataWithEntity<MovementComponent, PositionComponent, EvadeStateComponent>
@@ -24,12 +29,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                 [ReadOnly] ref EvadeStateComponent evadeComponent)
             {
                 //If the distance is larger than trashold then keep moving                
-                if (Vector2.Distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) > 1f)
+                if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) > 1f)
                     movementComponent.Direction =
                         positionComponent.InitialPosition - positionComponent.CurrentPosition;
                 else
                 {
-                    movementComponent.Direction = Vector2.zero;
+                    movementComponent.Direction = float2.zero;
 
                     CommandBuffer.RemoveComponent(index, entity, typeof(EvadeStateComponent));
                     CommandBuffer.AddComponent(index, entity,
@@ -41,18 +46,22 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             }
         }
 
-        [Inject]
-        private EvadeStateBarrier _EvadeStateBarrier;
+        private EvadeStateBarrier _evadeStateBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _evadeStateBarrier = World.Active.GetOrCreateManager<EvadeStateBarrier>();
+        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new EvadeStateJob
+            var handle = new EvadeStateJob
             {
-                CommandBuffer = _EvadeStateBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _evadeStateBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
+            _evadeStateBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
-
-        private class EvadeStateBarrier : BarrierSystem { }
     }
 }

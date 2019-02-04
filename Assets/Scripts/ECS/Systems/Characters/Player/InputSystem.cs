@@ -1,19 +1,22 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class InputSystem : JobComponentSystem
     {        
+        [BurstCompile]
         private struct InputJob : IJobProcessComponentData<InputComponent, MovementComponent>
         {
-            public Vector2 Direction;
+            public float2 Direction;
             public int AttackPressed;
             public int MouseClicked;
-            public Vector3 MousePosition;
+            public float3 MousePosition;
             public int ActionButtonPressed;
 
             public void Execute(ref InputComponent inputComponent, ref MovementComponent movementComponent)
@@ -32,18 +35,18 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var direction = Vector2.zero;
+            var direction = float2.zero;
             var attackPressed = 0;
             var mouseClicked = 0;
             var actionButtonPressed = 0;
             if (Input.GetKey(KeyCode.A))
-                direction += Vector2.left;
+                direction += new float2(-1, 0);
             if (Input.GetKey(KeyCode.D))
-                direction += Vector2.right;
+                direction += new float2(1, 0);
             if (Input.GetKey(KeyCode.W))
-                direction += Vector2.up;
+                direction += new float2(0, 1);
             if (Input.GetKey(KeyCode.S))
-                direction += Vector2.down;
+                direction += new float2(0, -1);
             if (Input.GetKeyDown(KeyCode.Space))
                 attackPressed = 1;
             if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.E))

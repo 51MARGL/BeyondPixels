@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
 using Unity.Entities;
@@ -8,13 +7,13 @@ using UnityEngine;
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 {
     public class TileMapSystem : ComponentSystem
-    {        
+    {
         private struct Data
         {
             public readonly int Length;
             public ComponentDataArray<BoardComponent> BoardComponents;
-            public ComponentDataArray<BoardReadyComponent> BoardReadyComponents;            
-            public SubtractiveComponent<TilemapReadyComponent> TilemapReadyComponents;            
+            public ComponentDataArray<BoardReadyComponent> BoardReadyComponents;
+            public SubtractiveComponent<TilemapReadyComponent> TilemapReadyComponents;
             public EntityArray EntityArray;
         }
         [Inject]
@@ -62,10 +61,38 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         else
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Postition.x, tile.Postition.y, 0), tilemapComponent.WallTile);
-                            tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Postition.x, tile.Postition.y, 0), tilemapComponent.WallTileTop);                       
+                            tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Postition.x, tile.Postition.y, 0), tilemapComponent.WallTileTop);
                         }
                     }
 
+
+                    //hide skybox
+                    for (int x = -10; x < _data.BoardComponents[i].Size.x + 10; x++)
+                    {
+                        for (int y = -10; y < 0; y++)
+                        {
+                            tilemapComponent.TilemapWalls.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTile);
+                            tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTileTop);
+                        }
+                        for (int y = _data.BoardComponents[i].Size.y; y < _data.BoardComponents[i].Size.y + 10; y++)
+                        {
+                            tilemapComponent.TilemapWalls.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTile);
+                            tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTileTop);
+                        }
+                    }
+                    for (int y = 0; y < _data.BoardComponents[i].Size.y; y++)
+                    {
+                        for (int x = -10; x < 0; x++)
+                        {
+                            tilemapComponent.TilemapWalls.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTile);
+                            tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTileTop);
+                        }
+                        for (int x = _data.BoardComponents[i].Size.x; x < _data.BoardComponents[i].Size.x + 10; x++)
+                        {
+                            tilemapComponent.TilemapWalls.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTile);
+                            tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTileTop);
+                        }
+                    }
 
                     for (int x = 1; x < tilemapComponent.TilemapWalls.size.x - 1; x++)
                         for (int y = 1; y < tilemapComponent.TilemapWalls.size.y - 1; y++)

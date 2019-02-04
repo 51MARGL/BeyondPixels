@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,7 +9,10 @@ using UnityEngine;
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class SpellCastingSystem : JobComponentSystem
-    {       
+    {
+        [DisableAutoCreation]
+        public class SpellCastBarrier : BarrierSystem { }
+
         [RequireComponentTag(typeof(SpellBookComponent))]
         [RequireSubtractiveComponent(typeof(SpellCastingComponent))]
         private struct SpellCastJob : IJobProcessComponentDataWithEntity<InputComponent>
@@ -29,17 +33,22 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             }
         }
         [Inject]
-        private SpellCastBarrier _barrier;
+        private SpellCastBarrier _spellCastBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _spellCastBarrier = World.Active.GetOrCreateManager<SpellCastBarrier>();
+        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new SpellCastJob
+            var handle = new SpellCastJob
             {
-                CommandBuffer = _barrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _spellCastBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
+            _spellCastBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
-
-        public class SpellCastBarrier : BarrierSystem { }
     }
 }

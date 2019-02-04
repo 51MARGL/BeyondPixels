@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Systems
@@ -76,12 +77,10 @@ namespace BeyondPixels.UI.ECS.Systems
                 var currentHealth = _healthData.HealthComponents[i].CurrentValue;
                 var maxHealth = _healthData.HealthComponents[i].MaxValue;
                 var currentFill = (float)currentHealth / maxHealth;
-                if (playerUIHealthGroup.HealthImage.fillAmount != currentFill)
-                {
-                    playerUIHealthGroup.HealthImage.fillAmount
-                        = Mathf.Lerp(playerUIHealthGroup.HealthImage.fillAmount, currentFill, deltaTime * 10f);
-                    playerUIHealthGroup.HealthText.text = currentHealth + " / " + maxHealth;
-                }
+
+                playerUIHealthGroup.HealthImage.fillAmount
+                    = math.lerp(playerUIHealthGroup.HealthImage.fillAmount, currentFill, deltaTime * 10f);
+                playerUIHealthGroup.HealthText.text = currentHealth + " / " + maxHealth;
             }
 
 

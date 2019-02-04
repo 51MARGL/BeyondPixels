@@ -3,7 +3,8 @@
     "references": [
         "BeyondPixels.ECS.Components",
         "Unity.Entities",
-        "Unity.Entities.Hybrid"
+        "Unity.Entities.Hybrid",
+        "Unity.Mathematics"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

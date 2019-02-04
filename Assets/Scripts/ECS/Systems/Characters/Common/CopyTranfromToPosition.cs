@@ -2,7 +2,7 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
-using UnityEngine;
+using Unity.Mathematics;
 using UnityEngine.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -18,7 +18,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             public void Execute(int index, TransformAccess transform)
             {
                 var position = PositionComponents[index];
-                position.CurrentPosition = transform.position;
+                position.CurrentPosition = new float2(transform.position.x, transform.position.y);
                 PositionComponents[index] = position;
             }
         }

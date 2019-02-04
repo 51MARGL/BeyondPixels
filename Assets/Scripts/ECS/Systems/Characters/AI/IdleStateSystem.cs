@@ -1,14 +1,19 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class IdleStateSystem : JobComponentSystem
     {
+        [DisableAutoCreation]
+        private class IdleStateBarrier : BarrierSystem { }
+
         [RequireSubtractiveComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
         private struct IdleStateJob : IJobProcessComponentDataWithEntity<IdleStateComponent, PositionComponent>
         {
@@ -25,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     return;
 
                 CommandBuffer.RemoveComponent(index, entity, typeof(IdleStateComponent));
-                if (Vector2.Distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) < 1)
+                if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) < 1)
                     CommandBuffer.AddComponent(index, entity,
                         new InspectStateComponent
                         {
@@ -40,18 +45,22 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             }
         }
 
-        [Inject]
         private IdleStateBarrier _idleStateBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _idleStateBarrier = World.Active.GetOrCreateManager<IdleStateBarrier>();
+        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new IdleStateJob
+            var handle = new IdleStateJob
             {
                 CommandBuffer = _idleStateBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
+            _idleStateBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
-
-        private class IdleStateBarrier : BarrierSystem { }
     }
 }

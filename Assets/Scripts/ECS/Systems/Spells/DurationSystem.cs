@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -9,6 +10,9 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class DurationSystem : JobComponentSystem
     {
+        [DisableAutoCreation]
+        public class DurationBarrier : BarrierSystem { }
+
         [RequireSubtractiveComponent(typeof(DestroyComponent))]
         private struct DurationJob : IJobProcessComponentDataWithEntity<DurationComponent, SpellComponent>
         {
@@ -27,17 +31,22 @@ namespace BeyondPixels.ECS.Systems.Spells
             }
         }
         [Inject]
-        private DurationBarrier _barrier;
+        private DurationBarrier _durationBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _durationBarrier = World.Active.GetOrCreateManager<DurationBarrier>();
+        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new DurationJob
+            var handle = new DurationJob
             {
-                CommandBuffer = _barrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _durationBarrier.CreateCommandBuffer().ToConcurrent(),
                 DeltaTime = Time.deltaTime
             }.Schedule(this, inputDeps);
+            _durationBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
-
-        public class DurationBarrier : BarrierSystem { }
     }
 }

@@ -3,6 +3,7 @@ using BeyondPixels.ECS.Components.Characters.Player;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Jobs;
 
@@ -19,14 +20,17 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
             public void Execute(int index, TransformAccess transform)
             {
+                if (MovementComponents[index].Direction.Equals(float2.zero))
+                    return;
+
                 var velocity =
-                    MovementComponents[index].Direction.normalized *
+                    math.normalize(MovementComponents[index].Direction) *
                     MovementComponents[index].Speed *
                     DeltaTime;
 
                 transform.position += new Vector3(velocity.x, velocity.y, 0f);
 
-                var scale = Mathf.Abs(transform.localScale.x);
+                var scale = math.abs(transform.localScale.x);
                 if (velocity.x < 0f)
                     transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
                 else if (velocity.x > 0f)

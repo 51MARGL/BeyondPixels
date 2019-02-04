@@ -3,6 +3,7 @@ using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.Utilities;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -29,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             {
                 var movementComponent = _data.MovementComponents[i];
                 var animatorComponent = _data.AnimatorComponents[i];
-                if (movementComponent.Direction != Vector2.zero)
+                if (!movementComponent.Direction.Equals(float2.zero))
                 {
                     animatorComponent.ActivateLayer("RunLayer");
 

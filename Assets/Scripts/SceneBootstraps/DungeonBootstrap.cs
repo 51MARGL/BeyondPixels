@@ -4,6 +4,7 @@ using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
 using BeyondPixels.UI;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.SceneBootstraps
@@ -34,7 +35,7 @@ namespace BeyondPixels.SceneBootstraps
             });
             entityManager.AddComponentData(playerEntity, new MovementComponent
             {
-                Direction = Vector2.zero,
+                Direction = float2.zero,
                 Speed = playerInitializeComponent.MovementSpeed
             });
             entityManager.AddComponentData(playerEntity, new HealthComponent
@@ -48,7 +49,7 @@ namespace BeyondPixels.SceneBootstraps
             });
             entityManager.AddComponentData(playerEntity, new PositionComponent
             {
-                InitialPosition = player.transform.position
+                InitialPosition = new float2(player.transform.position.x, player.transform.position.y)
             });
             GameObject.Destroy(playerInitializeComponent);
             entityManager.RemoveComponent<PlayerInitializeComponent>(playerEntity);
@@ -76,7 +77,7 @@ namespace BeyondPixels.SceneBootstraps
             });
             entityManager.AddComponentData(enemyEntity, new WeaponComponent
             {
-                DamageValue = enemyInitializeComponent.WeaponDamage, 
+                DamageValue = enemyInitializeComponent.WeaponDamage,
                 AttackRange = enemyInitializeComponent.AttackRange,
                 CoolDown = enemyInitializeComponent.AttackCoolDown
             });
@@ -86,7 +87,7 @@ namespace BeyondPixels.SceneBootstraps
             });
             entityManager.AddComponentData(enemyEntity, new PositionComponent
             {
-                InitialPosition = enemy.transform.position
+                InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
             });
             GameObject.Destroy(enemyInitializeComponent);
             entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
@@ -118,7 +119,7 @@ namespace BeyondPixels.SceneBootstraps
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
                 for (int i = 0; i < 20; i++)
                 {
-                    var randomPositon = new Vector2(Random.Range(-50f, 50f), Random.Range(-50f, 50f));
+                    var randomPositon = new Vector2(UnityEngine.Random.Range(-25f, 25f), UnityEngine.Random.Range(-25f, 25f));
                     var enemy = GameObject.Instantiate(PrefabManager.Instance.EnemyPrefab, randomPositon, Quaternion.identity);
                     var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
                     var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
@@ -129,7 +130,7 @@ namespace BeyondPixels.SceneBootstraps
                     });
                     entityManager.AddComponentData(enemyEntity, new MovementComponent
                     {
-                        Direction = Vector2.zero,
+                        Direction = float2.zero,
                         Speed = enemyInitializeComponent.MovementSpeed
                     });
                     entityManager.AddComponentData(enemyEntity, new HealthComponent
@@ -149,7 +150,7 @@ namespace BeyondPixels.SceneBootstraps
                     });
                     entityManager.AddComponentData(enemyEntity, new PositionComponent
                     {
-                        InitialPosition = enemy.transform.position
+                        InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
                     });
                     GameObject.Destroy(enemyInitializeComponent);
                     entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);

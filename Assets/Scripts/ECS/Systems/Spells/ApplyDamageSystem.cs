@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Spells;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -9,6 +10,9 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class ApplyDamageSystem : JobComponentSystem
     {
+        [DisableAutoCreation]
+        public class ApplyDamageSystemBarrier : BarrierSystem { }
+
         private struct ApplyDamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, SpellCollisionComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -68,20 +72,25 @@ namespace BeyondPixels.ECS.Systems.Spells
         private ComponentDataFromEntity<CharacterComponent> _characterComponents;
         [Inject]
         public ComponentDataFromEntity<TargetRequiredComponent> _targetRequiredComponents;
-        [Inject]
-        private ApplyDamageSystemBarrier _barrier;
+
+        private ApplyDamageSystemBarrier _applyDamageBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _applyDamageBarrier = World.Active.GetOrCreateManager<ApplyDamageSystemBarrier>();
+        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new ApplyDamageJob
+            var handle = new ApplyDamageJob
             {
-                CommandBuffer = _barrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _applyDamageBarrier.CreateCommandBuffer().ToConcurrent(),
                 DamageComponents = _damageComponents,
                 CharacterComponents = _characterComponents,
                 TargetRequiredComponents = _targetRequiredComponents
             }.Schedule(this, inputDeps);
+            _applyDamageBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
-
-        public class ApplyDamageSystemBarrier : BarrierSystem { }
     }
 }

@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Spells;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using static BeyondPixels.ECS.Components.Characters.Common.SpellBookComponent;
 
@@ -33,7 +34,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 var casterEntity = _data.EntityArray[i];
 
                 if (inputComponent.AttackButtonPressed == 1
-                    || inputComponent.InputDirection != Vector2.zero)
+                    || !(inputComponent.InputDirection.Equals(float2.zero)))
                 {
                     PostUpdateCommands.RemoveComponent<SpellCastingComponent>(casterEntity);
                     return;
@@ -82,11 +83,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             (Entity entity, PositionComponent position) caster,
             (Entity entity, PositionComponent position) target)
         {
-            var position = new Vector3(0, 0, 100);
+            var position = new float3(0, 0, 100);
             if (spell.SelfTarget)
-                position = caster.position.CurrentPosition;
+                position = new float3(caster.position.CurrentPosition.x, caster.position.CurrentPosition.y, 100); 
             else if (spell.TargetRequired)
-                position = target.position.CurrentPosition;
+                position = new float3(target.position.CurrentPosition.x, target.position.CurrentPosition.y, 100);
 
             var spellObject = GameObject.Instantiate(spell.Prefab, position, Quaternion.identity);
             var spellEntity = spellObject.GetComponent<GameObjectEntity>().Entity;

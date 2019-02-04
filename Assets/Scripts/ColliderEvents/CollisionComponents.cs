@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -25,7 +26,7 @@ namespace BeyondPixels.ColliderEvents
     public struct SpellCollisionComponent : IComponentData
     {
         public Entity SpellEntity;
-        public Vector2 ImpactPoint;
+        public float2 ImpactPoint;
         public float ImpactTime;
     }
 }

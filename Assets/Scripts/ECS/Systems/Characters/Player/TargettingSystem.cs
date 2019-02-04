@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -29,8 +30,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 {
                     var ray = Camera.main.ScreenPointToRay(inputComponent.MousePosition);
                     var layerMask = LayerMask.GetMask("Clickable");
-                    var raycastHit = Physics2D.GetRayIntersection(ray, Mathf.Infinity, layerMask);
-                    
+                    var raycastHit = Physics2D.GetRayIntersection(ray, 100f, layerMask);
+
                     if (raycastHit.transform != null)
                     {
                         if (_targetComponents.Exists(_data.EntityArray[i]))

@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.AI;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,6 +9,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class AggroEventSystem : JobComponentSystem
     {
+        [DisableAutoCreation]
+        public class AggroEventBarrier : BarrierSystem { }
+
         private struct AggroEventJob : IJobProcessComponentDataWithEntity<CollisionInfo, AggroRangeCollisionComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -33,17 +37,22 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 CommandBuffer.DestroyEntity(index, entity);
             }
         }
-        [Inject]
+
         private AggroEventBarrier _aggroEventBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _aggroEventBarrier = World.Active.GetOrCreateManager<AggroEventBarrier>();
+        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            return new AggroEventJob
+            var handle = new AggroEventJob
             {
                 CommandBuffer = _aggroEventBarrier.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
+            _aggroEventBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
-
-        public class AggroEventBarrier : BarrierSystem { }
     }
 }
