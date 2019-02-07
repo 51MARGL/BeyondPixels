@@ -6,7 +6,7 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
 {
     public struct TileComponent : IComponentData
     {
-        public int2 Postition;
+        public int2 Position;
         public TileType TileType;
     }
 

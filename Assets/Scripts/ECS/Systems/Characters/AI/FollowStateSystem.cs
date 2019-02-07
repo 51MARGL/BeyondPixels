@@ -1,6 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -30,6 +29,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                 [ReadOnly] ref WeaponComponent weaponComponent,
                                 [ReadOnly] ref PositionComponent positionComponent)
             {
+                if (!Positions.Exists(followStateComponent.Target))
+                {
+                    CommandBuffer.RemoveComponent<FollowStateComponent>(index, entity);
+                    return;
+                }
+
                 var target = followStateComponent.Target;
                 var targetPosition = Positions[target];
 

@@ -5,7 +5,6 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 {
@@ -17,9 +16,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         [BurstCompile]
         private struct SetRoomTilesJob : IJobParallelFor
         {
-            [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<RoomComponent> Roms;
-            [NativeDisableContainerSafetyRestriction] [WriteOnly] public NativeArray<TileType> Tiles;
-            [ReadOnly] public int TileStride;
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<RoomComponent> Roms;
+
+            [NativeDisableContainerSafetyRestriction]
+            [WriteOnly]
+            public NativeArray<TileType> Tiles;
+
+            [ReadOnly]
+            public int TileStride;
 
             public void Execute(int index)
             {
@@ -28,9 +34,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 {
                     int xCoord = currentRoom.X + j;
 
+                    if (currentRoom.X == 0 || currentRoom.Y == 0)
+                        return;
                     for (int k = 0; k < currentRoom.Size.y; k++)
                     {
-                        int yCoord = currentRoom.Y + k;
+                        int yCoord = currentRoom.Y + k;                        
                         Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
                     }
                 }
@@ -40,9 +48,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         [BurstCompile]
         private struct SetCorridorTilesJob : IJobParallelFor
         {
-            [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<CorridorComponent> Corridors;
-            [NativeDisableContainerSafetyRestriction] [WriteOnly] public NativeArray<TileType> Tiles;
-            [ReadOnly] public int TileStride;
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<CorridorComponent> Corridors;
+
+            [NativeDisableContainerSafetyRestriction]
+            [WriteOnly]
+            public NativeArray<TileType> Tiles;
+
+            [ReadOnly]
+            public int TileStride;
 
             public void Execute(int index)
             {
@@ -55,23 +70,23 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
                     switch (currentCorridor.Direction)
                     {
-                        case Direction.North:
+                        case Direction.Up:
                             yCoord += j;
                             break;
-                        case Direction.East:
+                        case Direction.Left:
                             xCoord += j;
                             break;
-                        case Direction.South:
+                        case Direction.Down:
                             yCoord -= j;
                             break;
-                        case Direction.West:
+                        case Direction.Right:
                             xCoord -= j;
                             break;
                     }
 
                     Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
 
-                    if (currentCorridor.Direction == Direction.North || currentCorridor.Direction == Direction.South)
+                    if (currentCorridor.Direction == Direction.Up || currentCorridor.Direction == Direction.Down)
                         Tiles[(yCoord * TileStride) + xCoord - 1] = TileType.Floor;
                     else
                         Tiles[((yCoord - 1) * TileStride) + xCoord] = TileType.Floor;
@@ -82,7 +97,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         [BurstCompile]
         private struct FinalizeBoardJob : IJob
         {
-            [ReadOnly] public BoardComponent Board;
+            [ReadOnly]
+            public BoardComponent Board;
             public NativeArray<TileType> Tiles;
 
             public void Execute()
@@ -96,12 +112,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 for (int x = 0; x < board.Size.x; x++)
                 {
                     tiles[x] = TileType.Wall;
+                    tiles[tilesStride + x] = TileType.Wall;
                     tiles[((board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
+                    tiles[((board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
                 }
                 for (int y = 0; y < board.Size.y; y++)
                 {
                     tiles[y * tilesStride] = TileType.Wall;
+                    tiles[y * tilesStride + 1] = TileType.Wall;
                     tiles[(y * tilesStride) + board.Size.x - 1] = TileType.Wall;
+                    tiles[(y * tilesStride) + board.Size.x - 2] = TileType.Wall;
                 }
             }
 
@@ -135,8 +155,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         private struct InstantiateTilesJob : IJobParallelFor
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
-            [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<TileType> Tiles;
-            [ReadOnly] public int TileStride;
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<TileType> Tiles;
+
+            [ReadOnly]
+            public int TileStride;
 
             //Index represents row
             public void Execute(int index)
@@ -147,7 +171,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     CommandBuffer.AddComponent(index, entity, new TileComponent
                     {
                         TileType = Tiles[(index * TileStride) + x],
-                        Postition = new int2(x, index)
+                        Position = new int2(x, index)
                     });
                 }
             }
@@ -156,9 +180,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         private struct CleanUpJob : IJobParallelFor
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
-            [NativeDisableContainerSafetyRestriction] [DeallocateOnJobCompletion] [ReadOnly]
+            [NativeDisableContainerSafetyRestriction]
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
             public NativeArray<BoardComponent> Boards;
-            [NativeDisableContainerSafetyRestriction] [DeallocateOnJobCompletion] [ReadOnly]
+
+            [NativeDisableContainerSafetyRestriction]
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
             public NativeArray<Entity> BoardEntities;
 
             public void Execute(int index)
@@ -176,10 +205,19 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         [BurstCompile]
         private struct CreateRoomsAndCorridorsJob : IJobParallelFor
         {
-            [ReadOnly] public BoardComponent Board;
-            [NativeDisableParallelForRestriction] public NativeArray<RoomComponent> Rooms;
-            [NativeDisableParallelForRestriction] public NativeArray<CorridorComponent> Corridors;
-            [DeallocateOnJobCompletion] [ReadOnly] public NativeArray<BatchData> Data;
+            [ReadOnly]
+            public BoardComponent Board;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<RoomComponent> Rooms;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<CorridorComponent> Corridors;
+
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<BatchData> Data;
+
             public Unity.Mathematics.Random Random;
 
             public void Execute(int index)
@@ -285,7 +323,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 {
                     Board = board,
                     Tiles = tiles,
-                }.Schedule(JobHandle.CombineDependencies(CreateRoomsAndCorridorsJobHandle, CreateRoomsAndCorridorsJobHandle));
+                }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
 
                 var instantiateTilesJobHandle = new InstantiateTilesJob
                 {
@@ -310,73 +348,85 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             var roomWidth = random.NextInt(3, board.RoomSize);
             var roomHeight = random.NextInt(3, board.RoomSize);
 
-            var xPos = (int)math.round(board.Size.x / 2f - roomWidth / 2f);
-            var yPos = (int)math.round(board.Size.y / 2f - roomHeight / 2f);
+            var centerX = (int)math.round(board.Size.x / 2f - roomWidth / 2f);
+            var centerY = (int)math.round(board.Size.y / 2f - roomHeight / 2f);
 
             return new RoomComponent
             {
-                X = xPos,
-                Y = yPos,
+                X = centerX,
+                Y = centerY,
                 Size = new int2(roomWidth, roomHeight),
-                EnteringCorridor = Direction.North
+                EnteringCorridor = Direction.Up
             };
         }
 
         private static RoomComponent CreateRoom(BoardComponent board, CorridorComponent corridor, ref Unity.Mathematics.Random random)
         {
-            var enteringCorridor = corridor.Direction;
-
             var roomWidth = random.NextInt(3, board.RoomSize);
             var roomHeight = random.NextInt(3, board.RoomSize);
 
-            var xPos = 0;
-            var yPos = 0;
+            var roomX = 0;
+            var roomY = 0;
 
             switch (corridor.Direction)
             {
-                case Direction.North:
-                    roomHeight = math.clamp(roomHeight, 1, board.Size.y - corridor.EndPositionY);
-                    yPos = corridor.EndPositionY;
-                    xPos = random.NextInt(corridor.EndPositionX - roomWidth, corridor.EndPositionX);
-                    xPos = math.clamp(xPos, 2, board.Size.x - 2 - roomWidth);
+                case Direction.Up:
+                    roomHeight = math.clamp(roomHeight, 0, board.Size.y - 2 - corridor.EndY);
+                    roomY = corridor.EndY;
+                    roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
+                    roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
                     break;
-                case Direction.East:
-                    roomWidth = math.clamp(roomWidth, 1, board.Size.x - corridor.EndPositionX);
-                    xPos = corridor.EndPositionX;
-                    yPos = random.NextInt(corridor.EndPositionY - roomHeight, corridor.EndPositionY);
-                    yPos = math.clamp(yPos, 2, board.Size.y - 2 - roomHeight);
+                case Direction.Left:
+                    roomWidth = math.clamp(roomWidth, 0, board.Size.x - 2 - corridor.EndX);
+                    roomX = corridor.EndX;
+                    roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
+                    roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
                     break;
-                case Direction.South:
-                    roomHeight = math.clamp(roomHeight, 1, corridor.EndPositionY);
-                    yPos = corridor.EndPositionY - roomHeight;
-                    xPos = random.NextInt(corridor.EndPositionX - roomWidth, corridor.EndPositionX);
-                    xPos = math.clamp(xPos, 2, board.Size.x - 2 - roomWidth);
+                case Direction.Down:
+                    roomHeight = math.clamp(roomHeight, 0, corridor.EndY);
+                    roomY = corridor.EndY - roomHeight + 1;
+                    roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
+                    roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
                     break;
-                case Direction.West:
-                    roomWidth = math.clamp(roomWidth, 1, corridor.EndPositionX);
-                    xPos = corridor.EndPositionX - roomWidth;
-                    yPos = random.NextInt(corridor.EndPositionY - roomHeight, corridor.EndPositionY);
-                    yPos = math.clamp(yPos, 2, board.Size.y - 2 - roomHeight);
+                case Direction.Right:
+                    roomWidth = math.clamp(roomWidth, 0, corridor.EndX);
+                    roomX = corridor.EndX - roomWidth + 1;
+                    roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
+                    roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
                     break;
             }
 
             return new RoomComponent
             {
-                X = xPos,
-                Y = yPos,
+                X = math.clamp(roomX, 2, board.Size.x - 2),
+                Y = math.clamp(roomY, 2, board.Size.y - 2),
                 Size = new int2(roomWidth, roomHeight),
-                EnteringCorridor = enteringCorridor
+                EnteringCorridor = corridor.Direction
             };
         }
 
-        private static CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, bool first, ref Unity.Mathematics.Random random, int fDirection = -1)
+        private static CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, bool first, ref Unity.Mathematics.Random random, int forceDirection = -1)
         {
             var direction = (Direction)random.NextInt(0, 4);
             var oppositeDirection = (Direction)(((int)room.EnteringCorridor + 2) % 4);
 
-            if (first && fDirection != -1)
-                direction = (Direction)fDirection;
-            else if (!first && direction == oppositeDirection)
+            if (first && forceDirection != -1)
+                direction = (Direction)forceDirection;
+            else if (!first && random.NextInt(0, 100) > 50) //50% chance to go further from center
+            {
+                var centerX = (int)math.round(board.Size.x / 2f);
+                var centerY = (int)math.round(board.Size.y / 2f);
+                if (room.X > centerX && room.Y > centerY)
+                    direction = random.NextInt(0, 10) > 4 ? Direction.Left : Direction.Up;
+                else if (room.X < centerX && room.Y > centerY)
+                    direction = random.NextInt(0, 10) > 4 ? Direction.Right : Direction.Up;
+                else if (room.X > centerX && room.Y < centerY)
+                    direction = random.NextInt(0, 10) > 4 ? Direction.Left : Direction.Down;
+                else
+                    direction = random.NextInt(0, 10) > 4 ? Direction.Right : Direction.Down;
+            }
+
+            if (!first && direction == oppositeDirection)
             {
                 int directionInt = (int)direction;
                 directionInt++;
@@ -386,43 +436,41 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
 
             var corridorLength = random.NextInt(board.MinCorridorLength, board.MaxCorridorLength);
-            var startXPos = 0;
-            var startYPos = 0;
+            var corridorX = 0;
+            var corridorY = 0;
 
             int maxLength = board.MaxCorridorLength;
 
             switch (direction)
             {
-                case Direction.North:
-                    startXPos = random.NextInt(room.X, room.X + room.Size.x);
-                    startYPos = room.Y + room.Size.y;
-                    maxLength = board.Size.y - startYPos;
+                case Direction.Up:
+                    corridorX = random.NextInt(room.X, room.X + room.Size.x);
+                    corridorY = room.Y + room.Size.y - 2;
+                    maxLength = board.Size.y - 2 - corridorY;
                     break;
-                case Direction.East:
-                    startXPos = room.X + room.Size.x;
-                    startYPos = random.NextInt(room.Y, room.Y + room.Size.y);
-                    maxLength = board.Size.x - startXPos;
+                case Direction.Left:
+                    corridorX = room.X + room.Size.x - 2;
+                    corridorY = random.NextInt(room.Y, room.Y + room.Size.y);
+                    maxLength = board.Size.x - 2 - corridorX;
                     break;
-                case Direction.South:
-                    startXPos = random.NextInt(room.X, room.X + room.Size.x);
-                    startYPos = room.Y;
-                    maxLength = startYPos;
+                case Direction.Down:
+                    corridorX = random.NextInt(room.X, room.X + room.Size.x + 1);
+                    corridorY = room.Y;
+                    maxLength = corridorY - 2;
                     break;
-                case Direction.West:
-                    startXPos = room.X;
-                    startYPos = random.NextInt(room.Y, room.Y + room.Size.y);
-                    maxLength = startXPos;
+                case Direction.Right:
+                    corridorX = room.X;
+                    corridorY = random.NextInt(room.Y, room.Y + room.Size.y + 1);
+                    maxLength = corridorX - 2;
                     break;
             }
 
-            corridorLength = math.clamp(corridorLength, 1, maxLength);
-            startXPos = math.clamp(startXPos, 2, board.Size.x - 3);
-            startYPos = math.clamp(startYPos, 2, board.Size.y - 3);
+            corridorLength = math.clamp(corridorLength, 0, maxLength);
 
             return new CorridorComponent
             {
-                StartX = startXPos,
-                StartY = startYPos,
+                StartX = corridorX,
+                StartY = corridorY,
                 Length = corridorLength,
                 Direction = direction
             };

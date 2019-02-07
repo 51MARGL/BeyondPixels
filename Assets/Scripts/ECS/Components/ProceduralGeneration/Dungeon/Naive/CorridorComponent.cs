@@ -11,26 +11,26 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
         public Direction Direction;
 
         // Get the end position of the corridor based on it's start position and which direction it's heading.
-        public int EndPositionX
+        public int EndX
         {
             get
             {
-                if (Direction == Direction.North || Direction == Direction.South)
+                if (Direction == Direction.Up || Direction == Direction.Down)
                     return StartX;
-                if (Direction == Direction.East)
+                if (Direction == Direction.Left)
                     return StartX + Length - 1;
                 return StartX - Length + 1;
             }
         }
 
 
-        public int EndPositionY
+        public int EndY
         {
             get
             {
-                if (Direction == Direction.East || Direction == Direction.West)
+                if (Direction == Direction.Left || Direction == Direction.Right)
                     return StartY;
-                if (Direction == Direction.North)
+                if (Direction == Direction.Up)
                     return StartY + Length - 1;
                 return StartY - Length + 1;
             }
@@ -39,6 +39,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
 
     public enum Direction
     {
-        North, East, South, West
+        Up, Left, Down, Right
     }
 }

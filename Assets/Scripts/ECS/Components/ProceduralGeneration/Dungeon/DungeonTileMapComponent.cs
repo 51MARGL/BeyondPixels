@@ -14,5 +14,7 @@ namespace Assets.Scripts.Components.ProceduralGeneration.Dungeon
         public RuleTile WallTileTop;
         public AnimatedTile WallTorchAnimatedTile;
         public GameObject TorchLight;
+        public int OuterWallWidth;
+        public Coroutine tileSpawnRoutine;
     }
 }
