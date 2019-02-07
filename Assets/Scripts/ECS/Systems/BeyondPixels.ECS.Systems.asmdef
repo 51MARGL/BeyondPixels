@@ -10,9 +10,10 @@
         "Unity.Mathematics",
         "Unity.Collections",
         "BeyondPixels.Utilities",
-        "BeyondPixels.Tilemap",
+        "BeyondPixels",
         "Unity.Transforms",
-        "BeyondPixels.SceneBootstap"
+        "BeyondPixels.SceneBootstap",
+        "BeyondPixels.Tilemap"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

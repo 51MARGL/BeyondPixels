@@ -138,7 +138,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        if (iterationCounter % (math.clamp(2 * i, 1, boardSize.y / 5)) == 0)
+                        if (iterationCounter % (math.clamp(i, 1, boardSize.y / 2)) == 0)
                             yield return null;
                     }
             }
@@ -154,8 +154,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                         tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                     }
-                    if (x % (boardSize.x / 5) == 0)
-                        yield return null;
                 }
 
             if (boardSize.x % 2 == 0)
@@ -169,9 +167,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                         tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                     }
-                    if (y % (boardSize.y / 5) == 0)
-                        yield return null;
                 }
+                yield return null;
 
             //hide skybox
             for (int x = -tilemapComponent.OuterWallWidth; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)

@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb2e8b880c66464182f230c0a7d03de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoardWidth: 50
+  BoardWidth: 75
   BoardHeight: 50
   RoomCount: 30
   RoomSize: 10

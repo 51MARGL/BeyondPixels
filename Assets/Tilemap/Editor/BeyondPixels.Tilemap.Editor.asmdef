@@ -1,14 +1,12 @@
 {
-    "name": "BeyondPixels.ECS.Components",
+    "name": "BeyondPixels.Tilemap.Editor",
     "references": [
-        "Unity.Entities",
-        "Unity.Entities.Hybrid",
-        "Unity.Mathematics",
-        "BeyondPixels",
         "BeyondPixels.Tilemap"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
