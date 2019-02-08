@@ -43,9 +43,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb2e8b880c66464182f230c0a7d03de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoardWidth: 75
-  BoardHeight: 50
-  RoomCount: 30
-  RoomSize: 10
-  MaxCorridorLength: 10
-  MinCorridorLength: 5
+  DungeonGenerators:
+    Switch: 0
+    Naive:
+      BoardWidth: 100
+      BoardHeight: 75
+      RoomCount: 30
+      RoomSize: 10
+      MaxCorridorLength: 10
+      MinCorridorLength: 5
+    CellularAutomaton:
+      BoardWidth: 100
+      BoardHeight: 75
+      RandomFillPercent: 75
+      PassRadius: 3

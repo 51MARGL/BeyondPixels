@@ -1,15 +1,14 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
+namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomaton
 {
     public class CleanUpSystem : ComponentSystem
     {        
         private ComponentGroup _boardGroup;
         private ComponentGroup _roomGroup;
-        private ComponentGroup _corridorGroup;
         private ComponentGroup _tileGroup;
 
         protected override void OnCreateManager()
@@ -20,9 +19,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 ComponentType.ReadOnly(typeof(TilemapReadyComponent))
             );
             _roomGroup = GetComponentGroup(
-                ComponentType.ReadOnly(typeof(RoomComponent)));
-            _corridorGroup = GetComponentGroup(
-               ComponentType.ReadOnly(typeof(CorridorComponent)));
+                ComponentType.ReadOnly(typeof(RoomComponent)));            
             _tileGroup = GetComponentGroup(
                ComponentType.ReadOnly(typeof(TileComponent)));
         }
@@ -34,7 +31,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
             DeleteAllEntities(this._roomGroup.CreateArchetypeChunkArray(Allocator.TempJob));
-            DeleteAllEntities(this._corridorGroup.CreateArchetypeChunkArray(Allocator.TempJob));
             DeleteAllEntities(this._tileGroup.CreateArchetypeChunkArray(Allocator.TempJob));
         }
 

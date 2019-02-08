@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BeyondPixels.ECS.Components.Objects;
+﻿using BeyondPixels.ECS.Components.Objects;
 using Unity.Entities;
 using UnityEngine;
 
@@ -27,6 +26,7 @@ namespace BeyondPixels.ECS.Systems.Objects
             for (int i = 0; i < count; i++)
             {
                 EntityManager.DestroyEntity(objectsToDestroy[i].entity);
+                //release this frame for EntityManager
                 GameObject.Destroy(objectsToDestroy[i].gameObject, 0.01f);
             }
 

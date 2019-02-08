@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
+namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomaton
 {
     public class TileMapSystem : ComponentSystem
     {

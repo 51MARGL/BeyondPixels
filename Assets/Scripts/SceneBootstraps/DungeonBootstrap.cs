@@ -2,21 +2,52 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
 using BeyondPixels.UI;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using System;
 
 namespace BeyondPixels.SceneBootstraps
-{
+{    
     public class DungeonBootstrap : MonoBehaviour
     {
-        public int BoardWidth;
-        public int BoardHeight;
-        public int RoomCount;
-        public int RoomSize;
-        public int MaxCorridorLength;
-        public int MinCorridorLength;
+        [Serializable]
+        public class DungeonGeneratorSettings
+        {
+            public Switch Switch;
+            public NaiveSettings Naive;
+            public CellularAutomatonSettings CellularAutomaton;
+        }
+
+        public enum Switch
+        {
+            Naive, CellularAutomaton
+        }
+
+        [Serializable]
+        public class NaiveSettings
+        {
+            public int BoardWidth;
+            public int BoardHeight;
+            public int RoomCount;
+            public int RoomSize;
+            public int MaxCorridorLength;
+            public int MinCorridorLength;
+        }
+
+        [Serializable]
+        public class CellularAutomatonSettings
+        {
+            public int BoardWidth;
+            public int BoardHeight;
+            [Range(1, 100)]
+            public int RandomFillPercent;
+            public int PassRadius;
+        }
+
+        public DungeonGeneratorSettings DungeonGenerators;
 
         // Use this for initialization
         private void Start()
@@ -95,15 +126,30 @@ namespace BeyondPixels.SceneBootstraps
 
 
             #region DungeonGeneration
-            var board = entityManager.CreateEntity();
-            entityManager.AddComponentData(board, new BoardComponent
+            Entity board;
+            switch (DungeonGenerators.Switch)
             {
-                Size = new Unity.Mathematics.int2(BoardWidth, BoardHeight),
-                RoomCount = RoomCount,
-                RoomSize = RoomSize,
-                MaxCorridorLength = MaxCorridorLength,
-                MinCorridorLength = MinCorridorLength
-            });
+                case Switch.Naive:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
+                        RoomCount = DungeonGenerators.Naive.RoomCount,
+                        RoomSize = DungeonGenerators.Naive.RoomSize,
+                        MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
+                        MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
+                    });
+                    break;
+                case Switch.CellularAutomaton:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
+                        RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
+                        PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
+                    });
+                    break;
+            }
             #endregion
 
 
@@ -161,15 +207,30 @@ namespace BeyondPixels.SceneBootstraps
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
 
-                var board = entityManager.CreateEntity();
-                entityManager.AddComponentData(board, new BoardComponent
+                Entity board;
+                switch (DungeonGenerators.Switch)
                 {
-                    Size = new Unity.Mathematics.int2(BoardWidth, BoardHeight),
-                    RoomCount = RoomCount,
-                    RoomSize = RoomSize,
-                    MaxCorridorLength = MaxCorridorLength,
-                    MinCorridorLength = MinCorridorLength
-                });
+                    case Switch.Naive:
+                        board = entityManager.CreateEntity();
+                        entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
+                        {
+                            Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
+                            RoomCount = DungeonGenerators.Naive.RoomCount,
+                            RoomSize = DungeonGenerators.Naive.RoomSize,
+                            MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
+                            MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
+                        });
+                        break;
+                    case Switch.CellularAutomaton:
+                        board = entityManager.CreateEntity();
+                        entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
+                        {
+                            Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
+                            RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
+                            PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
+                        });
+                        break;
+                }
             }
         }
     }

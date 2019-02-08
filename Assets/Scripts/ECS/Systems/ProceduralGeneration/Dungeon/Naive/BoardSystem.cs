@@ -11,7 +11,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
     public class BoardSystem : JobComponentSystem
     {
         [DisableAutoCreation]
-        public class BoardSystemBarrier : BarrierSystem { }
+        private class BoardSystemBarrier : BarrierSystem { }
 
         [BurstCompile]
         private struct SetRoomTilesJob : IJobParallelFor
@@ -218,22 +218,21 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             [ReadOnly]
             public NativeArray<BatchData> Data;
 
-            public Unity.Mathematics.Random Random;
-
             public void Execute(int index)
             {
                 var batch = Data[index];
+                var random = new Random((uint)index + 1);
 
                 Rooms[batch.FirstRoomIndex] =
-                    CreateRoom(Board, Corridors[batch.FirstCorridorIndex], ref Random);
+                    CreateRoom(Board, Corridors[batch.FirstCorridorIndex], ref random);
                 Corridors[3 + batch.FirstRoomIndex] =
-                    CreateCorridor(Rooms[batch.FirstRoomIndex], Board, false, ref Random);
+                    CreateCorridor(Rooms[batch.FirstRoomIndex], Board, false, ref random);
 
                 for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
                 {
-                    Rooms[i] = CreateRoom(Board, Corridors[j - 1], ref Random);
+                    Rooms[i] = CreateRoom(Board, Corridors[j - 1], ref random);
                     if (j < Corridors.Length)
-                        Corridors[j] = CreateCorridor(Rooms[i], Board, false, ref Random);
+                        Corridors[j] = CreateCorridor(Rooms[i], Board, false, ref random);
                 }
             }
         }
@@ -301,8 +300,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     Board = board,
                     Rooms = rooms,
                     Corridors = corridors,
-                    Data = batch,
-                    Random = random
+                    Data = batch
                 }.Schedule(batch.Length, 1, inputDeps);
 
                 var setRoomTilesJobHandle = new SetRoomTilesJob
@@ -325,22 +323,22 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     Tiles = tiles,
                 }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
 
-                var instantiateTilesJobHandle = new InstantiateTilesJob
+                inputDeps = new InstantiateTilesJob
                 {
                     CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
                     Tiles = tiles,
                     TileStride = board.Size.x
                 }.Schedule(board.Size.y, 1, finalizeBoardJobHandle);
 
-                inputDeps = new CleanUpJob
-                {
-                    CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
-                    Boards = boards,
-                    BoardEntities = boardEntities
-                }.Schedule(boards.Length, 1, instantiateTilesJobHandle);
             }
-            _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
-            return inputDeps;
+            var handle = new CleanUpJob
+            {
+                CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
+                Boards = boards,
+                BoardEntities = boardEntities
+            }.Schedule(boards.Length, 1, inputDeps);
+            _boardSystemBarrier.AddJobHandleForProducer(handle);
+            return handle;
         }
 
         private static RoomComponent CreateRoom(BoardComponent board, ref Unity.Mathematics.Random random)
@@ -417,13 +415,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 var centerX = (int)math.round(board.Size.x / 2f);
                 var centerY = (int)math.round(board.Size.y / 2f);
                 if (room.X > centerX && room.Y > centerY)
-                    direction = random.NextInt(0, 10) > 4 ? Direction.Left : Direction.Up;
+                    direction = random.NextBool() ? Direction.Left : Direction.Up;
                 else if (room.X < centerX && room.Y > centerY)
-                    direction = random.NextInt(0, 10) > 4 ? Direction.Right : Direction.Up;
+                    direction = random.NextBool() ? Direction.Right : Direction.Up;
                 else if (room.X > centerX && room.Y < centerY)
-                    direction = random.NextInt(0, 10) > 4 ? Direction.Left : Direction.Down;
+                    direction = random.NextBool() ? Direction.Left : Direction.Down;
                 else
-                    direction = random.NextInt(0, 10) > 4 ? Direction.Right : Direction.Down;
+                    direction = random.NextBool() ? Direction.Right : Direction.Down;
             }
 
             if (!first && direction == oppositeDirection)
