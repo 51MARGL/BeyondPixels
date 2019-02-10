@@ -7,7 +7,8 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutom
     public struct TileComponent : IComponentData
     {
         public int2 Position;
-        public TileType TileType;
+        public TileType CurrentGenState;
+        public TileType NextGenState;
     }
 
     public enum TileType

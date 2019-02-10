@@ -56,17 +56,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad980451443d70438faac0bc6c235a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_LookaheadTime: 0.6
-  m_LookaheadSmoothing: 15
+  m_LookaheadTime: 0.5
+  m_LookaheadSmoothing: 10
   m_LookaheadIgnoreY: 0
-  m_XDamping: 1
-  m_YDamping: 20
+  m_XDamping: 0.5
+  m_YDamping: 0.5
   m_ZDamping: 0
-  m_ScreenX: 0.5
-  m_ScreenY: 0.49999997
+  m_ScreenX: 0.49999994
+  m_ScreenY: 0.49999994
   m_CameraDistance: 10
-  m_DeadZoneWidth: 0.2418356
-  m_DeadZoneHeight: 0.4806379
+  m_DeadZoneWidth: 0.1716204
+  m_DeadZoneHeight: 0.30357546
   m_DeadZoneDepth: 0
   m_UnlimitedSoftZone: 0
   m_SoftZoneWidth: 0.8

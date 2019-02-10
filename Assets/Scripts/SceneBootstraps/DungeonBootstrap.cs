@@ -1,16 +1,14 @@
-﻿using BeyondPixels.ECS.Components.Characters.AI;
+﻿using System;
+using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
 using BeyondPixels.UI;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using System;
 
 namespace BeyondPixels.SceneBootstraps
-{    
+{
     public class DungeonBootstrap : MonoBehaviour
     {
         [Serializable]
@@ -53,6 +51,33 @@ namespace BeyondPixels.SceneBootstraps
         private void Start()
         {
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+
+            #region DungeonGeneration
+            Entity board;
+            switch (DungeonGenerators.Switch)
+            {
+                case Switch.Naive:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
+                        RoomCount = DungeonGenerators.Naive.RoomCount,
+                        RoomSize = DungeonGenerators.Naive.RoomSize,
+                        MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
+                        MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
+                    });
+                    break;
+                case Switch.CellularAutomaton:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
+                        RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
+                        PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
+                    });
+                    break;
+            }
+            #endregion
 
             #region PlayerEntityArchetype
             var player = PrefabManager.Instance.PlayerPrefab;
@@ -123,35 +148,6 @@ namespace BeyondPixels.SceneBootstraps
             GameObject.Destroy(enemyInitializeComponent);
             entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
             #endregion
-
-
-            #region DungeonGeneration
-            Entity board;
-            switch (DungeonGenerators.Switch)
-            {
-                case Switch.Naive:
-                    board = entityManager.CreateEntity();
-                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
-                    {
-                        Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
-                        RoomCount = DungeonGenerators.Naive.RoomCount,
-                        RoomSize = DungeonGenerators.Naive.RoomSize,
-                        MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
-                        MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
-                    });
-                    break;
-                case Switch.CellularAutomaton:
-                    board = entityManager.CreateEntity();
-                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
-                    {
-                        Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
-                        RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
-                        PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
-                    });
-                    break;
-            }
-            #endregion
-
 
             #region UI
             UIManager.Instance.Initialize(player);

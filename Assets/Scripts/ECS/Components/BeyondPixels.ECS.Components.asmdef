@@ -4,7 +4,6 @@
         "Unity.Entities",
         "Unity.Entities.Hybrid",
         "Unity.Mathematics",
-        "BeyondPixels",
         "BeyondPixels.Tilemap"
     ],
     "optionalUnityReferences": [],

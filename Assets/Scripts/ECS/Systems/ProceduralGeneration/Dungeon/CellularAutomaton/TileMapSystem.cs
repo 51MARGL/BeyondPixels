@@ -97,7 +97,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     for (int x = xLeft, iterationCounter = 0; x <= xRigth; x++, iterationCounter++)
                     {
                         var tile = tileDataList[yTop * boardSize.x + x];
-                        if (tile.TileType == TileType.Floor)
+                        if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -106,7 +106,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
 
                         tile = tileDataList[yBottom * boardSize.x + x];
-                        if (tile.TileType == TileType.Floor)
+                        if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -122,7 +122,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     for (int y = yBottom, iterationCounter = 0; y <= yTop; y++, iterationCounter++)
                     {
                         var tile = tileDataList[y * boardSize.x + xLeft];
-                        if (tile.TileType == TileType.Floor)
+                        if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -131,7 +131,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
 
                         tile = tileDataList[y * boardSize.x + xRigth];
-                        if (tile.TileType == TileType.Floor)
+                        if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -148,7 +148,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (int x = 0; x < boardSize.x; x++)
                 {
                     var tile = tileDataList[0 * boardSize.x + x];
-                    if (tile.TileType == TileType.Floor)
+                    if (tile.CurrentGenState == TileType.Floor)
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                     else
                     {
@@ -161,7 +161,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (int y = 0; y < boardSize.y; y++)
                 {
                     var tile = tileDataList[y * boardSize.x];
-                    if (tile.TileType == TileType.Floor)
+                    if (tile.CurrentGenState == TileType.Floor)
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                     else
                     {

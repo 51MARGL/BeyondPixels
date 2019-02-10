@@ -14,6 +14,44 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         private class BoardSystemBarrier : BarrierSystem { }
 
         [BurstCompile]
+        private struct CreateRoomsAndCorridorsJob : IJobParallelFor
+        {
+            [ReadOnly]
+            public BoardComponent Board;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<RoomComponent> Rooms;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<CorridorComponent> Corridors;
+
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<BatchData> Data;
+
+            [ReadOnly]
+            public int RandomSeed;
+
+            public void Execute(int index)
+            {
+                var batch = Data[index];
+                var random = new Random((uint)(RandomSeed * (index + 1)));
+
+                Rooms[batch.FirstRoomIndex] =
+                    CreateRoom(Board, Corridors[batch.FirstCorridorIndex], ref random);
+                Corridors[3 + batch.FirstRoomIndex] =
+                    CreateCorridor(Rooms[batch.FirstRoomIndex], Board, false, ref random);
+
+                for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
+                {
+                    Rooms[i] = CreateRoom(Board, Corridors[j - 1], ref random);
+                    if (j < Corridors.Length)
+                        Corridors[j] = CreateCorridor(Rooms[i], Board, false, ref random);
+                }
+            }
+        }
+
+        [BurstCompile]
         private struct SetRoomTilesJob : IJobParallelFor
         {
             [DeallocateOnJobCompletion]
@@ -38,7 +76,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         return;
                     for (int k = 0; k < currentRoom.Size.y; k++)
                     {
-                        int yCoord = currentRoom.Y + k;                        
+                        int yCoord = currentRoom.Y + k;
                         Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
                     }
                 }
@@ -146,9 +184,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                             tiles[(y * tilesStride) + x] = TileType.Floor;
                             inconsistentTileDetected = true;
                         }
-
                 if (inconsistentTileDetected)
-                    RemoveThinWalls(board, tiles, tilesStride);
+                    RemoveThinWalls(Board, Tiles, Board.Size.x);
             }
         }
 
@@ -201,40 +238,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             public int FirstRoomIndex;
             public int LastRoomIndex;
             public int FirstCorridorIndex;
-        }
-        [BurstCompile]
-        private struct CreateRoomsAndCorridorsJob : IJobParallelFor
-        {
-            [ReadOnly]
-            public BoardComponent Board;
-
-            [NativeDisableParallelForRestriction]
-            public NativeArray<RoomComponent> Rooms;
-
-            [NativeDisableParallelForRestriction]
-            public NativeArray<CorridorComponent> Corridors;
-
-            [DeallocateOnJobCompletion]
-            [ReadOnly]
-            public NativeArray<BatchData> Data;
-
-            public void Execute(int index)
-            {
-                var batch = Data[index];
-                var random = new Random((uint)index + 1);
-
-                Rooms[batch.FirstRoomIndex] =
-                    CreateRoom(Board, Corridors[batch.FirstCorridorIndex], ref random);
-                Corridors[3 + batch.FirstRoomIndex] =
-                    CreateCorridor(Rooms[batch.FirstRoomIndex], Board, false, ref random);
-
-                for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
-                {
-                    Rooms[i] = CreateRoom(Board, Corridors[j - 1], ref random);
-                    if (j < Corridors.Length)
-                        Corridors[j] = CreateCorridor(Rooms[i], Board, false, ref random);
-                }
-            }
         }
 
         private struct Data
@@ -300,7 +303,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     Board = board,
                     Rooms = rooms,
                     Corridors = corridors,
-                    Data = batch
+                    Data = batch,
+                    RandomSeed = random.NextInt()
                 }.Schedule(batch.Length, 1, inputDeps);
 
                 var setRoomTilesJobHandle = new SetRoomTilesJob
