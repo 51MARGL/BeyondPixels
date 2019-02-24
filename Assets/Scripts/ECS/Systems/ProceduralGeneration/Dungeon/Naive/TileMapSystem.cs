@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -59,7 +58,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     tilemapComponent.tileSpawnRoutine
                         = tilemapComponent.StartCoroutine(
                             this.SetTiles(
-                                tileDataList, j, _data.BoardComponents[i].Size, 
+                                tileDataList, j, _data.BoardComponents[i].Size,
                                 _tilemapData.TransformComponents[i]));
 
                     PostUpdateCommands.AddComponent(_data.EntityArray[i], new TilemapReadyComponent());
@@ -114,8 +113,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        if (iterationCounter % (math.clamp(2 * i, 1, boardSize.x / 5)) == 0)
-                            yield return null;
                     }
 
                 if (yBottom >= 0 && yTop < boardSize.y)
@@ -139,9 +136,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        if (iterationCounter % (math.clamp(i, 1, boardSize.y / 2)) == 0)
-                            yield return null;
                     }
+                yield return null;
             }
 
             if (boardSize.y % 2 == 0)
@@ -169,7 +165,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                     }
                 }
-                yield return null;
+            yield return null;
 
             //hide skybox
             for (int x = -tilemapComponent.OuterWallWidth; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)

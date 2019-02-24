@@ -133,7 +133,34 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         }
 
         [BurstCompile]
-        private struct FinalizeBoardJob : IJob
+        private struct CloseBordersJob : IJob
+        {
+            [ReadOnly]
+            public BoardComponent Board;
+            public NativeArray<TileType> Tiles;
+
+            public void Execute()
+            {
+                var tilesStride = Board.Size.x;
+                for (int x = 0; x < Board.Size.x; x++)
+                {
+                    Tiles[x] = TileType.Wall;
+                    Tiles[tilesStride + x] = TileType.Wall;
+                    Tiles[((Board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
+                    Tiles[((Board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
+                }
+                for (int y = 0; y < Board.Size.y; y++)
+                {
+                    Tiles[y * tilesStride] = TileType.Wall;
+                    Tiles[y * tilesStride + 1] = TileType.Wall;
+                    Tiles[(y * tilesStride) + Board.Size.x - 1] = TileType.Wall;
+                    Tiles[(y * tilesStride) + Board.Size.x - 2] = TileType.Wall;
+                }
+            }
+        }
+
+        [BurstCompile]
+        private struct RemoveThinWallsJob : IJob
         {
             [ReadOnly]
             public BoardComponent Board;
@@ -142,25 +169,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             public void Execute()
             {
                 RemoveThinWalls(Board, Tiles, Board.Size.x);
-                CloseBorders(Board, Tiles, Board.Size.x);
-            }
-
-            private void CloseBorders(BoardComponent board, NativeArray<TileType> tiles, int tilesStride)
-            {
-                for (int x = 0; x < board.Size.x; x++)
-                {
-                    tiles[x] = TileType.Wall;
-                    tiles[tilesStride + x] = TileType.Wall;
-                    tiles[((board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
-                    tiles[((board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
-                }
-                for (int y = 0; y < board.Size.y; y++)
-                {
-                    tiles[y * tilesStride] = TileType.Wall;
-                    tiles[y * tilesStride + 1] = TileType.Wall;
-                    tiles[(y * tilesStride) + board.Size.x - 1] = TileType.Wall;
-                    tiles[(y * tilesStride) + board.Size.x - 2] = TileType.Wall;
-                }
             }
 
             private void RemoveThinWalls(BoardComponent board, NativeArray<TileType> tiles, int tilesStride)
@@ -184,7 +192,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                                         && tiles[((y + 1) * tilesStride) + x] == TileType.Floor && tiles[(y * tilesStride) + x - 1] == TileType.Floor)
                                 ))
                             {
-                                tiles[(y * tilesStride) + x] = TileType.Floor;
+                                var currentTile = tiles[(y * tilesStride) + x];
+                                currentTile = TileType.Floor;
+                                tiles[(y * tilesStride) + x] = currentTile;
                                 inconsistentTileDetected = true;
                             }
                 }
@@ -284,7 +294,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     tiles[j] = TileType.Wall;
 
                 // setup fist room and corridors to all 4 directions
-                var random = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1, uint.MaxValue));
+                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmss").GetHashCode());
                 rooms[0] = CreateRoom(board, ref random);
                 corridors[0] = CreateCorridor(rooms[0], board, true, ref random, 0);
                 corridors[1] = CreateCorridor(rooms[0], board, true, ref random, 1);
@@ -323,18 +333,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     TileStride = board.Size.x
                 }.Schedule(corridors.Length, 1, CreateRoomsAndCorridorsJobHandle);
 
-                var finalizeBoardJobHandle = new FinalizeBoardJob
+                var removeThinWallsJobHandle = new RemoveThinWallsJob
                 {
                     Board = board,
                     Tiles = tiles,
                 }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
+
+                var closeBordersJobHandle = new CloseBordersJob
+                {
+                    Board = board,
+                    Tiles = tiles,
+                }.Schedule(removeThinWallsJobHandle);
 
                 inputDeps = new InstantiateTilesJob
                 {
                     CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
                     Tiles = tiles,
                     TileStride = board.Size.x
-                }.Schedule(board.Size.y, 1, finalizeBoardJobHandle);
+                }.Schedule(board.Size.y, 1, closeBordersJobHandle);
 
             }
             var handle = new CleanUpJob

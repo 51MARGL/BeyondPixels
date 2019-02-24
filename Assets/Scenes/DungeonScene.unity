@@ -253,6 +253,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
+        type: 3}
+      propertyPath: DungeonGenerators.CellularAutomaton.BoardWidth
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
+        type: 3}
+      propertyPath: DungeonGenerators.CellularAutomaton.BoardHeight
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
+        type: 3}
+      propertyPath: DungeonGenerators.CellularAutomaton.RandomFillPercent
+      value: 65
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
 --- !u!114 &207945295 stripped

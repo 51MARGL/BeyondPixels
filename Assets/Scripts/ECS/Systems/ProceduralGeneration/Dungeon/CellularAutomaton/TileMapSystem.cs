@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -59,7 +58,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     tilemapComponent.tileSpawnRoutine
                         = tilemapComponent.StartCoroutine(
                             this.SetTiles(
-                                tileDataList, j, _data.BoardComponents[i].Size, 
+                                tileDataList, j, _data.BoardComponents[i].Size,
                                 _tilemapData.TransformComponents[i]));
 
                     PostUpdateCommands.AddComponent(_data.EntityArray[i], new TilemapReadyComponent());
@@ -114,8 +113,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        if (iterationCounter % (math.clamp(2 * i, 1, boardSize.x / 5)) == 0)
-                            yield return null;
                     }
 
                 if (yBottom >= 0 && yTop < boardSize.y)
@@ -139,9 +136,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        if (iterationCounter % (math.clamp(i, 1, boardSize.y / 2)) == 0)
-                            yield return null;
                     }
+                yield return null;
             }
 
             if (boardSize.y % 2 == 0)
@@ -169,7 +165,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                     }
                 }
-                yield return null;
+            yield return null;
 
             //hide skybox
             for (int x = -tilemapComponent.OuterWallWidth; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)
@@ -199,23 +195,23 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 yield return null;
             }
 
-            for (int x = 1; x < tilemapComponent.TilemapWalls.size.x - 1; x++)
-            {
-                for (int y = 1; y < tilemapComponent.TilemapWalls.size.y - 1; y++)
-                {
-                    var sprite = tilemapComponent.TilemapWalls.GetSprite(new Vector3Int(x, y, 0));
-                    if (sprite != null && sprite.name == "wall-fire_0")
-                    {
-                        tilemapComponent.WallTorchAnimatedTile.m_AnimationStartTime = UnityEngine.Random.Range(1, 10);
-                        tilemapComponent.TilemapWallsAnimated.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTorchAnimatedTile);
-                        GameObject.Instantiate(tilemapComponent.TorchLight,
-                            new Vector3(x + 0.5f, y - 0.5f, -1),
-                            Quaternion.identity, lightParent);
+            //for (int x = 1; x < tilemapComponent.TilemapWalls.size.x - 1; x++)
+            //{
+            //    for (int y = 1; y < tilemapComponent.TilemapWalls.size.y - 1; y++)
+            //    {
+            //        var sprite = tilemapComponent.TilemapWalls.GetSprite(new Vector3Int(x, y, 0));
+            //        if (sprite != null && sprite.name == "wall-fire_0")
+            //        {
+            //            tilemapComponent.WallTorchAnimatedTile.m_AnimationStartTime = UnityEngine.Random.Range(1, 10);
+            //            tilemapComponent.TilemapWallsAnimated.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTorchAnimatedTile);
+            //            GameObject.Instantiate(tilemapComponent.TorchLight,
+            //                new Vector3(x + 0.5f, y - 0.5f, -1),
+            //                Quaternion.identity, lightParent);
 
-                    }
-                }
-                yield return null;
-            }
+            //        }
+            //    }
+            //    yield return null;
+            //}
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
             tileDataList = null;
