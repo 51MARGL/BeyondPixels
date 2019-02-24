@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -40,6 +41,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         }
         [Inject]
         private Tiles _tiles;
+        private NativeList<TileComponent> TilesList;
+
+        protected override void OnCreateManager()
+        {
+            TilesList = new NativeList<TileComponent>(Allocator.Persistent);
+        }
 
         protected override void OnUpdate()
         {
@@ -51,14 +58,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     if (tilemapComponent.tileSpawnRoutine != null)
                         return;
 
-                    var tileDataList = new List<TileComponent>();
+                    TilesList.Clear();
                     for (int k = 0; k < _tiles.Length; k++)
-                        tileDataList.Add(_tiles.TileComponents[k]);
+                        TilesList.Add(_tiles.TileComponents[k]);
 
                     tilemapComponent.tileSpawnRoutine
                         = tilemapComponent.StartCoroutine(
-                            this.SetTiles(
-                                tileDataList, j, _data.BoardComponents[i].Size,
+                            this.SetTiles(j, _data.BoardComponents[i].Size,
                                 _tilemapData.TransformComponents[i]));
 
                     PostUpdateCommands.AddComponent(_data.EntityArray[i], new TilemapReadyComponent());
@@ -66,8 +72,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        private IEnumerator SetTiles(List<TileComponent> tileDataList,
-                                     int entityIndex, int2 boardSize, Transform lightParent)
+        private IEnumerator SetTiles(int entityIndex, int2 boardSize, Transform lightParent)
         {
             var tilemapComponent = _tilemapData.DungeonTileMapComponents[entityIndex];
             var wallCollider = tilemapComponent.TilemapWalls.GetComponent<TilemapCollider2D>();
@@ -95,22 +100,26 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 if (xLeft >= 0 && xRigth < boardSize.x)
                     for (int x = xLeft, iterationCounter = 0; x <= xRigth; x++, iterationCounter++)
                     {
-                        var tile = tileDataList[yTop * boardSize.x + x];
+                        var tile = TilesList[yTop * boardSize.x + x];
                         if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
+
+                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
 
-                        tile = tileDataList[yBottom * boardSize.x + x];
+                        tile = TilesList[yBottom * boardSize.x + x];
                         if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
+
+                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
 
                     }
@@ -118,22 +127,26 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 if (yBottom >= 0 && yTop < boardSize.y)
                     for (int y = yBottom, iterationCounter = 0; y <= yTop; y++, iterationCounter++)
                     {
-                        var tile = tileDataList[y * boardSize.x + xLeft];
+                        var tile = TilesList[y * boardSize.x + xLeft];
                         if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
+
+                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
 
-                        tile = tileDataList[y * boardSize.x + xRigth];
+                        tile = TilesList[y * boardSize.x + xRigth];
                         if (tile.CurrentGenState == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
+
+                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
 
                     }
@@ -143,7 +156,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             if (boardSize.y % 2 == 0)
                 for (int x = 0; x < boardSize.x; x++)
                 {
-                    var tile = tileDataList[0 * boardSize.x + x];
+                    var tile = TilesList[0 * boardSize.x + x];
                     if (tile.CurrentGenState == TileType.Floor)
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                     else
@@ -156,7 +169,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             if (boardSize.x % 2 == 0)
                 for (int y = 0; y < boardSize.y; y++)
                 {
-                    var tile = tileDataList[y * boardSize.x];
+                    var tile = TilesList[y * boardSize.x];
                     if (tile.CurrentGenState == TileType.Floor)
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                     else
@@ -195,26 +208,33 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 yield return null;
             }
 
-            //for (int x = 1; x < tilemapComponent.TilemapWalls.size.x - 1; x++)
-            //{
-            //    for (int y = 1; y < tilemapComponent.TilemapWalls.size.y - 1; y++)
-            //    {
-            //        var sprite = tilemapComponent.TilemapWalls.GetSprite(new Vector3Int(x, y, 0));
-            //        if (sprite != null && sprite.name == "wall-fire_0")
-            //        {
-            //            tilemapComponent.WallTorchAnimatedTile.m_AnimationStartTime = UnityEngine.Random.Range(1, 10);
-            //            tilemapComponent.TilemapWallsAnimated.SetTile(new Vector3Int(x, y, 0), tilemapComponent.WallTorchAnimatedTile);
-            //            GameObject.Instantiate(tilemapComponent.TorchLight,
-            //                new Vector3(x + 0.5f, y - 0.5f, -1),
-            //                Quaternion.identity, lightParent);
-
-            //        }
-            //    }
-            //    yield return null;
-            //}
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
-            tileDataList = null;
+        }
+
+        private void CreateLightTile(int2 boardSize, Transform lightParent, DungeonTileMapComponent tilemapComponent, TileComponent tile)
+        {
+            if (tile.Position.x > 1 && tile.Position.x < boardSize.x - 1
+                && tile.Position.y > 1 && tile.Position.y < boardSize.y - 1
+                && TilesList[(tile.Position.y - 1) * boardSize.x + tile.Position.x].CurrentGenState == TileType.Floor
+                && TilesList[(tile.Position.y + 1) * boardSize.x + tile.Position.x].CurrentGenState == TileType.Wall
+                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x + 1].CurrentGenState == TileType.Wall
+                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x - 1].CurrentGenState == TileType.Wall
+                && UnityEngine.Random.Range(0, 100) > 75
+               )
+            {
+                tilemapComponent.WallTorchAnimatedTile.m_AnimationStartTime = UnityEngine.Random.Range(1, 10);
+                tilemapComponent.TilemapWallsAnimated.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTorchAnimatedTile);
+                GameObject.Instantiate(tilemapComponent.TorchLight,
+                    new Vector3(tile.Position.x + 0.5f, tile.Position.y - 0.5f, -1),
+                    Quaternion.identity, lightParent);
+
+            }
+        }
+
+        protected override void OnDestroyManager()
+        {
+            TilesList.Dispose();
         }
     }
 }
