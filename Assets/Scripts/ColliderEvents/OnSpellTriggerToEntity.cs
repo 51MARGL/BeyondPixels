@@ -1,5 +1,6 @@
-﻿using BeyondPixels.Components.Spells;
+﻿using BeyondPixels.ECS.Components.Spells;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -28,7 +29,7 @@ namespace BeyondPixels.ColliderEvents
                         new SpellCollisionComponent
                         {
                             SpellEntity = spellEntity,
-                            ImpactPoint = this.transform.position,
+                            ImpactPoint = new float2(this.transform.position.x, this.transform.position.y),
                             ImpactTime = Time.time
                         });
                 totalTime = 0;
@@ -58,7 +59,7 @@ namespace BeyondPixels.ColliderEvents
                             new SpellCollisionComponent
                             {
                                 SpellEntity = spellEntity,
-                                ImpactPoint = this.transform.position,
+                                ImpactPoint = new float2(this.transform.position.x, this.transform.position.y),
                                 ImpactTime = Time.time
                             });
                     totalTime = 0;

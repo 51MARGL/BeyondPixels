@@ -1,0 +1,25 @@
+{
+    "name": "BeyondPixels.ECS.Systems",
+    "references": [
+        "BeyondPixels.ECS.Components",
+        "BeyondPixels.ColliderEvents",
+        "Unity.Burst",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Jobs",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "BeyondPixels.Utilities",
+        "Unity.Transforms",
+        "BeyondPixels.SceneBootstap",
+        "BeyondPixels.Tilemap"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

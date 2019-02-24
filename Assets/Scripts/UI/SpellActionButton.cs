@@ -1,4 +1,5 @@
-﻿using BeyondPixels.Components.Characters.Common;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Player;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -37,13 +38,9 @@ namespace BeyondPixels.UI
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-
-                if (!entityManager.HasComponent<SpellCastingComponent>(this.SpellCaster))
-                    entityManager.AddComponentData(this.SpellCaster, new SpellCastingComponent
-                    {
-                        SpellIndex = this.SpellIndex,
-                        StartedAt = Time.time
-                    });
+                var inputComponent = entityManager.GetComponentData<InputComponent>(this.SpellCaster);
+                inputComponent.ActionButtonPressed = this.SpellIndex + 1;
+                entityManager.SetComponentData(this.SpellCaster, inputComponent);
             }
         }
     }
