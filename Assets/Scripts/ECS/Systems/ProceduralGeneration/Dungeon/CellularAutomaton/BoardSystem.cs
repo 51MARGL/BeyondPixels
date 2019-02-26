@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
+﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;

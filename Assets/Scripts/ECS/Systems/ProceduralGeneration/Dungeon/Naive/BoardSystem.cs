@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
+﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -365,8 +366,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
         private static RoomComponent CreateRoom(BoardComponent board, ref Unity.Mathematics.Random random)
         {
-            var roomWidth = random.NextInt(3, board.RoomSize);
-            var roomHeight = random.NextInt(3, board.RoomSize);
+            var roomWidth = random.NextInt(3, board.MaxRoomSize);
+            var roomHeight = random.NextInt(3, board.MaxRoomSize);
 
             var centerX = (int)math.round(board.Size.x / 2f - roomWidth / 2f);
             var centerY = (int)math.round(board.Size.y / 2f - roomHeight / 2f);
@@ -382,8 +383,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
         private static RoomComponent CreateRoom(BoardComponent board, CorridorComponent corridor, ref Unity.Mathematics.Random random)
         {
-            var roomWidth = random.NextInt(3, board.RoomSize);
-            var roomHeight = random.NextInt(3, board.RoomSize);
+            var roomWidth = random.NextInt(3, board.MaxRoomSize);
+            var roomHeight = random.NextInt(3, board.MaxRoomSize);
 
             var roomX = 0;
             var roomY = 0;
