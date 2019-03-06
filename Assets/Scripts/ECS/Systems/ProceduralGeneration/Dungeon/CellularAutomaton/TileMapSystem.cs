@@ -62,10 +62,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     for (int k = 0; k < _tiles.Length; k++)
                         TilesList.Add(_tiles.TileComponents[k]);
 
-                    tilemapComponent.tileSpawnRoutine
-                        = tilemapComponent.StartCoroutine(
-                            this.SetTiles(j, _data.BoardComponents[i].Size,
-                                _tilemapData.TransformComponents[i]));
+                    if (TilesList.Length > 0)
+                        tilemapComponent.tileSpawnRoutine
+                            = tilemapComponent.StartCoroutine(
+                                this.SetTiles(j, _data.BoardComponents[i].Size,
+                                    _tilemapData.TransformComponents[i]));
 
                     PostUpdateCommands.AddComponent(_data.EntityArray[i], new TilemapReadyComponent());
                 }
@@ -208,6 +209,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 yield return null;
             }
 
+            TilesList.Clear();
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
         }

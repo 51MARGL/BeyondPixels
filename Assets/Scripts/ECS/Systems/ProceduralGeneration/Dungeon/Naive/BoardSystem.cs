@@ -227,22 +227,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        private struct CleanUpJob : IJobParallelFor
+        private struct TagBoardDoneJob : IJob
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [NativeDisableContainerSafetyRestriction]
-            [DeallocateOnJobCompletion]
+            public EntityCommandBuffer CommandBuffer;
             [ReadOnly]
-            public NativeArray<BoardComponent> Boards;
+            public Entity BoardEntity;
 
-            [NativeDisableContainerSafetyRestriction]
-            [DeallocateOnJobCompletion]
-            [ReadOnly]
-            public NativeArray<Entity> BoardEntities;
-
-            public void Execute(int index)
+            public void Execute()
             {
-                CommandBuffer.AddComponent(index, BoardEntities[index], new BoardReadyComponent());
+                CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
             }
         }
 
@@ -272,18 +265,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var boards = new NativeArray<BoardComponent>(_data.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var boardEntities = new NativeArray<Entity>(_data.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             for (int i = 0; i < _data.Length; i++)
             {
-                boards[i] = _data.BoardComponents[i];
-                boardEntities[i] = _data.EntityArray[i];
-            }
-
-            for (int i = 0; i < _data.Length; i++)
-            {
-                var board = boards[i];
-                var boardEntity = boardEntities[i];
+                var board = _data.BoardComponents[i];
 
                 var roomCount = board.RoomCount;
 
@@ -337,31 +321,30 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 var removeThinWallsJobHandle = new RemoveThinWallsJob
                 {
                     Board = board,
-                    Tiles = tiles,
+                    Tiles = tiles
                 }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
 
                 var closeBordersJobHandle = new CloseBordersJob
                 {
                     Board = board,
-                    Tiles = tiles,
+                    Tiles = tiles
                 }.Schedule(removeThinWallsJobHandle);
 
-                inputDeps = new InstantiateTilesJob
+                var instantiateTilesJobHandle = new InstantiateTilesJob
                 {
                     CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
                     Tiles = tiles,
                     TileStride = board.Size.x
                 }.Schedule(board.Size.y, 1, closeBordersJobHandle);
 
+                inputDeps = new TagBoardDoneJob
+                {
+                    CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
+                    BoardEntity = _data.EntityArray[i]
+                }.Schedule(instantiateTilesJobHandle);
+                _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
             }
-            var handle = new CleanUpJob
-            {
-                CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
-                Boards = boards,
-                BoardEntities = boardEntities
-            }.Schedule(boards.Length, 1, inputDeps);
-            _boardSystemBarrier.AddJobHandleForProducer(handle);
-            return handle;
+            return inputDeps;
         }
 
         private static RoomComponent CreateRoom(BoardComponent board, ref Unity.Mathematics.Random random)

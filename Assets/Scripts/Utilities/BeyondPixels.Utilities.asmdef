@@ -1,7 +1,8 @@
 {
     "name": "BeyondPixels.Utilities",
     "references": [
-        "Cinemachine"
+        "Cinemachine",
+        "Unity.Mathematics"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

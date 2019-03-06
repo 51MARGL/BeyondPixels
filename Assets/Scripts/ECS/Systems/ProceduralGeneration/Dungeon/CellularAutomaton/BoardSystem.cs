@@ -187,8 +187,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                var widthStep = Board.Size.x / (Board.Size.x / 25);
-                var heightStep = Board.Size.y / (Board.Size.y / 25);
+                var widthStep = Board.Size.x / (Board.Size.x / 50);
+                var heightStep = Board.Size.y / (Board.Size.y / 50);
                 var currentIndex = 0;
                 for (int y = 0; y < Board.Size.y; y += heightStep)
                 {
@@ -644,35 +644,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        private struct TagBoardDoneJob : IJobParallelFor
+        private struct TagBoardDoneJob : IJob
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [NativeDisableContainerSafetyRestriction]
+            public EntityCommandBuffer CommandBuffer;
             [ReadOnly]
-            public NativeArray<BoardComponent> Boards;
+            public Entity BoardEntity;
 
-            [NativeDisableContainerSafetyRestriction]
-            [ReadOnly]
-            public NativeArray<Entity> BoardEntities;
-
-            public void Execute(int index)
+            public void Execute()
             {
-                CommandBuffer.AddComponent(index, BoardEntities[index], new BoardReadyComponent());
+                CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
             }
-        }
-
-        [BurstCompile]
-        private struct CleanUpJob : IJobParallelFor
-        {
-            [DeallocateOnJobCompletion]
-            [ReadOnly]
-            public NativeArray<BoardComponent> Boards;
-
-            [DeallocateOnJobCompletion]
-            [ReadOnly]
-            public NativeArray<Entity> BoardEntities;
-
-            public void Execute(int index) { }
         }
 
         private struct Data
@@ -702,18 +683,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var boards = new NativeArray<BoardComponent>(_data.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            var boardEntities = new NativeArray<Entity>(_data.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             for (int i = 0; i < _data.Length; i++)
             {
-                boards[i] = _data.BoardComponents[i];
-                boardEntities[i] = _data.EntityArray[i];
-            }
-
-            for (int i = 0; i < _data.Length; i++)
-            {
-                var board = boards[i];
-                var boardEntity = boardEntities[i];
+                var board = _data.BoardComponents[i];
                 if (CurrentPhase == 0)
                 {
                     Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -731,24 +703,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     }.Schedule(board.Size.y, 1, inputDeps);
 
                     var lastGenerationJobHandle = randomFillBoardJobHandle;
-                    for (int geneation = 0; geneation < 3; geneation++)
+                    for (int geneation = 0; geneation < 5; geneation++)
                     {
                         var calculateNextGenerationJobHandle = new CalculateNextGenerationJob
                         {
                             Tiles = Tiles,
-                            TileStride = board.Size.x,
+                            TileStride = board.Size.x
                         }.Schedule(Tiles.Length, 1, lastGenerationJobHandle);
 
                         lastGenerationJobHandle = new ProcessNextGenerationJob
                         {
-                            Tiles = Tiles,
+                            Tiles = Tiles
                         }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
                     }
 
                     var closeBordersJobHandle = new CloseBordersJob
                     {
                         Board = board,
-                        Tiles = Tiles,
+                        Tiles = Tiles
                     }.Schedule(lastGenerationJobHandle);
 
                     inputDeps = new GetRoomsJob
@@ -790,7 +762,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         RoomTiles = RoomTiles,
                         Rooms = RoomList,
                         ConnectedRoomsTable = connectedRoomsTable,
-                        Corridors = concurrentQueue,
+                        Corridors = concurrentQueue
                     }.Schedule(findClosestRoomsConnectionsJobHandle);
                 }
                 else if (CurrentPhase == 2)
@@ -800,7 +772,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
                     {
                         CorridorsArray = corridorsArray,
-                        CorridorsQueue = CorridorsQueue,
+                        CorridorsQueue = CorridorsQueue
                     }.Schedule(inputDeps);
 
                     var createCorridorsJobHandle = new CreateCorridorsJob
@@ -814,25 +786,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     var calculateNextGenerationJobHandle = new CalculateNextGenerationJob
                     {
                         Tiles = Tiles,
-                        TileStride = board.Size.x,
+                        TileStride = board.Size.x
                     }.Schedule(Tiles.Length, 1, createCorridorsJobHandle);
 
-                    var processNextGenerationJobHandle = new ProcessNextGenerationJob
+                    var lastGenerationJobHandle = new ProcessNextGenerationJob
                     {
                         Tiles = Tiles,
                     }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
-                    
 
                     var removeThinWallsJobHandle = new RemoveThinWallsJob
                     {
                         Board = board,
-                        Tiles = Tiles,
-                    }.Schedule(processNextGenerationJobHandle);
+                        Tiles = Tiles
+                    }.Schedule(lastGenerationJobHandle);
 
                     var closeBordersJobHandle = new CloseBordersJob
                     {
                         Board = board,
-                        Tiles = Tiles,
+                        Tiles = Tiles
                     }.Schedule(removeThinWallsJobHandle);
 
                     var instantiateTilesJobHandle = new InstantiateTilesJob
@@ -845,20 +816,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                     inputDeps = new TagBoardDoneJob
                     {
-                        CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
-                        Boards = boards,
-                        BoardEntities = boardEntities
-                    }.Schedule(boards.Length, 1, instantiateTilesJobHandle);
+                        CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
+                        BoardEntity = _data.EntityArray[i]
+                    }.Schedule(instantiateTilesJobHandle);
                     _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
                 }
             }
             CurrentPhase = (CurrentPhase + 1) % 3;
 
-            return new CleanUpJob
-            {
-                Boards = boards,
-                BoardEntities = boardEntities
-            }.Schedule(boards.Length, 1, inputDeps);
+            return inputDeps;
         }
 
         protected override void OnDestroyManager()
