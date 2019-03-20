@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomaton
+namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 {
     public class TileMapSystem : ComponentSystem
     {
@@ -102,7 +102,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     for (int x = xLeft, iterationCounter = 0; x <= xRigth; x++, iterationCounter++)
                     {
                         var tile = TilesList[yTop * boardSize.x + x];
-                        if (tile.CurrentGenState == TileType.Floor)
+                        if (tile.TileType == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -113,7 +113,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
 
                         tile = TilesList[yBottom * boardSize.x + x];
-                        if (tile.CurrentGenState == TileType.Floor)
+                        if (tile.TileType == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -122,14 +122,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                             CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
-
                     }
 
                 if (yBottom >= 0 && yTop < boardSize.y)
                     for (int y = yBottom, iterationCounter = 0; y <= yTop; y++, iterationCounter++)
                     {
                         var tile = TilesList[y * boardSize.x + xLeft];
-                        if (tile.CurrentGenState == TileType.Floor)
+                        if (tile.TileType == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -140,7 +139,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
 
                         tile = TilesList[y * boardSize.x + xRigth];
-                        if (tile.CurrentGenState == TileType.Floor)
+                        if (tile.TileType == TileType.Floor)
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                         else
                         {
@@ -149,7 +148,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                             CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
-
                     }
                 yield return null;
             }
@@ -158,7 +156,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (int x = 0; x < boardSize.x; x++)
                 {
                     var tile = TilesList[0 * boardSize.x + x];
-                    if (tile.CurrentGenState == TileType.Floor)
+                    if (tile.TileType == TileType.Floor)
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                     else
                     {
@@ -171,7 +169,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (int y = 0; y < boardSize.y; y++)
                 {
                     var tile = TilesList[y * boardSize.x];
-                    if (tile.CurrentGenState == TileType.Floor)
+                    if (tile.TileType == TileType.Floor)
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
                     else
                     {
@@ -218,10 +216,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         {
             if (tile.Position.x > 1 && tile.Position.x < boardSize.x - 1
                 && tile.Position.y > 1 && tile.Position.y < boardSize.y - 1
-                && TilesList[(tile.Position.y - 1) * boardSize.x + tile.Position.x].CurrentGenState == TileType.Floor
-                && TilesList[(tile.Position.y + 1) * boardSize.x + tile.Position.x].CurrentGenState == TileType.Wall
-                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x + 1].CurrentGenState == TileType.Wall
-                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x - 1].CurrentGenState == TileType.Wall
+                && TilesList[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor
+                && TilesList[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
+                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
+                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall
                 && UnityEngine.Random.Range(0, 100) > 75
                )
             {

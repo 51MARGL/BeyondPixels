@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton
+namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon
 {
     public struct BoardReadyComponent : IComponentData { }
 }

@@ -44,12 +44,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DungeonGenerators:
-    Switch: 1
+    Switch: 0
     Naive:
       BoardWidth: 100
       BoardHeight: 75
       RoomCount: 30
-      RoomSize: 10
+      MaxRoomSize: 10
       MaxCorridorLength: 10
       MinCorridorLength: 5
     CellularAutomaton:
@@ -57,3 +57,7 @@ MonoBehaviour:
       BoardHeight: 75
       RandomFillPercent: 70
       PassRadius: 1
+    BSP:
+      BoardWidth: 0
+      BoardHeight: 0
+      MinRoomSize: 0

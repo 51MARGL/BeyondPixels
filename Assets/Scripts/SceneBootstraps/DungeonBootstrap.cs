@@ -17,11 +17,12 @@ namespace BeyondPixels.SceneBootstraps
             public Switch Switch;
             public NaiveSettings Naive;
             public CellularAutomatonSettings CellularAutomaton;
+            public BSPSettings BSP;
         }
 
         public enum Switch
         {
-            Naive, CellularAutomaton
+            Naive, CellularAutomaton, BSP
         }
 
         [Serializable]
@@ -30,7 +31,7 @@ namespace BeyondPixels.SceneBootstraps
             public int BoardWidth;
             public int BoardHeight;
             public int RoomCount;
-            public int RoomSize;
+            public int MaxRoomSize;
             public int MaxCorridorLength;
             public int MinCorridorLength;
         }
@@ -43,6 +44,14 @@ namespace BeyondPixels.SceneBootstraps
             [Range(1, 100)]
             public int RandomFillPercent;
             public int PassRadius;
+        }
+
+        [Serializable]
+        public class BSPSettings
+        {
+            public int BoardWidth;
+            public int BoardHeight;
+            public int MinRoomSize;
         }
 
         public DungeonGeneratorSettings DungeonGenerators;
@@ -62,7 +71,7 @@ namespace BeyondPixels.SceneBootstraps
                     {
                         Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
                         RoomCount = DungeonGenerators.Naive.RoomCount,
-                        RoomSize = DungeonGenerators.Naive.RoomSize,
+                        MaxRoomSize = DungeonGenerators.Naive.MaxRoomSize,
                         MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
                         MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
                     });
@@ -74,6 +83,14 @@ namespace BeyondPixels.SceneBootstraps
                         Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
                         RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
                         PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
+                    });
+                    break;
+                case Switch.BSP:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.BSP.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.BSP.BoardWidth, DungeonGenerators.BSP.BoardHeight),
+                        MinRoomSize = DungeonGenerators.BSP.MinRoomSize
                     });
                     break;
             }
@@ -212,7 +229,7 @@ namespace BeyondPixels.SceneBootstraps
                         {
                             Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
                             RoomCount = DungeonGenerators.Naive.RoomCount,
-                            RoomSize = DungeonGenerators.Naive.RoomSize,
+                            MaxRoomSize = DungeonGenerators.Naive.MaxRoomSize,
                             MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
                             MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
                         });
@@ -224,6 +241,14 @@ namespace BeyondPixels.SceneBootstraps
                             Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
                             RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
                             PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
+                        });
+                        break;
+                    case Switch.BSP:
+                        board = entityManager.CreateEntity();
+                        entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.BSP.BoardComponent
+                        {
+                            Size = new int2(DungeonGenerators.BSP.BoardWidth, DungeonGenerators.BSP.BoardHeight),
+                            MinRoomSize = DungeonGenerators.BSP.MinRoomSize
                         });
                         break;
                 }

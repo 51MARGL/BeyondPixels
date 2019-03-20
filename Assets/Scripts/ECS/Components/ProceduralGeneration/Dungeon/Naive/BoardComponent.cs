@@ -8,7 +8,7 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
     {
         public int2 Size;            
         public int RoomCount;
-        public int RoomSize;
+        public int MaxRoomSize;
         public int MinCorridorLength;
         public int MaxCorridorLength;
     }
