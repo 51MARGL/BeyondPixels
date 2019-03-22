@@ -123,19 +123,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            for (int i = 0; i < _boardDataStart.Length; i++)
-            {
-                Debug.Log("LStart");
-                return this.SetupValidationGrid(_boardDataStart.FinalBoardComponents[i].Size, _boardDataStart.EntityArray[i], inputDeps);
-            }
+            if (_boardDataStart.Length > 0)
+                return this.SetupValidationGrid(_boardDataStart.FinalBoardComponents[0].Size, _boardDataStart.EntityArray[0], inputDeps);
 
             for (int b = 0; b < _boardDataEnd.Length; b++)
                 for (int t = 0; t < _tilemapData.Length; t++)
                 {
-                    Debug.Log("LEnd");
                     if (_tilemapData.DungeonTileMapComponents[t].tileSpawnRoutine == null && _samples.Length > 0)
                     {
-                        Debug.Log("LC: " + _samples.Length);
                         var commandBuffer = _lightSpawningSystemBarrier.CreateCommandBuffer();
                         var samplesArray = new NativeArray<SampleComponent>(_samples.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
                         commandBuffer.AddComponent(_boardDataEnd.EntityArray[b], new LightsSpawnedComponent());
