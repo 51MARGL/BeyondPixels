@@ -639,7 +639,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (int x = 0; x < TileStride; x++)
                 {
                     var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, Tiles[(index * TileStride) + x]);
+                    CommandBuffer.AddComponent(index, entity, new FinalTileComponent
+                    {
+                        TileType = Tiles[(index * TileStride) + x].CurrentGenState,
+                        Position = new int2(x, index)
+                    });
                 }
             }
         }
@@ -649,10 +653,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             public EntityCommandBuffer CommandBuffer;
             [ReadOnly]
             public Entity BoardEntity;
+            [ReadOnly]
+            public int2 BoardSize;
 
             public void Execute()
             {
                 CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
+                var finalBoardComponent = CommandBuffer.CreateEntity();
+                CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                {
+                    Size = BoardSize
+                });
             }
         }
 
@@ -690,7 +701,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 {
                     Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                     RoomTiles = new NativeArray<TileComponent>(Tiles.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                    var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmss").GetHashCode());
+                    var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
                     RoomList.Clear();
                     CorridorsQueue.Clear();
 
@@ -817,12 +828,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     inputDeps = new TagBoardDoneJob
                     {
                         CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
-                        BoardEntity = _data.EntityArray[i]
+                        BoardEntity = _data.EntityArray[i],
+                        BoardSize = _data.BoardComponents[i].Size
                     }.Schedule(instantiateTilesJobHandle);
                     _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
                 }
+                else if (CurrentPhase == 3)
+                {
+                    RoomList.Clear();
+                    CorridorsQueue.Clear();
+                }
             }
-            CurrentPhase = (CurrentPhase + 1) % 3;
+            CurrentPhase = (CurrentPhase + 1) % 4;
 
             return inputDeps;
         }

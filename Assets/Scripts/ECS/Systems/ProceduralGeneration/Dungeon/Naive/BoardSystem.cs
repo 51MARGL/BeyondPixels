@@ -212,13 +212,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             [ReadOnly]
             public int TileStride;
 
-            //Index represents row
             public void Execute(int index)
             {
                 for (int x = 0; x < TileStride; x++)
                 {
                     var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, new TileComponent
+                    CommandBuffer.AddComponent(index, entity, new FinalTileComponent
                     {
                         TileType = Tiles[(index * TileStride) + x],
                         Position = new int2(x, index)
@@ -232,10 +231,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             public EntityCommandBuffer CommandBuffer;
             [ReadOnly]
             public Entity BoardEntity;
+            [ReadOnly]
+            public int2 BoardSize;
 
             public void Execute()
             {
                 CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
+                var finalBoardComponent = CommandBuffer.CreateEntity();
+                CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                {
+                    Size = BoardSize
+                });
             }
         }
 
@@ -279,7 +285,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     tiles[j] = TileType.Wall;
 
                 // setup fist room and corridors to all 4 directions
-                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmss").GetHashCode());
+                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
                 rooms[0] = CreateRoom(board, ref random);
                 corridors[0] = CreateCorridor(rooms[0], board, true, ref random, 0);
                 corridors[1] = CreateCorridor(rooms[0], board, true, ref random, 1);
@@ -340,7 +346,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 inputDeps = new TagBoardDoneJob
                 {
                     CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
-                    BoardEntity = _data.EntityArray[i]
+                    BoardEntity = _data.EntityArray[i],
+                    BoardSize = _data.BoardComponents[i].Size
                 }.Schedule(instantiateTilesJobHandle);
                 _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
             }

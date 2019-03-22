@@ -6,7 +6,7 @@ using Unity.Entities;
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomaton
 {
     public class CleanUpSystem : ComponentSystem
-    {        
+    {
         private ComponentGroup _boardGroup;
         private ComponentGroup _roomGroup;
         private ComponentGroup _tileGroup;
@@ -15,11 +15,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         {
             _boardGroup = GetComponentGroup(
                 ComponentType.ReadOnly(typeof(BoardComponent)),
-                ComponentType.ReadOnly(typeof(BoardReadyComponent)),
-                ComponentType.ReadOnly(typeof(TilemapReadyComponent))
+                ComponentType.ReadOnly(typeof(BoardReadyComponent))
             );
             _roomGroup = GetComponentGroup(
-                ComponentType.ReadOnly(typeof(RoomComponent)));            
+                ComponentType.ReadOnly(typeof(RoomComponent)));
             _tileGroup = GetComponentGroup(
                ComponentType.ReadOnly(typeof(TileComponent)));
         }

@@ -179,11 +179,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114016617257970294, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
-        type: 3}
-      propertyPath: OuterWallWidth
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c6ba44e23ce61349b5d405e1ee69ac1, type: 3}
 --- !u!114 &142753894 stripped
@@ -260,23 +255,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
-      propertyPath: DungeonGenerators.CellularAutomaton.BoardWidth
+      propertyPath: DungeonGenerators.BSP.BoardWidth
       value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
-      propertyPath: DungeonGenerators.BSP.BoardWidth
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
       propertyPath: DungeonGenerators.BSP.BoardHeight
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
-      propertyPath: DungeonGenerators.BSP.MinRoomSize
-      value: 10
+      propertyPath: DungeonGenerators.Naive.BoardWidth
+      value: 75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
@@ -570,6 +560,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1421551967352072, guid: 4dd1a8fe18bb4a84f808391a7981e881, type: 3}
+      propertyPath: m_Name
+      value: PrefabManager
+      objectReference: {fileID: 0}
     - target: {fileID: 4896923928862106, guid: 4dd1a8fe18bb4a84f808391a7981e881, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -602,6 +596,18 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 4896923928862106, guid: 4dd1a8fe18bb4a84f808391a7981e881, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4896923928862106, guid: 4dd1a8fe18bb4a84f808391a7981e881, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4896923928862106, guid: 4dd1a8fe18bb4a84f808391a7981e881, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114492610671535480, guid: 4dd1a8fe18bb4a84f808391a7981e881,
         type: 3}
       propertyPath: PlayerPrefab
@@ -609,10 +615,9 @@ PrefabInstance:
       objectReference: {fileID: 592520473}
     - target: {fileID: 114492610671535480, guid: 4dd1a8fe18bb4a84f808391a7981e881,
         type: 3}
-      propertyPath: EnemyPrefab
+      propertyPath: Cube
       value: 
-      objectReference: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b,
-        type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4dd1a8fe18bb4a84f808391a7981e881, type: 3}
 --- !u!114 &1447603530 stripped

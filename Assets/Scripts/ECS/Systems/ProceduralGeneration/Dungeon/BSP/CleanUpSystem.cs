@@ -6,7 +6,7 @@ using Unity.Entities;
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 {
     public class CleanUpSystem : ComponentSystem
-    {        
+    {
         private ComponentGroup _boardGroup;
         private ComponentGroup _roomGroup;
         private ComponentGroup _corridorGroup;
@@ -16,8 +16,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         {
             _boardGroup = GetComponentGroup(
                 ComponentType.ReadOnly(typeof(BoardComponent)),
-                ComponentType.ReadOnly(typeof(BoardReadyComponent)),
-                ComponentType.ReadOnly(typeof(TilemapReadyComponent))
+                ComponentType.ReadOnly(typeof(BoardReadyComponent))
             );
             _roomGroup = GetComponentGroup(
                 ComponentType.ReadOnly(typeof(RoomComponent)));

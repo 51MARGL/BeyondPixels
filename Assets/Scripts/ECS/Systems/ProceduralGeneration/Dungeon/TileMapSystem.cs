@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -12,24 +11,22 @@ using UnityEngine.Tilemaps;
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 {
     public class TileMapSystem : ComponentSystem
-    {
-        private struct Data
+    {        
+        private struct BoardData
         {
-            public readonly int Length;
-            public ComponentDataArray<BoardComponent> BoardComponents;
-            public ComponentDataArray<BoardReadyComponent> BoardReadyComponents;
+            public readonly int Length;            
+            public ComponentDataArray<FinalBoardComponent> FinalBoardComponents;
             public SubtractiveComponent<TilemapReadyComponent> TilemapReadyComponents;
             public EntityArray EntityArray;
         }
         [Inject]
-        private Data _data;
+        private BoardData _boardData;
 
         private struct TilemapData
         {
             public readonly int Length;
             public ComponentArray<DungeonTileMapComponent> DungeonTileMapComponents;
             public ComponentArray<Transform> TransformComponents;
-            public EntityArray EntityArray;
         }
         [Inject]
         private TilemapData _tilemapData;
@@ -37,45 +34,48 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         private struct Tiles
         {
             public readonly int Length;
-            public ComponentDataArray<TileComponent> TileComponents;
+            public ComponentDataArray<FinalTileComponent> TileComponents;
         }
         [Inject]
         private Tiles _tiles;
-        private NativeList<TileComponent> TilesList;
+        private NativeList<FinalTileComponent> TilesList;
 
         protected override void OnCreateManager()
         {
-            TilesList = new NativeList<TileComponent>(Allocator.Persistent);
+            TilesList = new NativeList<FinalTileComponent>(Allocator.Persistent);
         }
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
-            {
-                for (int j = 0; j < _tilemapData.Length; j++)
-                {
-                    var tilemapComponent = _tilemapData.DungeonTileMapComponents[j];
-                    if (tilemapComponent.tileSpawnRoutine != null)
-                        return;
-
-                    TilesList.Clear();
-                    for (int k = 0; k < _tiles.Length; k++)
-                        TilesList.Add(_tiles.TileComponents[k]);
-
-                    if (TilesList.Length > 0)
-                        tilemapComponent.tileSpawnRoutine
-                            = tilemapComponent.StartCoroutine(
-                                this.SetTiles(j, _data.BoardComponents[i].Size,
-                                    _tilemapData.TransformComponents[i]));
-
-                    PostUpdateCommands.AddComponent(_data.EntityArray[i], new TilemapReadyComponent());
-                }
-            }
+            for (int i = 0; i < _boardData.Length; i++)
+                this.SetBoardTiles(_boardData.FinalBoardComponents[i].Size, _boardData.EntityArray[i]);
         }
 
-        private IEnumerator SetTiles(int entityIndex, int2 boardSize, Transform lightParent)
+        private void SetBoardTiles(int2 boardSize, Entity boardEntity)
         {
-            var tilemapComponent = _tilemapData.DungeonTileMapComponents[entityIndex];
+            for (int j = 0; j < _tilemapData.Length; j++)
+            {
+                var tilemapComponent = _tilemapData.DungeonTileMapComponents[j];
+                if (tilemapComponent.tileSpawnRoutine != null)
+                    return;
+
+                TilesList.Clear();
+                for (int k = 0; k < _tiles.Length; k++)
+                    TilesList.Add(_tiles.TileComponents[k]);
+
+                if (TilesList.Length > 0)
+                    tilemapComponent.tileSpawnRoutine
+                        = tilemapComponent.StartCoroutine(
+                            this.SetTiles(_tilemapData.DungeonTileMapComponents[j], boardSize,
+                                _tilemapData.TransformComponents[j]));
+
+                PostUpdateCommands.AddComponent(boardEntity, new TilemapReadyComponent());
+            }
+            
+        }
+
+        private IEnumerator SetTiles(DungeonTileMapComponent tilemapComponent, int2 boardSize, Transform transform)
+        {
             var wallCollider = tilemapComponent.TilemapWalls.GetComponent<TilemapCollider2D>();
             wallCollider.enabled = false;
             tilemapComponent.TilemapWalls.ClearAllTiles();
@@ -83,8 +83,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             tilemapComponent.TilemapBase.ClearAllTiles();
             tilemapComponent.TilemapWallsAnimated.ClearAllTiles();
             var lightList = new List<Transform>();
-            for (int k = 4; k < _tilemapData.TransformComponents[entityIndex].childCount; k++)
-                lightList.Add(_tilemapData.TransformComponents[entityIndex].GetChild(k));
+            for (int k = 4; k < transform.childCount; k++)
+                lightList.Add(transform.GetChild(k));
             lightList.ForEach(obj => GameObject.Destroy(obj.gameObject));
 
             var centerX = (int)math.floor(boardSize.x / 2f);
@@ -108,8 +108,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
-
-                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
 
                         tile = TilesList[yBottom * boardSize.x + x];
@@ -119,8 +117,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
-
-                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
                     }
 
@@ -134,8 +130,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
-
-                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
 
                         tile = TilesList[y * boardSize.x + xRigth];
@@ -145,8 +139,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         {
                             tilemapComponent.TilemapWalls.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTile);
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
-
-                            CreateLightTile(boardSize, lightParent, tilemapComponent, tile);
                         }
                     }
                 yield return null;
@@ -210,27 +202,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             TilesList.Clear();
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
-        }
-
-        private void CreateLightTile(int2 boardSize, Transform lightParent, DungeonTileMapComponent tilemapComponent, TileComponent tile)
-        {
-            if (tile.Position.x > 1 && tile.Position.x < boardSize.x - 1
-                && tile.Position.y > 1 && tile.Position.y < boardSize.y - 1
-                && TilesList[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor
-                && TilesList[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
-                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
-                && TilesList[(tile.Position.y) * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall
-                && UnityEngine.Random.Range(0, 100) > 75
-               )
-            {
-                tilemapComponent.WallTorchAnimatedTile.m_AnimationStartTime = UnityEngine.Random.Range(1, 10);
-                tilemapComponent.TilemapWallsAnimated.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTorchAnimatedTile);
-                GameObject.Instantiate(tilemapComponent.TorchLight,
-                    new Vector3(tile.Position.x + 0.5f, tile.Position.y - 0.5f, -1),
-                    Quaternion.identity, lightParent);
-
-            }
-        }
+        }       
 
         protected override void OnDestroyManager()
         {

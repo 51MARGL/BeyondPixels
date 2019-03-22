@@ -274,7 +274,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 for (int x = 0; x < TileStride; x++)
                 {
                     var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, new TileComponent
+                    CommandBuffer.AddComponent(index, entity, new FinalTileComponent
                     {
                         TileType = Tiles[(index * TileStride) + x],
                         Position = new int2(x, index)
@@ -288,12 +288,19 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             public EntityCommandBuffer CommandBuffer;
             [ReadOnly]
             public Entity BoardEntity;
+            [ReadOnly]
+            public int2 BoardSize;
             [DeallocateOnJobCompletion]
             public NativeArray<NodeComponent> TreeArray;
 
             public void Execute()
             {
                 CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
+                var finalBoardComponent = CommandBuffer.CreateEntity();
+                CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                {
+                    Size = BoardSize
+                });
             }
         }
 
@@ -325,7 +332,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             {
                 var board = _data.BoardComponents[i];
                 var boardEntity = _data.EntityArray[i];
-                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmss").GetHashCode());
+                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
                 if (CurrentPhase == 0)
                 {
                     Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -398,13 +405,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     {
                         CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
                         BoardEntity = _data.EntityArray[i],
+                        BoardSize = _data.BoardComponents[i].Size,
                         TreeArray = TreeArray
                     }.Schedule(instantiateTilesJobHandle);
                     _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
                 }
+                else if (CurrentPhase == 2)
+                {
+                    CorridorsQueue.Clear();
+                }
             }
 
-            CurrentPhase = (CurrentPhase + 1) % 2;
+            CurrentPhase = (CurrentPhase + 1) % 3;
             return inputDeps;
         }
 

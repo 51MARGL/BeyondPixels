@@ -25,6 +25,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                                 [ReadOnly] ref CollisionInfo collisionInfo,
                                 [ReadOnly] ref DamageComponent damageComponent)
             {
+                if (!HealthComponents.Exists(collisionInfo.Other))
+                    return;
+
                 var healthComponent = HealthComponents[collisionInfo.Other];
                 healthComponent.CurrentValue -= damageComponent.DamageOnImpact;
                 if (healthComponent.CurrentValue < 0)
@@ -37,7 +40,6 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
                 if (healthComponent.CurrentValue <= 0)
                 {
-                    //healthComponent.CurrentValue = 0;
                     CommandBuffer.AddComponent(index, collisionInfo.Other, new DestroyComponent());
                     return;
                 }
