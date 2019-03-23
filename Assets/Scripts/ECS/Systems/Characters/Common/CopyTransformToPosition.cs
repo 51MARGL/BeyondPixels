@@ -7,8 +7,7 @@ using UnityEngine.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    [UpdateBefore(typeof(UnityEngine.Experimental.PlayerLoop.FixedUpdate))]
-    public class CopyTranfromToPosition : JobComponentSystem
+    public class CopyTransformToPosition : JobComponentSystem
     {
         [BurstCompile]
         private struct CopyTransformToPositionJob : IJobParallelForTransform
@@ -35,6 +34,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             var transformArray = _transformGroup.GetTransformAccessArray();
             return new CopyTransformToPositionJob
             {
+                //no other method for now
                 PositionComponents = _transformGroup.GetComponentDataArray<PositionComponent>()
             }.Schedule(transformArray, inputDeps);
         }

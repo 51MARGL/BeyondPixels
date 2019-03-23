@@ -7,20 +7,25 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class SpellCoolDownSystem : ComponentSystem
     {
-        private struct Data
+       private ComponentGroup _group;
+
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentArray<SpellBookComponent> SpellBookComponents;
-            public EntityArray EntityArray;
+            _group = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(SpellBookComponent), typeof(PositionComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
-                foreach (var spell in _data.SpellBookComponents[i].Spells.Where(x => x.CoolDownTimeLeft > 0))
+            Entities.With(_group).ForEach((SpellBookComponent spellBookComponent) =>
+            {
+                foreach (var spell in spellBookComponent.Spells.Where(x => x.CoolDownTimeLeft > 0))
                     spell.CoolDownTimeLeft -= Time.deltaTime;
+            });
         }
     }
 }

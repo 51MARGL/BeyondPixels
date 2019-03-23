@@ -25,7 +25,7 @@ namespace BeyondPixels.ColliderEvents
 
     public struct SpellCollisionComponent : IComponentData
     {
-        public Entity SpellEntity;
+        public Entity Target;
         public float2 ImpactPoint;
         public float ImpactTime;
     }

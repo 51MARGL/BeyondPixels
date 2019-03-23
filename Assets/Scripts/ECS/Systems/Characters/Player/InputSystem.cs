@@ -9,7 +9,7 @@ using UnityEngine;
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class InputSystem : JobComponentSystem
-    {        
+    {
         [BurstCompile]
         private struct InputJob : IJobProcessComponentData<InputComponent, MovementComponent>
         {

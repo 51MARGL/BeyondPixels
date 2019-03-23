@@ -10,11 +10,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class SpellCastingSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        public class SpellCastBarrier : BarrierSystem { }
-
         [RequireComponentTag(typeof(SpellBookComponent))]
-        [RequireSubtractiveComponent(typeof(SpellCastingComponent), typeof(AttackComponent))]
+        [ExcludeComponent(typeof(SpellCastingComponent), typeof(AttackComponent))]
         private struct SpellCastJob : IJobProcessComponentDataWithEntity<InputComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -35,22 +32,21 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 }
             }
         }
-        [Inject]
-        private SpellCastBarrier _spellCastBarrier;
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
         protected override void OnCreateManager()
         {
-            _spellCastBarrier = World.Active.GetOrCreateManager<SpellCastBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new SpellCastJob
             {
-                CommandBuffer = _spellCastBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
-            _spellCastBarrier.AddJobHandleForProducer(handle);
+            _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

@@ -5,54 +5,52 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class SpellCastAnimationSystem : ComponentSystem
     {
         private struct SpellStateComponent : IComponentData { }
 
-        private struct AddedData
-        {
-            public readonly int Length;
-            public ComponentArray<Animator> AnimatorComponents;
-            public ComponentArray<SpellBookComponent> SpellBookComponents;
-            public ComponentDataArray<SpellCastingComponent> SpellCastingComponents;
-            public SubtractiveComponent<SpellStateComponent> CompStates;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private AddedData _added;
+        private ComponentGroup _addedGroup;
+        private ComponentGroup _removedGroup;
 
-        private struct RemovedData
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentArray<Animator> AnimatorComponents;
-            public ComponentArray<SpellBookComponent> SpellBookComponents;
-            public SubtractiveComponent<SpellCastingComponent> SpellCastingComponents;
-            public ComponentDataArray<SpellStateComponent> CompStates;
-            public EntityArray EntityArray;
+            _addedGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(Animator), typeof(SpellBookComponent), typeof(SpellCastingComponent)
+                },
+                None = new ComponentType[] {
+                    typeof(SpellStateComponent)
+                }
+            });
+            _removedGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(Animator), typeof(SpellBookComponent), typeof(SpellStateComponent)
+                },
+                None = new ComponentType[] {
+                    typeof(SpellCastingComponent)
+                }
+            });
         }
-        [Inject]
-        private RemovedData _removed;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _added.Length; i++)
+            Entities.With(_addedGroup).ForEach((Entity entity, Animator animatorComponent) =>
             {
-                var animatorComponent = _added.AnimatorComponents[i];
-
                 animatorComponent.ActivateLayer("CastSpellLayer");
                 animatorComponent.SetBool("spellCasting", true);
 
-                PostUpdateCommands.AddComponent(_added.EntityArray[i], new SpellStateComponent());
-            }
-
-            for (int i = 0; i < _removed.Length; i++)
+                PostUpdateCommands.AddComponent(entity, new SpellStateComponent());
+            });
+            Entities.With(_removedGroup).ForEach((Entity entity, Animator animatorComponent) =>
             {
-                var animatorComponent = _removed.AnimatorComponents[i];
                 animatorComponent.ActivateLayer("CastSpellLayer");
                 animatorComponent.SetBool("spellCasting", false);
 
-                PostUpdateCommands.RemoveComponent<SpellStateComponent>(_removed.EntityArray[i]);
-            }
+                PostUpdateCommands.RemoveComponent<SpellStateComponent>(entity);
+            });
         }
     }
 }

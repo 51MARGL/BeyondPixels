@@ -6,27 +6,24 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
-    [UpdateAfter(typeof(AttackSystem))]
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class AttackAnimationSystem : ComponentSystem
     {
-        private struct Data
-        {
-            public readonly int Length;
-            public ComponentArray<Animator> AnimatorComponents;
-            public ComponentDataArray<CharacterComponent> CharacterComponents;
-            public ComponentDataArray<AttackComponent> AttackComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private Data _data;
+        private ComponentGroup _group;
 
+        protected override void OnCreateManager()
+        {
+            _group = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(Animator), typeof(CharacterComponent), typeof(AttackComponent)
+                }
+            });
+        }
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
+            Entities.With(_group).ForEach((Entity entity, Animator animatorComponent, ref AttackComponent attackComponent) =>
             {
-                var attackComponent = _data.AttackComponents[i];
-                var animatorComponent = _data.AnimatorComponents[i];
-
                 animatorComponent.ActivateLayer("AttackLayer");
 
                 string attackTriggerName = "Attack" + (attackComponent.CurrentComboIndex + 1);
@@ -38,9 +35,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 {
                     foreach (var comboName in new[] { "Attack1", "Attack2" })
                         animatorComponent.ResetTrigger(comboName);
-                    PostUpdateCommands.RemoveComponent<AttackComponent>(_data.EntityArray[i]);
+                    PostUpdateCommands.RemoveComponent<AttackComponent>(entity);
                 }
-            }
+
+            });
         }
     }
 }

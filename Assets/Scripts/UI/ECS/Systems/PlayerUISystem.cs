@@ -29,7 +29,7 @@ namespace BeyondPixels.UI.ECS.Systems
             public ComponentArray<PlayerUIComponent> PlayerUIComponents;
             public ComponentArray<SpellBookComponent> SpellBookComponents;
             public ComponentDataArray<SpellCastingComponent> SpellCastingComponents;
-            public SubtractiveComponent<SpellStateComponent> CompStates;
+            public ExcludeComponent<SpellStateComponent> CompStates;
             public EntityArray EntityArray;
         }
         [Inject]
@@ -50,7 +50,7 @@ namespace BeyondPixels.UI.ECS.Systems
             public readonly int Length;
             public ComponentArray<PlayerUIComponent> PlayerUIComponents;
             public ComponentArray<SpellBookComponent> SpellBookComponents;
-            public SubtractiveComponent<SpellCastingComponent> SpellCastingComponents;
+            public ExcludeComponent<SpellCastingComponent> SpellCastingComponents;
             public ComponentDataArray<SpellStateComponent> CompStates;
             public EntityArray EntityArray;
         }

@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Spells;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -10,73 +11,79 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class SpellCastSystem : ComponentSystem
     {
-        private struct Data
+        private ComponentGroup _spellCasterGroup;
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentDataArray<InputComponent> InputComponents;
-            public ComponentDataArray<SpellCastingComponent> SpellCastingComponents;
-            public ComponentArray<SpellBookComponent> SpellBookComponents;
-            public EntityArray EntityArray;
+            _spellCasterGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(InputComponent), typeof(SpellCastingComponent),
+                    typeof(SpellBookComponent), typeof(PositionComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
-        [Inject]
-        private ComponentDataFromEntity<TargetComponent> _targetComponents;
-        [Inject]
-        private ComponentDataFromEntity<PositionComponent> _positionComponents;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
-            {
-                var inputComponent = _data.InputComponents[i];
-
-                var casterEntity = _data.EntityArray[i];
-
-                if (inputComponent.AttackButtonPressed == 1
-                    || !(inputComponent.InputDirection.Equals(float2.zero)))
+            using (var chunks = _spellCasterGroup.CreateArchetypeChunkArray(Allocator.TempJob))
+                for (int c = 0; c < chunks.Length; c++)
                 {
-                    PostUpdateCommands.RemoveComponent<SpellCastingComponent>(casterEntity);
-                    return;
+                    var chunk = chunks[c];
+                    var entities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
+                    var inputComponents = chunk.GetNativeArray(GetArchetypeChunkComponentType<InputComponent>(true));
+                    var positionComponents = chunk.GetNativeArray(GetArchetypeChunkComponentType<PositionComponent>(true));
+                    var spellCastingComponents = chunk.GetNativeArray(GetArchetypeChunkComponentType<SpellCastingComponent>(true));
+                    for (int i = 0; i < chunk.Count; i++)
+                    {
+                        var entity = entities[i];
+                        var positionComponent = positionComponents[i];
+                        var spellCastingComponent = spellCastingComponents[i];
+                        var spellBookComponent = EntityManager.GetComponentObject<SpellBookComponent>(entity);
+
+                        if (inputComponents[i].AttackButtonPressed == 1
+                            || !(inputComponents[i].InputDirection.Equals(float2.zero)))
+                        {
+                            PostUpdateCommands.RemoveComponent<SpellCastingComponent>(entity);
+                            return;
+                        }
+
+                        var spellIndex = spellCastingComponent.SpellIndex;
+                        var spellInitializer = spellBookComponent.Spells[spellIndex];
+
+                        if (spellInitializer.CoolDownTimeLeft > 0
+                            || (spellInitializer.TargetRequired
+                            && !EntityManager.HasComponent<TargetComponent>(entity)))
+                        {
+                            PostUpdateCommands.RemoveComponent<SpellCastingComponent>(entity);
+                            return;
+                        }
+
+                        if (spellCastingComponent.StartedAt + spellInitializer.CastTime > Time.time)
+                            return;
+
+                        (Entity entity, PositionComponent position) target;
+                        if (spellInitializer.TargetRequired)
+                        {
+                            var targetComponent = EntityManager.GetComponentData<TargetComponent>(entity);
+                            target.position =
+                                EntityManager.GetComponentData<PositionComponent>(targetComponent.Target);
+                            target.entity = targetComponent.Target;
+                        }
+                        else
+                        {
+                            target.position = positionComponent;
+                            target.entity = entity;
+                        }
+
+                        InstantiateSpellPrefab(spellBookComponent.Spells[spellIndex],
+                            (entity, positionComponent),
+                            target);
+
+                        PostUpdateCommands.RemoveComponent<SpellCastingComponent>(entity);
+
+                        spellInitializer.CoolDownTimeLeft = spellInitializer.CoolDown;
+                    }
                 }
-
-                var spellCastingComponent = _data.SpellCastingComponents[i];
-
-                var spellIndex = spellCastingComponent.SpellIndex;
-                var spellInitializer = _data.SpellBookComponents[i]
-                                        .Spells[spellIndex];
-
-                if (spellInitializer.CoolDownTimeLeft > 0
-                    || (spellInitializer.TargetRequired && !_targetComponents.Exists(casterEntity)))
-                {
-                    PostUpdateCommands.RemoveComponent<SpellCastingComponent>(casterEntity);
-                    return;
-                }
-
-                if (spellCastingComponent.StartedAt + spellInitializer.CastTime > Time.time)
-                    return;
-
-                // No clue why, but gets NativeArray deallocation error without these
-                (Entity entity, PositionComponent position) target;
-                if (spellInitializer.TargetRequired)
-                {
-                    target.position = _positionComponents[_targetComponents[casterEntity].Target];
-                    target.entity = _targetComponents[casterEntity].Target;
-                }
-                else
-                {
-                    target.position = _positionComponents[casterEntity];
-                    target.entity = casterEntity;
-                }
-
-                InstantiateSpellPrefab(_data.SpellBookComponents[i].Spells[spellIndex],
-                    (casterEntity, _positionComponents[casterEntity]),
-                    target);
-
-                PostUpdateCommands.RemoveComponent<SpellCastingComponent>(casterEntity);
-
-                spellInitializer.CoolDownTimeLeft = spellInitializer.CoolDown;
-            }
         }
 
         private void InstantiateSpellPrefab(Spell spell,
@@ -85,7 +92,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         {
             var position = new float3(0, 0, 100);
             if (spell.SelfTarget)
-                position = new float3(caster.position.CurrentPosition.x, caster.position.CurrentPosition.y, 100); 
+                position = new float3(caster.position.CurrentPosition.x, caster.position.CurrentPosition.y, 100);
             else if (spell.TargetRequired)
                 position = new float3(target.position.CurrentPosition.x, target.position.CurrentPosition.y, 100);
 
@@ -129,7 +136,6 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
             if (spell.LockOnTarget)
                 PostUpdateCommands.AddComponent(spellEntity, new LockOnTargetComponent());
-
         }
     }
 }

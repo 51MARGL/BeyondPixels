@@ -8,28 +8,28 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    [UpdateAfter(typeof(MovementSystem))]
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class MovementAnimationSystem : ComponentSystem
     {
-        private struct Data
+        private ComponentGroup _group;
+
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentArray<Animator> AnimatorComponents;
-            public ComponentDataArray<MovementComponent> MovementComponents;
-            public ComponentArray<Transform> TransformComponents;
-            public SubtractiveComponent<AttackComponent> AttackComponents;
-            public SubtractiveComponent<AttackStateComponent> AttackStateComponents;
-            public SubtractiveComponent<SpellCastingComponent> SpellCastingComponents;
+            _group = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(Animator), typeof(MovementComponent), typeof(Transform)
+                },
+                None = new ComponentType[] {
+                    typeof(AttackComponent), typeof(AttackStateComponent), typeof(SpellCastingComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
+            Entities.With(_group).ForEach((Animator animatorComponent, ref MovementComponent movementComponent) =>
             {
-                var movementComponent = _data.MovementComponents[i];
-                var animatorComponent = _data.AnimatorComponents[i];
                 if (!movementComponent.Direction.Equals(float2.zero))
                 {
                     animatorComponent.ActivateLayer("RunLayer");
@@ -42,8 +42,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 {
                     animatorComponent.ActivateLayer("IdleLayer");
                 }
-            }
+            });
         }
     }
-
 }
