@@ -15,10 +15,13 @@ namespace BeyondPixels.ColliderEvents
             if (collider.gameObject.CompareTag("Hitbox"))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
+                var spellEntity = GetComponent<GameObjectEntity>().Entity;
+                if (!entityManager.Exists(spellEntity))
+                    return;
+
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                              typeof(SpellCollisionComponent),
                                                              typeof(DamageComponent));
-                var spellEntity = GetComponent<GameObjectEntity>().Entity;
                 var caster = entityManager.GetComponentData<SpellComponent>(spellEntity).Caster;
                 var damageComponent = entityManager.GetComponentData<DamageComponent>(spellEntity);
                 var targetComponent = entityManager.GetComponentData<TargetRequiredComponent>(spellEntity);
@@ -28,7 +31,7 @@ namespace BeyondPixels.ColliderEvents
                          new CollisionInfo
                          {
                              Sender = caster,
-                             Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
+                             Target = collider.GetComponentInParent<GameObjectEntity>().Entity,
                              EventType = EventType.TriggerEnter
                          });
                 entityManager.SetComponentData(eventEntity,
@@ -50,10 +53,13 @@ namespace BeyondPixels.ColliderEvents
                 if (totalTime > 1f)
                 {
                     var entityManager = World.Active.GetExistingManager<EntityManager>();
+                    var spellEntity = GetComponent<GameObjectEntity>().Entity;
+                    if (!entityManager.Exists(spellEntity))
+                        return;
+
                     var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                                  typeof(SpellCollisionComponent),
                                                                  typeof(DamageComponent));
-                    var spellEntity = GetComponent<GameObjectEntity>().Entity;
                     var caster = entityManager.GetComponentData<SpellComponent>(spellEntity).Caster;
                     var damageComponent = entityManager.GetComponentData<DamageComponent>(spellEntity);
                     var targetComponent = entityManager.GetComponentData<TargetRequiredComponent>(spellEntity);
@@ -63,7 +69,7 @@ namespace BeyondPixels.ColliderEvents
                             new CollisionInfo
                             {
                                 Sender = caster,
-                                Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
+                                Target = collider.GetComponentInParent<GameObjectEntity>().Entity,
                                 EventType = EventType.TriggerStay
                             });
                     entityManager.SetComponentData(eventEntity,

@@ -18,6 +18,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             public int MouseClicked;
             public float3 MousePosition;
             public int ActionButtonPressed;
+            public int SelectTargetButtonPressed;
 
             public void Execute(ref InputComponent inputComponent, ref MovementComponent movementComponent)
             {
@@ -28,6 +29,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
                 inputComponent.MouseButtonClicked = MouseClicked;
                 inputComponent.MousePosition = MousePosition;
+                inputComponent.SelectTargetButtonPressed = SelectTargetButtonPressed;
 
                 if (ActionButtonPressed > 0)
                     inputComponent.ActionButtonPressed = ActionButtonPressed;
@@ -40,6 +42,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             var attackPressed = 0;
             var mouseClicked = 0;
             var actionButtonPressed = 0;
+            var selectTargetButtonPressed = 0;
             if (Input.GetKey(KeyCode.A))
                 direction += new float2(-1, 0);
             if (Input.GetKey(KeyCode.D))
@@ -58,6 +61,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 actionButtonPressed = 2;
             if (Input.GetKeyDown(KeyCode.Alpha3))
                 actionButtonPressed = 3;
+            if (Input.GetKeyDown(KeyCode.Tab))
+                selectTargetButtonPressed = 1;
 
             return new InputJob
             {
@@ -65,7 +70,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 AttackPressed = attackPressed,
                 MouseClicked = mouseClicked,
                 MousePosition = Input.mousePosition,
-                ActionButtonPressed = actionButtonPressed
+                ActionButtonPressed = actionButtonPressed,
+                SelectTargetButtonPressed = selectTargetButtonPressed
             }.Schedule(this, inputDeps);
         }
     }

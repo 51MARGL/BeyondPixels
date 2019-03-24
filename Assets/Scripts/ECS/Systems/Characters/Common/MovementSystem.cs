@@ -45,11 +45,18 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            _group = GetComponentGroup(
-                ComponentType.Exclude(typeof(AttackComponent)),
-                ComponentType.ReadOnly(typeof(MovementComponent)),
-                typeof(UnityEngine.Transform)
-            );
+            _group = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly(typeof(MovementComponent)),
+                    typeof(UnityEngine.Transform)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(AttackComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

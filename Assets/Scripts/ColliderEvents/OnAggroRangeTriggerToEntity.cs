@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using BeyondPixels.ECS.Components.Characters.AI;
+using Unity.Entities;
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -10,14 +11,20 @@ namespace BeyondPixels.ColliderEvents
             if (collider.gameObject.CompareTag("Player"))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
+                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                    return;
+
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
 
-                entityManager.SetComponentData(eventEntity, new CollisionInfo
-                {
-                    Sender = GetComponentInParent<GameObjectEntity>().Entity,
-                    Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
-                    EventType = EventType.TriggerEnter
-                });
+                if (!entityManager.HasComponent<FollowStateComponent>(sender))
+                    entityManager.SetComponentData(eventEntity, new CollisionInfo
+                    {
+                        Sender = sender,
+                        Target = target,
+                        EventType = EventType.TriggerEnter
+                    });
             }
         }
 
@@ -27,14 +34,20 @@ namespace BeyondPixels.ColliderEvents
                 && this.gameObject.layer == collider.gameObject.layer)
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
+                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                    return;
+
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
 
-                entityManager.SetComponentData(eventEntity, new CollisionInfo
-                {
-                    Sender = GetComponentInParent<GameObjectEntity>().Entity,
-                    Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
-                    EventType = EventType.TriggerExit
-                });
+                if (entityManager.HasComponent<FollowStateComponent>(sender))
+                    entityManager.SetComponentData(eventEntity, new CollisionInfo
+                    {
+                        Sender = sender,
+                        Target = target,
+                        EventType = EventType.TriggerExit
+                    });
             }
         }
     }

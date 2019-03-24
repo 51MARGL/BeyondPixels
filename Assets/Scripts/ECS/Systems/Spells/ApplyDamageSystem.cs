@@ -36,14 +36,14 @@ namespace BeyondPixels.ECS.Systems.Spells
                     var characterComponents = chunk.GetNativeArray(CharacterComponentType);
                     for (int i = 0; i < chunk.Count; i++)
                     {
-                        if (entities[i] == collisionInfo.Other)
+                        if (entities[i] == collisionInfo.Target)
                             targetType = characterComponents[i].CharacterType;
                         if (entities[i] == collisionInfo.Sender)
                             casterType = characterComponents[i].CharacterType;
                     }
                 }
                 if (targetType == casterType
-                    && spellCollisionComponent.Target != collisionInfo.Other)
+                    && spellCollisionComponent.Target != collisionInfo.Target)
                 {
                     CommandBuffer.DestroyEntity(index, entity);
                     return;
@@ -56,20 +56,20 @@ namespace BeyondPixels.ECS.Systems.Spells
                         newEntity = CommandBuffer.CreateEntity(index);
                         CommandBuffer.AddComponent(index, newEntity, collisionInfo);
                         CommandBuffer.AddComponent(index, newEntity,
-                                new DamageComponent
+                                new FinalDamageComponent
                                 {
                                     DamageType = damageComponent.DamageType,
-                                    DamageOnImpact = damageComponent.DamageOnImpact
+                                    DamageAmount = damageComponent.DamageOnImpact
                                 });
                         break;
                     case EventType.TriggerStay:
                         newEntity = CommandBuffer.CreateEntity(index);
                         CommandBuffer.AddComponent(index, newEntity, collisionInfo);
                         CommandBuffer.AddComponent(index, newEntity,
-                                new DamageComponent
+                                new FinalDamageComponent
                                 {
                                     DamageType = damageComponent.DamageType,
-                                    DamageOnImpact = damageComponent.DamagePerSecond
+                                    DamageAmount = damageComponent.DamagePerSecond
                                 });
                         break;
                 }

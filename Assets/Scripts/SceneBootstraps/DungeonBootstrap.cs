@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI;
 using BeyondPixels.Utilities;
 using Unity.Entities;
@@ -12,6 +13,8 @@ namespace BeyondPixels.SceneBootstraps
 {
     public class DungeonBootstrap : MonoBehaviour
     {
+
+        public static SpellBookComponent spellBook;
         [Serializable]
         public class DungeonGeneratorSettings
         {
@@ -99,10 +102,13 @@ namespace BeyondPixels.SceneBootstraps
             //}
             #endregion
 
+            spellBook = GameObject.FindGameObjectWithTag("SpellBook").GetComponent<SpellBookComponent>();
+
             #region PlayerEntityArchetype
             var player = PrefabManager.Instance.PlayerPrefab;
             var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
             var playerInitializeComponent = player.GetComponent<PlayerInitializeComponent>();
+            entityManager.AddComponent(playerEntity, typeof(PlayerComponent));
             entityManager.AddComponent(playerEntity, typeof(InputComponent));
 
             entityManager.AddComponentData(playerEntity, new CharacterComponent
@@ -131,9 +137,55 @@ namespace BeyondPixels.SceneBootstraps
             entityManager.RemoveComponent<PlayerInitializeComponent>(playerEntity);
             #endregion            
 
+            for (int i = 0; i < 3; i++)
+            {
+                var spellEntity = entityManager.CreateEntity(typeof(ActiveSpellComponent));
+                entityManager.SetComponentData(spellEntity, new ActiveSpellComponent
+                {
+                    Owner = playerEntity,
+                    ActionIndex = i + 1,
+                    SpellIndex = i
+                });
+            }
             #region UI
-            UIManager.Instance.Initialize(player);
+            UIManager.Instance.Initialize(spellBook);
             #endregion
+
+            var randomPositon = new Vector3(-1, -1, 0);
+            var enemy = GameObject.Instantiate(PrefabManager.Instance.EnemyPrefab, randomPositon, Quaternion.identity);
+            var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
+            var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
+
+            entityManager.AddComponentData(enemyEntity, new CharacterComponent
+            {
+                CharacterType = CharacterType.Enemy
+            });
+            entityManager.AddComponentData(enemyEntity, new MovementComponent
+            {
+                Direction = float2.zero,
+                Speed = enemyInitializeComponent.MovementSpeed
+            });
+            entityManager.AddComponentData(enemyEntity, new HealthComponent
+            {
+                MaxValue = enemyInitializeComponent.MaxHealth,
+                CurrentValue = enemyInitializeComponent.MaxHealth
+            });
+            entityManager.AddComponentData(enemyEntity, new WeaponComponent
+            {
+                DamageValue = enemyInitializeComponent.WeaponDamage,
+                AttackRange = enemyInitializeComponent.AttackRange,
+                CoolDown = enemyInitializeComponent.AttackCoolDown
+            });
+            entityManager.AddComponentData(enemyEntity, new IdleStateComponent
+            {
+                StartedAt = Time.time
+            });
+            entityManager.AddComponentData(enemyEntity, new PositionComponent
+            {
+                InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
+            });
+            GameObject.Destroy(enemyInitializeComponent);
+            entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
         }
 
         public void FixedUpdate()

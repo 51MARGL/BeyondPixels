@@ -10,5 +10,6 @@ namespace BeyondPixels.ECS.Components.Characters.Player
         public int MouseButtonClicked;
         public float3 MousePosition;
         public int ActionButtonPressed;
+        public int SelectTargetButtonPressed;
     }
 }

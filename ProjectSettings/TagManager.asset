@@ -16,6 +16,7 @@ TagManager:
   - AgroRange
   - Spell
   - PlayerSword
+  - SpellBook
   layers:
   - Default
   - TransparentFX

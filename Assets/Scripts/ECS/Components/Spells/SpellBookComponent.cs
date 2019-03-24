@@ -1,7 +1,8 @@
 ﻿using System;
+using BeyondPixels.ECS.Components.Characters.Common;
 using UnityEngine;
 
-namespace BeyondPixels.ECS.Components.Characters.Common
+namespace BeyondPixels.ECS.Components.Spells
 {
     public class SpellBookComponent : MonoBehaviour
     {
@@ -26,8 +27,6 @@ namespace BeyondPixels.ECS.Components.Characters.Common
             public bool LockOnTarget;
             public bool SelfTarget;
             public bool TargetRequired;
-
-            public float CoolDownTimeLeft;
         }
     }
 }

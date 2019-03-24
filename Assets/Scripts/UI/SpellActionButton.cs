@@ -1,5 +1,7 @@
-﻿using BeyondPixels.ECS.Components.Characters.Common;
+﻿using System;
+using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,8 +11,6 @@ namespace BeyondPixels.UI
 {
     public class SpellActionButton : MonoBehaviour, IPointerClickHandler
     {
-        public Entity SpellCaster;
-        public int SpellIndex;
         public Image CoolDownImage;
         public Text CoolDownText;
 
@@ -38,9 +38,12 @@ namespace BeyondPixels.UI
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-                var inputComponent = entityManager.GetComponentData<InputComponent>(this.SpellCaster);
-                inputComponent.ActionButtonPressed = this.SpellIndex + 1;
-                entityManager.SetComponentData(this.SpellCaster, inputComponent);
+                var eventEntity = entityManager.CreateEntity();
+                var index = Array.IndexOf(UIManager.Instance.UIComponent.SpellButtonsGroup.ActionButtons, this);
+                entityManager.AddComponentData(eventEntity, new ActionButtonPressedComponent
+                {
+                    ActionIndex = index
+                });
             }
         }
     }

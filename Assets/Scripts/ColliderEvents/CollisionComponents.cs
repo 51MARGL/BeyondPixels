@@ -7,7 +7,7 @@ namespace BeyondPixels.ColliderEvents
     public struct CollisionInfo : IComponentData
     {
         public Entity Sender;
-        public Entity Other;
+        public Entity Target;
         public EventType EventType;
     }
 

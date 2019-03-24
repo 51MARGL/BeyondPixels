@@ -18,7 +18,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             _addedGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
-                    typeof(Animator), typeof(SpellBookComponent), typeof(SpellCastingComponent)
+                    typeof(Animator), typeof(SpellCastingComponent)
                 },
                 None = new ComponentType[] {
                     typeof(SpellStateComponent)
@@ -27,7 +27,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             _removedGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
-                    typeof(Animator), typeof(SpellBookComponent), typeof(SpellStateComponent)
+                    typeof(Animator), typeof(SpellStateComponent)
                 },
                 None = new ComponentType[] {
                     typeof(SpellCastingComponent)

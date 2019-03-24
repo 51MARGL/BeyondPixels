@@ -1,36 +1,40 @@
-﻿//using BeyondPixels.ECS.Components.Objects;
-//using Unity.Entities;
-//using UnityEngine;
+﻿using BeyondPixels.ECS.Components.Objects;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Jobs;
+using UnityEngine;
 
-//namespace BeyondPixels.ECS.Systems.Objects
-//{
-//    public class DestroySystem : ComponentSystem
-//    {
-//        private struct Data
-//        {
-//            public readonly int Length;
-//            public ComponentDataArray<DestroyComponent> DestroyComponents;
-//            public ComponentArray<Transform> TransformComponents;
-//            public EntityArray EntityArray;
-//        }
-//        [Inject]
-//        private Data _data;
+namespace BeyondPixels.ECS.Systems.Objects
+{
+    public class DestroySystem : JobComponentSystem
+    {
+        private struct DestroyEntityJob : IJobProcessComponentDataWithEntity<DestroyComponent>
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+            public void Execute(Entity entity, int index, [ReadOnly] ref DestroyComponent destroyComponent)
+            {
+                var syncEntity = CommandBuffer.CreateEntity(index);
+                CommandBuffer.AddComponent(index, syncEntity, new SyncDestroyedComponent {
+                    EntityID = entity.Index
+                });
+                CommandBuffer.DestroyEntity(index, entity);
+            }
+        }
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
-//        protected override void OnUpdate()
-//        {
-//            var count = _data.Length;
-//            var objectsToDestroy = new (GameObject gameObject, Entity entity)[count];
-//            for (int i = 0; i < count; i++)
-//                objectsToDestroy[i] = (_data.TransformComponents[i].gameObject, _data.EntityArray[i]);
+        protected override void OnCreateManager()
+        {
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+        }
 
-//            for (int i = 0; i < count; i++)
-//            {
-//                EntityManager.DestroyEntity(objectsToDestroy[i].entity);
-//                //release this frame for EntityManager
-//                GameObject.Destroy(objectsToDestroy[i].gameObject, 0.01f);
-//            }
-
-//            objectsToDestroy = null;
-//        }
-//    }
-//}
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            var destroyJobHandle = new DestroyEntityJob
+            {
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent()
+            }.Schedule(this, inputDeps);
+            _endFrameBarrier.AddJobHandleForProducer(destroyJobHandle);
+            return destroyJobHandle;
+        }
+    }
+}

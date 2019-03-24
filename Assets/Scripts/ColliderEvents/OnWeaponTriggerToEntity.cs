@@ -12,23 +12,26 @@ namespace BeyondPixels.ColliderEvents
                 && !this.transform.parent.gameObject.CompareTag(collider.transform.parent.tag))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(DamageComponent));
+                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                    return;
+
+                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(FinalDamageComponent));
 
                 entityManager.SetComponentData(eventEntity,
                         new CollisionInfo
                         {
-                            Sender = GetComponentInParent<GameObjectEntity>().Entity,
-                            Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
+                            Sender = sender,
+                            Target = target,
                             EventType = EventType.TriggerEnter
                         });
                 entityManager.SetComponentData(eventEntity,
-                        new DamageComponent
+                        new FinalDamageComponent
                         {
                             DamageType = DamageType.Weapon,
-                            DamageOnImpact =
-                                entityManager.
-                                    GetComponentData<WeaponComponent>(this.GetComponentInParent<GameObjectEntity>().Entity).
-                                        DamageValue
+                            DamageAmount =
+                                entityManager.GetComponentData<WeaponComponent>(sender).DamageValue
                         });
             }
         }

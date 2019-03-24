@@ -28,7 +28,6 @@ namespace BeyondPixels.ECS.Systems.Spells
 
             public void Execute(int index, TransformAccess transform)
             {
-                var position = float2.zero;
                 for (int c = 0; c < Chunks.Length; c++)
                 {
                     var chunk = Chunks[c];
@@ -36,44 +35,52 @@ namespace BeyondPixels.ECS.Systems.Spells
                     var positionComponents = chunk.GetNativeArray(PositionComponentType);
                     for (int i = 0; i < chunk.Count; i++)
                         if (entities[i] == TargetRequiredComponents[index].Target)
-                            position = positionComponents[i].CurrentPosition;
+                        {
+                            transform.position =
+                                new Vector3(positionComponents[i].CurrentPosition.x, 
+                                            positionComponents[i].CurrentPosition.y, 0f);
+                        }
                 }
-
-                if (position.Equals(float2.zero))
-                    return;
-
-                transform.position = new Vector3(position.x, position.y, 0f);
             }
         }
         private ComponentGroup _spellGroup;
         private ComponentGroup _targetGroup;
+        private NativeArray<ComponentType> _spellComponentArray;
+        private NativeArray<ComponentType> _targetComponentArray;
 
         protected override void OnCreateManager()
         {
-            _spellGroup = GetComponentGroup(
-                ComponentType.ReadOnly(typeof(SpellComponent)),
-                ComponentType.ReadOnly(typeof(LockOnTargetComponent)),
-                ComponentType.ReadOnly(typeof(TargetRequiredComponent)),
-                ComponentType.Exclude(typeof(DestroyComponent)),
-                typeof(UnityEngine.Transform)
-            );
-            _targetGroup = GetComponentGroup(
-                ComponentType.ReadOnly(typeof(PositionComponent)),
-                ComponentType.ReadOnly(typeof(CharacterComponent)),
-                typeof(UnityEngine.Transform)
-            );
+            _spellComponentArray = new NativeArray<ComponentType>(5, Allocator.Persistent);
+            _spellComponentArray[0] = typeof(SpellComponent);
+            _spellComponentArray[1] = typeof(LockOnTargetComponent);
+            _spellComponentArray[2] = typeof(TargetRequiredComponent);
+            _spellComponentArray[3] = typeof(UnityEngine.Transform);
+            _spellComponentArray[4] = ComponentType.Exclude(typeof(DestroyComponent));
+
+            _spellGroup = GetComponentGroup(_spellComponentArray);
+
+            _targetComponentArray = new NativeArray<ComponentType>(2, Allocator.Persistent);
+            _targetComponentArray[0] = typeof(PositionComponent);
+            _targetComponentArray[1] = typeof(CharacterComponent);
+
+            _targetGroup = GetComponentGroup(_targetComponentArray);
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var chunks = _targetGroup.CreateArchetypeChunkArray(Allocator.TempJob);
             return new LockOnTargetJob
             {
                 TargetRequiredComponents = _spellGroup.ToComponentDataArray<TargetRequiredComponent>(Allocator.TempJob),
-                Chunks = chunks,
+                Chunks = _targetGroup.CreateArchetypeChunkArray(Allocator.TempJob),
                 EntityType = GetArchetypeChunkEntityType(),
                 PositionComponentType = GetArchetypeChunkComponentType<PositionComponent>()
             }.Schedule(_spellGroup.GetTransformAccessArray(), inputDeps);
+        }
+
+        protected override void OnDestroyManager()
+        {
+            _spellComponentArray.Dispose();
+            _targetComponentArray.Dispose();
         }
     }
 }

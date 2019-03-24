@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.ECS.Components
 {
-    public class PlayerUIComponent : MonoBehaviour
+    public class UIComponent : MonoBehaviour
     {
         public HealthGroupWrapper HealthGroup;
         public SpellCastBarGroupWrapper SpellCastBarGroup;

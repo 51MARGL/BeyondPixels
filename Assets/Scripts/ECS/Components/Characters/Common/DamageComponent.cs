@@ -10,6 +10,12 @@ namespace BeyondPixels.ECS.Components.Characters.Common
         public DamageType DamageType;
     }
 
+    public struct FinalDamageComponent : IComponentData
+    {
+        public int DamageAmount;
+        public DamageType DamageType;
+    }
+
     public enum DamageType
     {
         Weapon = 0,

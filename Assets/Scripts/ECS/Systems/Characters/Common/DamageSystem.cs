@@ -1,69 +1,83 @@
-﻿//using BeyondPixels.ColliderEvents;
-//using BeyondPixels.ECS.Components.Characters.Common;
-//using BeyondPixels.ECS.Components.Objects;
-//using BeyondPixels.ECS.Systems.Objects;
-//using Unity.Burst;
-//using Unity.Collections;
-//using Unity.Entities;
-//using Unity.Jobs;
+﻿using BeyondPixels.ColliderEvents;
+using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Objects;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Jobs;
 
-//namespace BeyondPixels.ECS.Systems.Characters.Common
-//{
-//    public class DamageSystem : JobComponentSystem
-//    {
-//        [DisableAutoCreation]
-//        public class DamageBarrier : EntityCommandBufferSystem { }
+namespace BeyondPixels.ECS.Systems.Characters.Common
+{
+    public class DamageSystem : JobComponentSystem
+    {
+        private struct DamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, FinalDamageComponent>
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
 
-//        private struct DamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, DamageComponent>
-//        {
-//            public EntityCommandBuffer.Concurrent CommandBuffer;
-//            [ReadOnly]
-//            public ComponentDataFromEntity<HealthComponent> HealthComponents;
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public ArchetypeChunkEntityType EntityType;
+            public ArchetypeChunkComponentType<HealthComponent> HealthComponentType;
 
-//            public void Execute(Entity entity,
-//                                int index,
-//                                [ReadOnly] ref CollisionInfo collisionInfo,
-//                                [ReadOnly] ref DamageComponent damageComponent)
-//            {
-//                if (!HealthComponents.Exists(collisionInfo.Other))
-//                    return;
+            public void Execute(Entity entity,
+                                int index,
+                                [ReadOnly] ref CollisionInfo collisionInfo,
+                                [ReadOnly] ref FinalDamageComponent damageComponent)
+            {
+                for (int c = 0; c < Chunks.Length; c++)
+                {
+                    var chunk = Chunks[c];
+                    var entities = chunk.GetNativeArray(EntityType);
+                    var healthComponents = chunk.GetNativeArray(HealthComponentType);
+                    for (int i = 0; i < chunk.Count; i++)
+                        if (entities[i] == collisionInfo.Target)
+                        {
+                            var healthComponent = healthComponents[i];
 
-//                var healthComponent = HealthComponents[collisionInfo.Other];
-//                healthComponent.CurrentValue -= damageComponent.DamageOnImpact;
-//                if (healthComponent.CurrentValue < 0)
-//                    healthComponent.CurrentValue = 0;
-//                else if (healthComponent.CurrentValue > healthComponent.MaxValue)
-//                    healthComponent.CurrentValue = healthComponent.MaxValue;
-//                CommandBuffer.SetComponent(index, collisionInfo.Other, healthComponent);
+                            healthComponent.CurrentValue -= damageComponent.DamageAmount;
+                            if (healthComponent.CurrentValue < 0)
+                                healthComponent.CurrentValue = 0;
+                            else if (healthComponent.CurrentValue > healthComponent.MaxValue)
+                                healthComponent.CurrentValue = healthComponent.MaxValue;
 
-//                CommandBuffer.DestroyEntity(index, entity);
+                            CommandBuffer.SetComponent(index, entities[i], healthComponent);
+                        }
+                }
 
-//                if (healthComponent.CurrentValue <= 0)
-//                {
-//                    CommandBuffer.AddComponent(index, collisionInfo.Other, new DestroyComponent());
-//                    return;
-//                }
-//            }
-//        }
-//        private DamageBarrier _damageBarrier;
+                CommandBuffer.DestroyEntity(index, entity);
+            }
+        }
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private ComponentGroup _healthGroup;
 
-//        [Inject]
-//        private ComponentDataFromEntity<HealthComponent> _healthComponents;
+        protected override void OnCreateManager()
+        {
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            _healthGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(HealthComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(DestroyComponent)
+                }
+            });
+        }
 
-//        protected override void OnCreateManager()
-//        {
-//            _damageBarrier = World.Active.GetOrCreateManager<DamageBarrier>();
-//        }
-
-//        protected override JobHandle OnUpdate(JobHandle inputDeps)
-//        {
-//            var handle = new DamageJob
-//            {
-//                CommandBuffer = _damageBarrier.CreateCommandBuffer().ToConcurrent(),
-//                HealthComponents = _healthComponents,
-//            }.Schedule(this, inputDeps);
-//            _damageBarrier.AddJobHandleForProducer(handle);
-//            return handle;
-//        }
-//    }
-//}
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            var handle = new DamageJob
+            {
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                Chunks = _healthGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = GetArchetypeChunkEntityType(),
+                HealthComponentType = GetArchetypeChunkComponentType<HealthComponent>()
+            }.Schedule(this, inputDeps);
+            _endFrameBarrier.AddJobHandleForProducer(handle);
+            return handle;
+        }
+    }
+}
