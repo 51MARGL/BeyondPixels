@@ -42,13 +42,15 @@ namespace BeyondPixels.ECS.Systems.Spells
                             casterType = characterComponents[i].CharacterType;
                     }
                 }
-                if (targetType == casterType
-                    && spellCollisionComponent.Target != collisionInfo.Target)
+                if ((targetType == casterType
+                    && spellCollisionComponent.Target != collisionInfo.Sender)
+                    || (targetType != casterType
+                    && spellCollisionComponent.Target == collisionInfo.Sender))
                 {
                     CommandBuffer.DestroyEntity(index, entity);
                     return;
                 }
-                
+
                 Entity newEntity;
                 switch (collisionInfo.EventType)
                 {
