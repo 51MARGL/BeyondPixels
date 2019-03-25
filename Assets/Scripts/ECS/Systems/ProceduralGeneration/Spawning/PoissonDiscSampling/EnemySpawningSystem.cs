@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.Characters.AI;
+﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
@@ -13,146 +12,166 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
 {
-    [UpdateAfter(typeof(TileMapSystem))]
     public class EnemySpawningSystem : JobComponentSystem
     {
+        private const int SystemRequestID = 1;
+
         private struct EnemiesSpawnStartedComponent : IComponentData { }
-
-        [DisableAutoCreation]
-        private class EnemySpawningSystemBarrier : BarrierSystem { }
-
-        private struct InitializeValidationGridJob : IJob
+        private struct InitializeValidationGridJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
         {
-            public EntityCommandBuffer CommandBuffer;
-
+            public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
-            public int2 BoardSize;
+            [DeallocateOnJobCompletion]
+            public NativeArray<FinalTileComponent> Tiles;
 
-            [ReadOnly]
-            public ComponentDataArray<FinalTileComponent> Tiles;
-
-            public Entity BoardEntity;
-
-            public void Execute()
+            public void Execute(Entity boardEntity, int index, ref FinalBoardComponent finalBoardComponent)
             {
-                var poissonDiscEntity = CommandBuffer.CreateEntity();
-                CommandBuffer.AddComponent(poissonDiscEntity, new PoissonDiscSamplingComponent
+                var poissonDiscEntity = CommandBuffer.CreateEntity(index);
+                var boardSize = finalBoardComponent.Size;
+                CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
-                    GridSize = BoardSize,
+                    GridSize = boardSize,
                     SamplesLimit = 30,
-                    Radius = 7
+                    Radius = 7,
+                    RequestID = SystemRequestID
+
                 });
-                for (int y = 0; y < BoardSize.y; y++)
-                    for (int x = 0; x < BoardSize.x; x++)
+                for (int y = 0; y < boardSize.y; y++)
+                    for (int x = 0; x < boardSize.x; x++)
                     {
-                        var entity = CommandBuffer.CreateEntity();
-                        CommandBuffer.AddComponent(entity, new CellComponent
+                        var entity = CommandBuffer.CreateEntity(index);
+                        CommandBuffer.AddComponent(index, entity, new PoissonCellComponent
                         {
-                            SampleIndex = Tiles[y * BoardSize.x + x].TileType == TileType.Floor ? -1 : -2,
-                            Position = Tiles[y * BoardSize.x + x].Position
+                            SampleIndex = Tiles[y * boardSize.x + x].TileType == TileType.Floor ? -1 : -2,
+                            Position = Tiles[y * boardSize.x + x].Position,
+                            RequestID = SystemRequestID
                         });
                     }
 
-                CommandBuffer.AddComponent(BoardEntity, new EnemiesSpawnStartedComponent());
+                CommandBuffer.AddComponent(index, boardEntity, new EnemiesSpawnStartedComponent());
             }
         }
 
-        private struct BoardDataStart
+        private struct TagBoardDoneJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
         {
-            public readonly int Length;
-            public ComponentDataArray<FinalBoardComponent> FinalBoardComponents;
-            public SubtractiveComponent<EnemiesSpawnStartedComponent> EnemiesSpawnStartedComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private BoardDataStart _boardDataStart;
+            public EntityCommandBuffer.Concurrent CommandBuffer;
 
-        private struct BoardDataEnd
-        {
-            public readonly int Length;
-            public ComponentDataArray<FinalBoardComponent> FinalBoardComponents;
-            public ComponentDataArray<EnemiesSpawnStartedComponent> EnemiesSpawnStartedComponents;
-            public SubtractiveComponent<EnemiesSpawnedComponent> EnemiesSpawnedComponents;
-            public EntityArray EntityArray;
+            public void Execute(Entity entity, int index, [ReadOnly] ref FinalBoardComponent finalBoardComponent)
+            {
+                CommandBuffer.AddComponent(index, entity, new EnemiesSpawnedComponent());
+            }
         }
-        [Inject]
-        private BoardDataEnd _boardDataEnd;
 
-        private struct Tiles
+        private struct CleanSamplesJob : IJobProcessComponentDataWithEntity<SampleComponent>
         {
-            public readonly int Length;
-            public ComponentDataArray<FinalTileComponent> TileComponents;
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+
+            public void Execute(Entity entity, int index, [ReadOnly] ref SampleComponent sampleComponent)
+            {
+                if (sampleComponent.RequestID == SystemRequestID)
+                    CommandBuffer.DestroyEntity(index, entity);
+            }
         }
-        [Inject]
-        private Tiles _tiles;
-        private struct SamplesData
-        {
-            public readonly int Length;
-            public ComponentDataArray<SampleComponent> SampleComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private SamplesData _samples;
-        private struct TilemapData
-        {
-            public readonly int Length;
-            public ComponentArray<DungeonTileMapComponent> DungeonTileMapComponents;
-            public ComponentArray<Transform> TransformComponents;
-        }
-        [Inject]
-        private TilemapData _tilemapData;
-        private EnemySpawningSystemBarrier _enemySpawningSystemBarrier;
+
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private ComponentGroup _tilesGroup;
+        private ComponentGroup _boardSpawnInitGroup;
+        private ComponentGroup _boardSpawnReadyGroup;
+        private ComponentGroup _samplesGroup;
 
         protected override void OnCreateManager()
         {
-            _enemySpawningSystemBarrier = World.Active.GetOrCreateManager<EnemySpawningSystemBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            _tilesGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalTileComponent)
+                }
+            });
+            _boardSpawnInitGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalBoardComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(EnemiesSpawnStartedComponent)
+                }
+            });
+            _boardSpawnReadyGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalBoardComponent), typeof(EnemiesSpawnStartedComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(EnemiesSpawnedComponent)
+                }
+            });
+            _samplesGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(SampleComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            for (int i = 0; i < _boardDataStart.Length; i++)
-                return this.SetupValidationGrid(_boardDataStart.FinalBoardComponents[i].Size, _boardDataStart.EntityArray[i], inputDeps);
+            if (_boardSpawnInitGroup.CalculateLength() > 0)
+                return SetupValidationGrid(inputDeps);
 
-            for (int b = 0; b < _boardDataEnd.Length; b++)
-                for (int t = 0; t < _tilemapData.Length; t++)
+            if (_boardSpawnReadyGroup.CalculateLength() > 0)
+            {
+                if (!TileMapSystem.TileMapDrawing && _samplesGroup.CalculateLength() > 0)
                 {
-                    if (_tilemapData.DungeonTileMapComponents[t].tileSpawnRoutine == null && _samples.Length > 0)
+                    var samplesArray = _samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
+                    var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
+                    for (int i = 0; i < samplesArray.Length; i++)
+                        if (samplesArray[i].RequestID == SystemRequestID)
+                            samplesList.Add(samplesArray[i]);
+
+                    var tagBoardDoneJobHandle = new TagBoardDoneJob
                     {
-                        var commandBuffer = _enemySpawningSystemBarrier.CreateCommandBuffer();
-                        var samplesArray = new NativeArray<SampleComponent>(_samples.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                        commandBuffer.AddComponent(_boardDataEnd.EntityArray[b], new EnemiesSpawnedComponent());
+                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                    }.Schedule(this, inputDeps);
+                    var cleanSamplesJobHandle = new CleanSamplesJob
+                    {
+                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                    }.Schedule(this, inputDeps);
 
-                        for (int i = 0; i < _samples.Length; i++)
-                            samplesArray[i] = _samples.SampleComponents[i];
+                    inputDeps = JobHandle.CombineDependencies(tagBoardDoneJobHandle, cleanSamplesJobHandle);
+                    _endFrameBarrier.AddJobHandleForProducer(inputDeps);
 
-                        for (int i = 0; i < _samples.Length; i++)
-                            commandBuffer.DestroyEntity(_samples.EntityArray[i]);
+                    inputDeps.Complete();
+                    for (int i = 0; i < samplesList.Length; i++)
+                        InstantiateEnemy(samplesList[i].Position);
 
-                        for (int i = 0; i < samplesArray.Length; i++)
-                            InstantiateEnemy(samplesArray[i].Position);
-
-                        samplesArray.Dispose();
-                    }
+                    samplesArray.Dispose();
+                    samplesList.Dispose();
                 }
+            }
             return inputDeps;
         }
 
-        private JobHandle SetupValidationGrid(int2 boardSize, Entity boardEntity, JobHandle inputDeps)
+        private JobHandle SetupValidationGrid(JobHandle inputDeps)
         {
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {
-                CommandBuffer = _enemySpawningSystemBarrier.CreateCommandBuffer(),
-                BoardSize = boardSize,
-                Tiles = _tiles.TileComponents,
-                BoardEntity = boardEntity
-            }.Schedule(inputDeps);
-            _enemySpawningSystemBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                Tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
+            }.Schedule(this, inputDeps);
+            _endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
             return initializeValidationGridJobHandle;
         }
 
         private void InstantiateEnemy(int2 position)
         {
-            var commandBuffer = _enemySpawningSystemBarrier.CreateCommandBuffer();
+            var commandBuffer = _endFrameBarrier.CreateCommandBuffer();
             var enemy = Object.Instantiate(PrefabManager.Instance.EnemyPrefab,
                 new Vector3(position.x + 0.5f, position.y + 0.5f, 0), Quaternion.identity);
             var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;

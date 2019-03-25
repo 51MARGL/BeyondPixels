@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace Assets.Scripts.Components.ProceduralGeneration.Dungeon
+namespace BeyondPixels.Components.ProceduralGeneration.Dungeon
 {
     public class DungeonTileMapComponent : MonoBehaviour
     {

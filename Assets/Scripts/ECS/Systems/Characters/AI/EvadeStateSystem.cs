@@ -12,10 +12,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     [UpdateBefore(typeof(FollowStateSystem))]
     public class EvadeStateSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        private class EvadeStateBarrier : BarrierSystem { }
-
-        [RequireSubtractiveComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
+        [ExcludeComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
         private struct EvadeStateJob :
             IJobProcessComponentDataWithEntity<MovementComponent, PositionComponent, EvadeStateComponent>
         {
@@ -46,21 +43,21 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             }
         }
 
-        private EvadeStateBarrier _evadeStateBarrier;
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
         protected override void OnCreateManager()
         {
-            _evadeStateBarrier = World.Active.GetOrCreateManager<EvadeStateBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new EvadeStateJob
             {
-                CommandBuffer = _evadeStateBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
-            _evadeStateBarrier.AddJobHandleForProducer(handle);
+            _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

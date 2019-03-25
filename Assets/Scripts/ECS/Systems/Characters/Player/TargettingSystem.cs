@@ -1,4 +1,6 @@
-﻿using BeyondPixels.ECS.Components.Characters.Player;
+﻿using System.Linq;
+using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Player;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -8,33 +10,25 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class TargettingSystem : ComponentSystem
     {
-        private struct Data
+        private ComponentGroup _playerGroup;
+
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentDataArray<InputComponent> InputComponents;
-            public SubtractiveComponent<TargetComponent> TargetComponents;
-            public EntityArray EntityArray;
+            _playerGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(InputComponent), typeof(PlayerComponent), typeof(PositionComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
-        private struct AddedData
-        {
-            public readonly int Length;
-            public ComponentDataArray<InputComponent> InputComponents;
-            public ComponentDataArray<TargetComponent> TargetComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private AddedData _addedData;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
+            Entities.With(_playerGroup).ForEach((Entity entity, ref InputComponent inputComponent, ref PositionComponent positionComponent) =>
             {
-                var inputComponent = _data.InputComponents[i];
-
                 if (inputComponent.MouseButtonClicked == 1
-                    && !EventSystem.current.IsPointerOverGameObject())
+                     && !EventSystem.current.IsPointerOverGameObject())
                 {
                     var ray = Camera.main.ScreenPointToRay(inputComponent.MousePosition);
                     var layerMask = LayerMask.GetMask("Clickable");
@@ -43,41 +37,83 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     if (raycastHit.transform != null)
                     {
                         if (raycastHit.transform.CompareTag("Enemy"))
-                            PostUpdateCommands.AddComponent(_data.EntityArray[i],
-                                new TargetComponent
-                                {
-                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
-                                });
-                    }
-                }
-            }
-
-            for (int i = 0; i < _addedData.Length; i++)
-            {
-                var inputComponent = _addedData.InputComponents[i];
-
-                if (inputComponent.MouseButtonClicked == 1
-                    && !EventSystem.current.IsPointerOverGameObject())
-                {
-                    var ray = Camera.main.ScreenPointToRay(inputComponent.MousePosition);
-                    var layerMask = LayerMask.GetMask("Clickable");
-                    var raycastHit = Physics2D.GetRayIntersection(ray, 100f, layerMask);
-
-                    if (raycastHit.transform != null)
-                    {
-                        if (raycastHit.transform.CompareTag("Enemy"))
-                            PostUpdateCommands.SetComponent(_addedData.EntityArray[i],
-                                new TargetComponent
-                                {
-                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
-                                });
+                        {
+                            if (!EntityManager.HasComponent<TargetComponent>(entity))
+                                PostUpdateCommands.AddComponent(entity,
+                                    new TargetComponent
+                                    {
+                                        Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                    });
+                            else
+                                PostUpdateCommands.SetComponent(entity,
+                                    new TargetComponent
+                                    {
+                                        Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                    });
+                        }
                     }
                     else
-                        PostUpdateCommands.RemoveComponent<TargetComponent>(_addedData.EntityArray[i]);
+                        PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
+
                 }
-                else if (!EntityManager.Exists(_addedData.TargetComponents[i].Target))
-                    PostUpdateCommands.RemoveComponent<TargetComponent>(_addedData.EntityArray[i]);
-            }
+                else if (inputComponent.SelectTargetButtonPressed == 1)
+                {
+                    var layerMask = LayerMask.GetMask("Clickable");
+
+                    var width = (Camera.main.ViewportToWorldPoint(new Vector3(1.0F, 0.0F, 10)) 
+                                - Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 0.0F, -Camera.main.transform.position.z))).x;
+                    var heigth = (Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 1.0F, 10)) 
+                                - Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 0.0F, -Camera.main.transform.position.z))).y;
+
+                    var hits = Physics2D.BoxCastAll(Camera.main.transform.position, 
+                                                    new Vector2(width, heigth), 0, 
+                                                    Camera.main.transform.forward, -Camera.main.transform.position.z, layerMask);
+                    if (hits.Length > 0)
+                    {
+                        var playerPosition = positionComponent.CurrentPosition;
+                        var colliders = hits.Select(h => h.collider)
+                                        .OrderBy(c => math.distance(playerPosition,
+                                                                    new float2(c.transform.position.x,
+                                                                                c.transform.position.y))).ToArray();
+                        if (EntityManager.HasComponent<TargetComponent>(entity))
+                        {
+                            var targetComponent = EntityManager.GetComponentData<TargetComponent>(entity);
+                            var currentTargetPosition = EntityManager.GetComponentData<PositionComponent>(targetComponent.Target);
+
+                            foreach (var collider in colliders)
+                            {
+                                if (collider.GetComponent<GameObjectEntity>().Entity != targetComponent.Target)
+                                {
+                                    PostUpdateCommands.SetComponent(entity,
+                                    new TargetComponent
+                                    {
+                                        Target = collider.GetComponent<GameObjectEntity>().Entity
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            PostUpdateCommands.AddComponent(entity,
+                                    new TargetComponent
+                                    {
+                                        Target = colliders[0].GetComponent<GameObjectEntity>().Entity
+                                    });
+                        }
+                    }
+                }
+
+                if (EntityManager.HasComponent<TargetComponent>(entity))
+                {
+                    var targetComponent = EntityManager.GetComponentData<TargetComponent>(entity);
+
+                    if (!EntityManager.Exists(targetComponent.Target)
+                        || !GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(Camera.main),
+                                                    EntityManager.GetComponentObject<SpriteRenderer>(targetComponent.Target).bounds))
+                        PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
+                }
+            });
         }
     }
 }

@@ -7,5 +7,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscS
     {
         public int2 Position;
         public int Radius;
+        public int RequestID;
     }
 }

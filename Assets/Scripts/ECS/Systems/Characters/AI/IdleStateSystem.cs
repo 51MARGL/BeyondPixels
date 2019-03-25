@@ -11,10 +11,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class IdleStateSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        private class IdleStateBarrier : BarrierSystem { }
-
-        [RequireSubtractiveComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
+        [ExcludeComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
         private struct IdleStateJob : IJobProcessComponentDataWithEntity<IdleStateComponent, PositionComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -45,21 +42,21 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             }
         }
 
-        private IdleStateBarrier _idleStateBarrier;
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
         protected override void OnCreateManager()
         {
-            _idleStateBarrier = World.Active.GetOrCreateManager<IdleStateBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new IdleStateJob
             {
-                CommandBuffer = _idleStateBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
-            _idleStateBarrier.AddJobHandleForProducer(handle);
+            _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

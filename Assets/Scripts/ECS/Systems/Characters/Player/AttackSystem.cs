@@ -1,44 +1,72 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
-    public class AttackSystem : ComponentSystem
+    public class AttackSystem : JobComponentSystem
     {
-        private struct Data
+        [ExcludeComponent(typeof(AttackComponent))]
+        private struct AttackInitialJob :
+            IJobProcessComponentDataWithEntity<InputComponent, CharacterComponent>
         {
-            public readonly int Length;
-            public ComponentDataArray<InputComponent> InputComponents;
-            public ComponentDataArray<CharacterComponent> CharacterComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private Data _data;
-        [Inject]
-        private ComponentDataFromEntity<AttackComponent> _attackComponents;
+            public EntityCommandBuffer.Concurrent CommandBuffer;
 
-        protected override void OnUpdate()
-        {
-            for (int i = 0; i < _data.Length; i++)
+            public void Execute(Entity entity,
+                                int index,
+                                [ReadOnly] ref InputComponent input,
+                                [ReadOnly] ref CharacterComponent evadeComponent)
             {
-                var input = _data.InputComponents[i];
-                if (input.AttackButtonPressed == 1 && !_attackComponents.Exists(_data.EntityArray[i]))
-                    PostUpdateCommands.AddComponent(_data.EntityArray[i],
+                if (input.AttackButtonPressed == 1)
+                    CommandBuffer.AddComponent(index, entity,
                         new AttackComponent
                         {
                             CurrentComboIndex = 0
                         });
-                else if (input.AttackButtonPressed == 1)
-                {
-                    var attackComponent = EntityManager.GetComponentData<AttackComponent>(_data.EntityArray[i]);
-                    PostUpdateCommands.SetComponent(_data.EntityArray[i],
-                        new AttackComponent
-                        {
-                            CurrentComboIndex = (attackComponent.CurrentComboIndex + 1) % 2 // hard coded number of attacks
-                        });
-                }
             }
+        }
+
+        private struct AttackComboJob :
+            IJobProcessComponentDataWithEntity<AttackComponent, InputComponent, CharacterComponent>
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+
+            public void Execute(Entity entity,
+                                int index,
+                                ref AttackComponent attackComponent,
+                                [ReadOnly] ref InputComponent input,
+                                [ReadOnly] ref CharacterComponent evadeComponent)
+            {
+                // hard coded number of attacks
+                if (input.AttackButtonPressed == 1)
+                    attackComponent.CurrentComboIndex = (attackComponent.CurrentComboIndex + 1) % 2;
+            }
+        }
+
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+
+        protected override void OnCreateManager()
+        {
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+        }
+
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            var AttackInitialJobHandle = new AttackInitialJob
+            {
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+            }.Schedule(this, inputDeps);
+            _endFrameBarrier.AddJobHandleForProducer(AttackInitialJobHandle);
+
+            var AttackComboJobHandle = new AttackComboJob
+            {
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+            }.Schedule(this, AttackInitialJobHandle);
+            _endFrameBarrier.AddJobHandleForProducer(AttackComboJobHandle);
+            return AttackComboJobHandle;
         }
     }
 }

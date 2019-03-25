@@ -10,10 +10,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class DurationSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        public class DurationBarrier : BarrierSystem { }
-
-        [RequireSubtractiveComponent(typeof(DestroyComponent))]
+        [ExcludeComponent(typeof(DestroyComponent))]
         private struct DurationJob : IJobProcessComponentDataWithEntity<DurationComponent, SpellComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -30,22 +27,22 @@ namespace BeyondPixels.ECS.Systems.Spells
                     durationComponent.Duration -= DeltaTime;
             }
         }
-        [Inject]
-        private DurationBarrier _durationBarrier;
+
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
         protected override void OnCreateManager()
         {
-            _durationBarrier = World.Active.GetOrCreateManager<DurationBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new DurationJob
             {
-                CommandBuffer = _durationBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 DeltaTime = Time.deltaTime
             }.Schedule(this, inputDeps);
-            _durationBarrier.AddJobHandleForProducer(handle);
+            _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

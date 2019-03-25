@@ -12,13 +12,20 @@ namespace BeyondPixels.ColliderEvents
                 && !this.transform.parent.gameObject.CompareTag(collider.transform.parent.tag))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(DamageComponent));
+                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                    return;
+
+                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), 
+                                                             typeof(WeaponCollisionComponent), 
+                                                             typeof(DamageComponent));
 
                 entityManager.SetComponentData(eventEntity,
                         new CollisionInfo
                         {
-                            Sender = GetComponentInParent<GameObjectEntity>().Entity,
-                            Other = collider.GetComponentInParent<GameObjectEntity>().Entity,
+                            Sender = sender,
+                            Target = target,
                             EventType = EventType.TriggerEnter
                         });
                 entityManager.SetComponentData(eventEntity,
@@ -26,9 +33,7 @@ namespace BeyondPixels.ColliderEvents
                         {
                             DamageType = DamageType.Weapon,
                             DamageOnImpact =
-                                entityManager.
-                                    GetComponentData<WeaponComponent>(this.GetComponentInParent<GameObjectEntity>().Entity).
-                                        DamageValue
+                                entityManager.GetComponentData<WeaponComponent>(sender).DamageValue
                         });
             }
         }

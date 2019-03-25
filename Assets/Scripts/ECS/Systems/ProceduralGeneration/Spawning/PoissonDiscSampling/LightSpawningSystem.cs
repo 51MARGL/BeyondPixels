@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP;
@@ -10,47 +10,42 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
 {
-    [UpdateAfter(typeof(TileMapSystem))]
     public class LightSpawningSystem : JobComponentSystem
     {
+        private const int SystemRequestID = 2;
         private struct LightSpawnStartedComponent : IComponentData { }
 
-        [DisableAutoCreation]
-        private class LightSpawningSystemBarrier : BarrierSystem { }
-
-        private struct InitializeValidationGridJob : IJob
+        private struct InitializeValidationGridJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
         {
-            public EntityCommandBuffer CommandBuffer;
-
+            public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
-            public int2 BoardSize;
+            [DeallocateOnJobCompletion]
+            public NativeArray<FinalTileComponent> Tiles;
 
-            [ReadOnly]
-            public ComponentDataArray<FinalTileComponent> Tiles;
-
-            public Entity BoardEntity;
-
-            public void Execute()
+            public void Execute(Entity boardEntity, int index, ref FinalBoardComponent finalBoardComponent)
             {
-                var poissonDiscEntity = CommandBuffer.CreateEntity();
-                CommandBuffer.AddComponent(poissonDiscEntity, new PoissonDiscSamplingComponent
+                var poissonDiscEntity = CommandBuffer.CreateEntity(index);
+                var boardSize = finalBoardComponent.Size;
+                CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
-                    GridSize = BoardSize,
+                    GridSize = boardSize,
                     SamplesLimit = 30,
-                    Radius = 10
+                    Radius = 10,
+                    RequestID = SystemRequestID
                 });
-                for (int y = 0; y < BoardSize.y; y++)
-                    for (int x = 0; x < BoardSize.x; x++)
+                for (int y = 0; y < boardSize.y; y++)
+                    for (int x = 0; x < boardSize.x; x++)
                     {
-                        var entity = CommandBuffer.CreateEntity();
-                        int validationIndex = GetValidationIndex(y * BoardSize.x + x, BoardSize);
-                        CommandBuffer.AddComponent(entity, new CellComponent
+                        var entity = CommandBuffer.CreateEntity(index);
+                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize);
+                        CommandBuffer.AddComponent(index, entity, new PoissonCellComponent
                         {
                             SampleIndex = validationIndex,
-                            Position = Tiles[y * BoardSize.x + x].Position
+                            Position = Tiles[y * boardSize.x + x].Position,
+                            RequestID = SystemRequestID
                         });
                     }
-                CommandBuffer.AddComponent(BoardEntity, new LightSpawnStartedComponent());
+                CommandBuffer.AddComponent(index, boardEntity, new LightSpawnStartedComponent());
             }
 
             private int GetValidationIndex(int tileIndex, int2 boardSize)
@@ -69,99 +64,146 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
         }
 
-        private struct BoardDataStart
+        private struct TagBoardDoneJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
         {
-            public readonly int Length;
-            public ComponentDataArray<FinalBoardComponent> FinalBoardComponents;
-            public ComponentDataArray<EnemiesSpawnedComponent> EnemiesSpawnedComponents;
-            public SubtractiveComponent<LightSpawnStartedComponent> LightSpawnStartedComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private BoardDataStart _boardDataStart;
+            public EntityCommandBuffer.Concurrent CommandBuffer;
 
-        private struct BoardDataEnd
-        {
-            public readonly int Length;
-            public ComponentDataArray<FinalBoardComponent> FinalBoardComponents;
-            public ComponentDataArray<LightSpawnStartedComponent> LightSpawnStartedComponents;
-            public SubtractiveComponent<LightsSpawnedComponent> LightsSpawnedComponents;
-            public EntityArray EntityArray;
+            public void Execute(Entity entity, int index, [ReadOnly] ref FinalBoardComponent finalBoardComponent)
+            {
+                CommandBuffer.AddComponent(index, entity, new LightsSpawnedComponent());
+            }
         }
-        [Inject]
-        private BoardDataEnd _boardDataEnd;
 
-        private struct Tiles
+        private struct CleanSamplesJob : IJobProcessComponentDataWithEntity<SampleComponent>
         {
-            public readonly int Length;
-            public ComponentDataArray<FinalTileComponent> TileComponents;
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+
+            public void Execute(Entity entity, int index, [ReadOnly] ref SampleComponent sampleComponent)
+            {
+                if (sampleComponent.RequestID == SystemRequestID)
+                    CommandBuffer.DestroyEntity(index, entity);
+            }
         }
-        [Inject]
-        private Tiles _tiles;
-        private struct SamplesData
-        {
-            public readonly int Length;
-            public ComponentDataArray<SampleComponent> SampleComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private SamplesData _samples;
-        private struct TilemapData
-        {
-            public readonly int Length;
-            public ComponentArray<DungeonTileMapComponent> DungeonTileMapComponents;
-            public ComponentArray<Transform> TransformComponents;
-        }
-        [Inject]
-        private TilemapData _tilemapData;
-        private LightSpawningSystemBarrier _lightSpawningSystemBarrier;
+
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private ComponentGroup _tilesGroup;
+        private ComponentGroup _boardSpawnInitGroup;
+        private ComponentGroup _boardSpawnReadyGroup;
+        private ComponentGroup _samplesGroup;
+        private ComponentGroup _tileMapGroup;
 
         protected override void OnCreateManager()
         {
-            _lightSpawningSystemBarrier = World.Active.GetOrCreateManager<LightSpawningSystemBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            _tilesGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalTileComponent)
+                }
+            });
+            _boardSpawnInitGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalBoardComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(LightSpawnStartedComponent)
+                }
+            });
+            _boardSpawnReadyGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalBoardComponent), typeof(LightSpawnStartedComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(LightsSpawnedComponent)
+                }
+            });
+            _samplesGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(SampleComponent)
+                }
+            });
+            _tileMapGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(DungeonTileMapComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            if (_boardDataStart.Length > 0)
-                return this.SetupValidationGrid(_boardDataStart.FinalBoardComponents[0].Size, _boardDataStart.EntityArray[0], inputDeps);
+            if (_boardSpawnInitGroup.CalculateLength() > 0)
+                return SetupValidationGrid(inputDeps);
 
-            for (int b = 0; b < _boardDataEnd.Length; b++)
-                for (int t = 0; t < _tilemapData.Length; t++)
+            if (_boardSpawnReadyGroup.CalculateLength() > 0)
+            {
+                if (!TileMapSystem.TileMapDrawing && _samplesGroup.CalculateLength() > 0)
                 {
-                    if (_tilemapData.DungeonTileMapComponents[t].tileSpawnRoutine == null && _samples.Length > 0)
+                    var tileMapChunks = _tileMapGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+                    DungeonTileMapComponent tileMapComponent = null;
+                    Transform tileMapTransform = null;
+                    for (int c = 0; c < tileMapChunks.Length; c++)
                     {
-                        var commandBuffer = _lightSpawningSystemBarrier.CreateCommandBuffer();
-                        var samplesArray = new NativeArray<SampleComponent>(_samples.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-                        commandBuffer.AddComponent(_boardDataEnd.EntityArray[b], new LightsSpawnedComponent());
-
-                        for (int i = 0; i < _samples.Length; i++)
-                            samplesArray[i] = _samples.SampleComponents[i];
-
-                        for (int i = 0; i < _samples.Length; i++)
-                            commandBuffer.DestroyEntity(_samples.EntityArray[i]);
-
-                        for (int i = 0; i < samplesArray.Length; i++)
-                            InstantiateLights(samplesArray[i].Position,
-                                              _tilemapData.DungeonTileMapComponents[t],
-                                              _tilemapData.TransformComponents[t]);
-
-                        samplesArray.Dispose();
+                        var chunk = tileMapChunks[c];
+                        var entities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
+                        for (int i = 0; i < chunk.Count; i++)
+                        {
+                            tileMapComponent = EntityManager.GetComponentObject<DungeonTileMapComponent>(entities[i]);
+                            tileMapTransform = EntityManager.GetComponentObject<Transform>(entities[i]);
+                        }
                     }
+
+                    var samplesArray = _samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
+                    var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
+                    
+                    for (int i = 0; i < samplesArray.Length; i++)
+                        if (samplesArray[i].RequestID == SystemRequestID)
+                            samplesList.Add(samplesArray[i]);
+
+                    var tagBoardDoneJobHandle = new TagBoardDoneJob
+                    {
+                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                    }.Schedule(this, inputDeps);
+                    var cleanSamplesJobHandle = new CleanSamplesJob
+                    {
+                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                    }.Schedule(this, inputDeps);
+
+                    inputDeps = JobHandle.CombineDependencies(tagBoardDoneJobHandle, cleanSamplesJobHandle);
+                    _endFrameBarrier.AddJobHandleForProducer(inputDeps);
+
+                    inputDeps.Complete();
+                    for (int i = 0; i < samplesList.Length; i++)
+                        InstantiateLights(samplesList[i].Position,
+                                        tileMapComponent,
+                                        tileMapTransform);
+
+                    samplesArray.Dispose();
+                    samplesList.Dispose();
+                    tileMapChunks.Dispose();
                 }
+            }
             return inputDeps;
         }
 
-        private JobHandle SetupValidationGrid(int2 boardSize, Entity boardEntity, JobHandle inputDeps)
+        private JobHandle SetupValidationGrid(JobHandle inputDeps)
         {
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {
-                CommandBuffer = _lightSpawningSystemBarrier.CreateCommandBuffer(),
-                BoardSize = boardSize,
-                Tiles = _tiles.TileComponents,
-                BoardEntity = boardEntity
-            }.Schedule(inputDeps);
-            _lightSpawningSystemBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                Tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
+            }.Schedule(this, inputDeps);
+            _endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
             return initializeValidationGridJobHandle;
         }
 

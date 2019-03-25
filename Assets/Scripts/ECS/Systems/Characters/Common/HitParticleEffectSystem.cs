@@ -3,6 +3,7 @@ using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -10,39 +11,45 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
     [UpdateBefore(typeof(DamageSystem))]
     public class HitParticleEffectSystem : ComponentSystem
     {
-        private struct DamageData
-        {
-            public readonly int Length;
-            public ComponentDataArray<CollisionInfo> CollisionInfos;
-            public ComponentDataArray<DamageComponent> DamageComponents;
-        }
-        [Inject]
-        private DamageData _damageData;
+        private ComponentGroup _damageGroup;
+        private ComponentGroup _characterGroup;
 
-        private struct Data
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentDataArray<CharacterComponent> CharacterComponents;
-            public ComponentArray<Transform> TransformComponents;
-            public EntityArray EntityArray;
+            _damageGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(CollisionInfo), typeof(FinalDamageComponent)
+                }
+            });
+            _characterGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(CharacterComponent), typeof(PositionComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
-
         protected override void OnUpdate()
         {
-            var positions = new NativeArray<Vector3>(_damageData.Length, Allocator.TempJob);
+            var positions = new NativeArray<float2>(_damageGroup.CalculateLength(), Allocator.TempJob);
 
             var k = 0;
-            for (int i = 0; i < _damageData.Length; i++)
-                for (int j = 0; j < _data.Length; j++)
-                    if (_damageData.CollisionInfos[i].Other == _data.EntityArray[j] 
-                        && _damageData.DamageComponents[i].DamageOnImpact > 0)
-                        positions[k++] = _data.TransformComponents[j].position;
+            Entities.With(_damageGroup).ForEach((Entity damageEntity, ref FinalDamageComponent damageComponent, ref CollisionInfo collisionInfo) =>
+            {
+                var eventTarget = collisionInfo.Target;
+                var damageValue = damageComponent.DamageAmount;
+                Entities.With(_characterGroup).ForEach((Entity characterEntity, ref PositionComponent positionComponent) =>
+                {
+                    if (eventTarget == characterEntity && damageValue > 0)
+                        positions[k++] = positionComponent.CurrentPosition;
+                });
+            });
 
             for (int i = 0; i < k; i++)
                 GameObject.Instantiate(PrefabManager.Instance.BloodSplashPrefab,
-                                       positions[i],
+                                       new float3(positions[i].x, positions[i].y, -1),
                                        Quaternion.identity);
             positions.Dispose();
         }

@@ -2,7 +2,9 @@
 using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI;
+using BeyondPixels.Utilities;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -55,10 +57,12 @@ namespace BeyondPixels.SceneBootstraps
         }
 
         public DungeonGeneratorSettings DungeonGenerators;
+        private FixedUpdateSystemGroup FixedGroup;
 
         // Use this for initialization
         private void Start()
         {
+            FixedGroup = World.Active.GetOrCreateManager<FixedUpdateSystemGroup>();
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
 
             #region DungeonGeneration
@@ -100,6 +104,7 @@ namespace BeyondPixels.SceneBootstraps
             var player = PrefabManager.Instance.PlayerPrefab;
             var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
             var playerInitializeComponent = player.GetComponent<PlayerInitializeComponent>();
+            entityManager.AddComponent(playerEntity, typeof(PlayerComponent));
             entityManager.AddComponent(playerEntity, typeof(InputComponent));
 
             entityManager.AddComponentData(playerEntity, new CharacterComponent
@@ -126,11 +131,28 @@ namespace BeyondPixels.SceneBootstraps
             });
             GameObject.Destroy(playerInitializeComponent);
             entityManager.RemoveComponent<PlayerInitializeComponent>(playerEntity);
-            #endregion            
-
-            #region UI
-            UIManager.Instance.Initialize(player);
             #endregion
+
+            #region spellInit
+            for (int i = 0; i < 3; i++)
+            {
+                var spellEntity = entityManager.CreateEntity(typeof(ActiveSpellComponent));
+                entityManager.SetComponentData(spellEntity, new ActiveSpellComponent
+                {
+                    Owner = playerEntity,
+                    ActionIndex = i + 1,
+                    SpellIndex = i
+                });
+            }
+            #endregion
+            #region UI
+            UIManager.Instance.Initialize();
+            #endregion
+        }
+
+        public void FixedUpdate()
+        {
+            FixedGroup.Update();
         }
 
         public void Update()

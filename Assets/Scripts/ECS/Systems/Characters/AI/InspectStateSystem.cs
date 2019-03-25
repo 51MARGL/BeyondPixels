@@ -1,6 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -11,14 +10,11 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class InspectStateSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        private class InspectStateBarrier : BarrierSystem { }
-
-        [RequireSubtractiveComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
+        [ExcludeComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
         private struct InspectStateJob : IJobProcessComponentDataWithEntity<MovementComponent, InspectStateComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
-            public Unity.Mathematics.Random Random;
+            public int RandomSeed;
             public float CurrentTime;
 
             public void Execute(Entity entity,
@@ -26,12 +22,14 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                 ref MovementComponent movementComponent,
                                 ref InspectStateComponent inspectStateComponent)
             {
-                if (CurrentTime - inspectStateComponent.StartedAt < Random.NextInt(10, 30) / 10f)
+                var random = new Unity.Mathematics.Random((uint)(RandomSeed + index));
+
+                if (CurrentTime - inspectStateComponent.StartedAt < random.NextInt(10, 30) / 10f)
                 {
                     if (inspectStateComponent.InspectDirection.Equals(float2.zero))
                     {
-                        inspectStateComponent.InspectDirection = 
-                            new float2(Random.NextFloat(-10, 10), Random.NextFloat(-10, 10));
+                        inspectStateComponent.InspectDirection =
+                            new float2(random.NextFloat(-10, 10), random.NextFloat(-10, 10));
                     }
                     movementComponent.Direction = inspectStateComponent.InspectDirection;
                 }
@@ -49,23 +47,23 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             }
         }
 
-        private InspectStateBarrier _inspectStateBarrier;
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
         protected override void OnCreateManager()
         {
-            _inspectStateBarrier = World.Active.GetOrCreateManager<InspectStateBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var random = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1, uint.MaxValue));
+            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
             var handle = new InspectStateJob
             {
-                CommandBuffer = _inspectStateBarrier.CreateCommandBuffer().ToConcurrent(),
-                Random = random,
+                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                RandomSeed = random.NextInt(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
-            _inspectStateBarrier.AddJobHandleForProducer(handle);
+            _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

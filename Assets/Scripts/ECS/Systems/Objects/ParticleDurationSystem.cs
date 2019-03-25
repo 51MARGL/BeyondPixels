@@ -7,21 +7,29 @@ namespace BeyondPixels.ECS.Systems.Objects
     [UpdateBefore(typeof(DestroySystem))]
     public class ParticleDurationSystem : ComponentSystem
     {
-        private struct Data
-        {
-            public readonly int Length;
-            public ComponentArray<ParticleSystem> ParticleSystemComponents;
-            public SubtractiveComponent<DestroyComponent> DestroyComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private Data _data;
+        private ComponentGroup _particlesGroup;
 
+        protected override void OnCreateManager()
+        {
+            _particlesGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(ParticleSystem)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(DestroyComponent)
+                }
+            });
+        }
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
-                if (!_data.ParticleSystemComponents[i].IsAlive())
-                    PostUpdateCommands.AddComponent(_data.EntityArray[i], new DestroyComponent());
+            Entities.With(_particlesGroup).ForEach((Entity entity, ParticleSystem particleSystem) =>
+            {
+                if (particleSystem != null && !particleSystem.IsAlive())
+                    PostUpdateCommands.AddComponent(entity, new DestroyComponent());
+            });
         }
     }
 }

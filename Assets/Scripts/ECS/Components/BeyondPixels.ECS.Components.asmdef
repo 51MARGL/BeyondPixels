@@ -1,10 +1,10 @@
 {
     "name": "BeyondPixels.ECS.Components",
     "references": [
-        "Unity.Entities",
-        "Unity.Entities.Hybrid",
-        "Unity.Mathematics",
-        "BeyondPixels.Tilemap"
+        "GUID:734d92eba21c94caba915361bd5ac177",
+        "GUID:8819f35a0fc84499b990e90a4ca1911f",
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:613783dc1674e844b87788ea74ede0f6"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -13,5 +13,6 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

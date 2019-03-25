@@ -9,5 +9,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscS
         public int SamplesLimit;
         public int Radius;
         public int HorizontalSearch;
+        public int RequestID;
     }
 }

@@ -7,37 +7,39 @@ using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Systems.UI
 {
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class EnemyUISystem : ComponentSystem
     {
-        private struct Data
+        private ComponentGroup _playerGroup;
+        private ComponentGroup _enemyGroup;
+        protected override void OnCreateManager()
         {
-            public readonly int Length;
-            public ComponentArray<EnemyUIComponent> EnemyUIComponents;
-            public ComponentArray<SpriteRenderer> RendererComponents;
-            public ComponentDataArray<HealthComponent> HealthComponents;
-            public EntityArray EntityArray;
+            _playerGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(TargetComponent), typeof(PlayerComponent)
+                }
+            });
+            _enemyGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(EnemyUIComponent), typeof(SpriteRenderer), typeof(HealthComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
-
-        private struct PlayerData
-        {
-            public readonly int Length;
-            public ComponentArray<PlayerUIComponent> PlayerUIComponents;
-            public ComponentDataArray<TargetComponent> TargetComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private PlayerData _playerData;
 
         protected override void OnUpdate()
         {
             var deltaTime = Time.deltaTime;
-            for (int i = 0; i < _data.Length; i++)
+            Entities.With(_enemyGroup).ForEach(
+                (Entity entity,
+                 ref HealthComponent healthComponent,
+                 SpriteRenderer spriteRenderer,
+                 EnemyUIComponent enemyUIComponent) =>
             {
-                var enemyUIComponent = _data.EnemyUIComponents[i];
+                // if object is vissible by main camera
                 if (GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(Camera.main),
-                       _data.RendererComponents[i].bounds)) // if object is vissible by main camera
+                                                    spriteRenderer.bounds)) 
                 {
                     if (!enemyUIComponent.Canvas.enabled)
                         enemyUIComponent.Canvas.enabled = true;
@@ -58,8 +60,8 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                         enemyUIComponent.Canvas.transform.localScale = new Vector3(math.abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
 
                     // Heatlh 
-                    var currentHealth = _data.HealthComponents[i].CurrentValue;
-                    var maxHealth = _data.HealthComponents[i].MaxValue;
+                    var currentHealth = healthComponent.CurrentValue;
+                    var maxHealth = healthComponent.MaxValue;
                     var currentFill = (float)currentHealth / maxHealth;
 
                     enemyUIComponent.HealthImage.fillAmount
@@ -68,18 +70,16 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                     enemyUIComponent.HealthText.text = displayedValue + " / " + maxHealth;
 
                     //Targetting image
-                    if (_playerData.Length > 0)
-                        for (int j = 0; j < _playerData.Length; j++)
-                        {
-                            if (_playerData.TargetComponents[j].Target == _data.EntityArray[i])
-                                enemyUIComponent.TargettingCircle.SetActive(true);
-                            else
-                                enemyUIComponent.TargettingCircle.SetActive(false);
-                        }
-                    else
-                        enemyUIComponent.TargettingCircle.SetActive(false);
+                    enemyUIComponent.TargettingCircle.SetActive(false);
+                    Entities.With(_playerGroup).ForEach((Entity playerEntity, ref TargetComponent targetComponent) =>
+                    {
+                        if (targetComponent.Target == entity)
+                            enemyUIComponent.TargettingCircle.SetActive(true);
+                        else
+                            enemyUIComponent.TargettingCircle.SetActive(false);
+                    });
                 }
-            }
+            });
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Characters.Common;
+﻿using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI.ECS.Components;
-using Unity.Entities;
 using UnityEngine;
 
 namespace BeyondPixels.UI
@@ -18,22 +17,12 @@ namespace BeyondPixels.UI
                 return _instance;
             }
         }
-
-        private GameObject _player;
-        private SpellActionButton[] _spellActions;
-
-        public void Initialize(GameObject player)
+        public UIComponent UIComponent;
+        public SpellBookComponent SpellBook;
+        public void Initialize()
         {
-            this._player = player;
-            this._spellActions = player.GetComponent<PlayerUIComponent>().SpellButtonsGroup.ActionButtons;
-
-            var playerEntity = _player.GetComponent<GameObjectEntity>().Entity;
-            var spellBook = _player.GetComponent<SpellBookComponent>();
-            foreach (var button in this._spellActions)
-            {
-                button.SpellIcon.sprite = spellBook.Spells[button.SpellIndex].Icon;
-                button.SpellCaster = playerEntity;
-            }
+            this.SpellBook = SpellBookManagerComponent.Instance.SpellBook;
+            this.UIComponent = GetComponent<UIComponent>();
         }
     }
 }

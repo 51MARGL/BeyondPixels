@@ -11,9 +11,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 {
     public class BoardSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        private class BoardSystemBarrier : BarrierSystem { }
-
         private struct CreateRoomsJob : IJobParallelFor
         {
             public NativeArray<NodeComponent> TreeArray;
@@ -304,120 +301,146 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        private struct Data
+        [BurstCompile]
+        private struct CleanUpJob : IJob
         {
-            public readonly int Length;
-            public ComponentDataArray<BoardComponent> BoardComponents;
-            public SubtractiveComponent<BoardReadyComponent> BoardReadyComponents;
-            public EntityArray EntityArray;
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> Chunks;
+            public void Execute()
+            {
+
+            }
         }
-        [Inject]
-        private Data _data;
+
         private NativeQueue<CorridorComponent> CorridorsQueue;
         private NativeArray<TileType> Tiles;
         private NativeArray<NodeComponent> TreeArray;
-        private BoardSystemBarrier _boardSystemBarrier;
         private int CurrentPhase;
 
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private ComponentGroup _boardGroup;
         protected override void OnCreateManager()
         {
-            _boardSystemBarrier = World.Active.GetOrCreateManager<BoardSystemBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
             CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
             CurrentPhase = 0;
+            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(BoardComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(BoardReadyComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            for (int i = 0; i < _data.Length; i++)
+            var boardChunks = _boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (int chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
             {
-                var board = _data.BoardComponents[i];
-                var boardEntity = _data.EntityArray[i];
-                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-                if (CurrentPhase == 0)
+                var chunk = boardChunks[chunkIndex];
+                var boardEntities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
+                var boards = chunk.GetNativeArray(GetArchetypeChunkComponentType<BoardComponent>());
+                for (int i = 0; i < chunk.Count; i++)
                 {
-                    Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                    for (int j = 0; j < Tiles.Length; j++)
-                        Tiles[j] = TileType.Wall;
-
-                    var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
-                    TreeArray = bspTree.ToNativeArray();
-
-                    var createRoomsJobHandle = new CreateRoomsJob
+                    var board = boards[i];
+                    var boardEntity = boardEntities[i];
+                    var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                    if (CurrentPhase == 0)
                     {
-                        TreeArray = TreeArray,
-                        RandomSeed = random.NextInt(),
-                        Board = board,
-                        MinRoomSize = board.MinRoomSize
-                    }.Schedule(TreeArray.Length, 1, inputDeps);
+                        Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        for (int j = 0; j < Tiles.Length; j++)
+                            Tiles[j] = TileType.Wall;
 
-                    var lastLevelJobHandle = createRoomsJobHandle;
-                    var concurrentQueue = CorridorsQueue.ToConcurrent();
-                    for (int level = bspTree.Height; level > 0; level--)
-                    {
-                        lastLevelJobHandle = new FindCorridorsForLevelJob
+                        var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
+                        TreeArray = bspTree.ToNativeArray();
+
+                        var createRoomsJobHandle = new CreateRoomsJob
                         {
                             TreeArray = TreeArray,
                             RandomSeed = random.NextInt(),
-                            Level = level,
-                            Corridors = concurrentQueue
-                        }.Schedule((int)math.pow(2, level - 1) - 1, 1, lastLevelJobHandle);
+                            Board = board,
+                            MinRoomSize = board.MinRoomSize
+                        }.Schedule(TreeArray.Length, 1, inputDeps);
+
+                        var lastLevelJobHandle = createRoomsJobHandle;
+                        var concurrentQueue = CorridorsQueue.ToConcurrent();
+                        for (int level = bspTree.Height; level > 0; level--)
+                        {
+                            lastLevelJobHandle = new FindCorridorsForLevelJob
+                            {
+                                TreeArray = TreeArray,
+                                RandomSeed = random.NextInt(),
+                                Level = level,
+                                Corridors = concurrentQueue
+                            }.Schedule((int)math.pow(2, level - 1) - 1, 1, lastLevelJobHandle);
+                        }
+                        inputDeps = lastLevelJobHandle;
                     }
-                    inputDeps = lastLevelJobHandle;
-                }
-                else if (CurrentPhase == 1)
-                {
-                    var corridorsArray = new NativeArray<CorridorComponent>(CorridorsQueue.Count, Allocator.TempJob);
-
-                    var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
+                    else if (CurrentPhase == 1)
                     {
-                        CorridorsArray = corridorsArray,
-                        CorridorsQueue = CorridorsQueue
-                    }.Schedule(inputDeps);
+                        var corridorsArray = new NativeArray<CorridorComponent>(CorridorsQueue.Count, Allocator.TempJob);
 
-                    var createCorridorsJobHandle = new CreateCorridorsJob
-                    {
-                        Tiles = Tiles,
-                        Corridors = corridorsArray,
-                        TileStride = board.Size.x
-                    }.Schedule(corridorsArray.Length, 1, corridorsQueueToArrayJobHandle);
+                        var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
+                        {
+                            CorridorsArray = corridorsArray,
+                            CorridorsQueue = CorridorsQueue
+                        }.Schedule(inputDeps);
 
-                    var setRoomTilesJobHandle = new SetRoomTilesJob
-                    {
-                        TreeArray = TreeArray,
-                        Tiles = Tiles,
-                        TileStride = board.Size.x
-                    }.Schedule(TreeArray.Length, 1, inputDeps);
+                        var createCorridorsJobHandle = new CreateCorridorsJob
+                        {
+                            Tiles = Tiles,
+                            Corridors = corridorsArray,
+                            TileStride = board.Size.x
+                        }.Schedule(corridorsArray.Length, 1, corridorsQueueToArrayJobHandle);
 
-                    var removeThinWallsJobHandle = new RemoveThinWallsJob
-                    {
-                        Board = board,
-                        Tiles = Tiles
-                    }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, createCorridorsJobHandle));
+                        var setRoomTilesJobHandle = new SetRoomTilesJob
+                        {
+                            TreeArray = TreeArray,
+                            Tiles = Tiles,
+                            TileStride = board.Size.x
+                        }.Schedule(TreeArray.Length, 1, inputDeps);
 
-                    var instantiateTilesJobHandle = new InstantiateTilesJob
-                    {
-                        CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
-                        Tiles = Tiles,
-                        TileStride = board.Size.x
-                    }.Schedule(board.Size.y, 1, removeThinWallsJobHandle);
+                        var removeThinWallsJobHandle = new RemoveThinWallsJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, createCorridorsJobHandle));
 
-                    inputDeps = new TagBoardDoneJob
+                        var instantiateTilesJobHandle = new InstantiateTilesJob
+                        {
+                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                            Tiles = Tiles,
+                            TileStride = board.Size.x
+                        }.Schedule(board.Size.y, 1, removeThinWallsJobHandle);
+
+                        inputDeps = new TagBoardDoneJob
+                        {
+                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer(),
+                            BoardEntity = boardEntity,
+                            BoardSize = board.Size,
+                            TreeArray = TreeArray
+                        }.Schedule(instantiateTilesJobHandle);
+                        _endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                    }
+                    else if (CurrentPhase == 2)
                     {
-                        CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
-                        BoardEntity = _data.EntityArray[i],
-                        BoardSize = _data.BoardComponents[i].Size,
-                        TreeArray = TreeArray
-                    }.Schedule(instantiateTilesJobHandle);
-                    _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
-                }
-                else if (CurrentPhase == 2)
-                {
-                    CorridorsQueue.Clear();
+                        CorridorsQueue.Clear();
+                    }
                 }
             }
 
             CurrentPhase = (CurrentPhase + 1) % 3;
-            return inputDeps;
+            var cleanUpJobHandle = new CleanUpJob
+            {
+                Chunks = boardChunks
+            }.Schedule(inputDeps);
+            return cleanUpJobHandle;
         }
 
         protected override void OnDestroyManager()

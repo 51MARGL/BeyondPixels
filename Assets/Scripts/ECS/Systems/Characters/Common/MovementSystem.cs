@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.Utilities;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -9,13 +10,15 @@ using UnityEngine.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    [UpdateBefore(typeof(UnityEngine.Experimental.PlayerLoop.FixedUpdate))]
+    [UpdateInGroup(typeof(FixedUpdateSystemGroup))]
     public class MovementSystem : JobComponentSystem
     {
         public struct MovementJob : IJobParallelForTransform
         {
             [ReadOnly]
-            public ComponentDataArray<MovementComponent> MovementComponents;
+            [DeallocateOnJobCompletion]
+            public NativeArray<MovementComponent> MovementComponents;
+
             public float DeltaTime;
 
             public void Execute(int index, TransformAccess transform)
@@ -42,11 +45,18 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            _group = GetComponentGroup(
-                ComponentType.Subtractive(typeof(AttackComponent)),
-                ComponentType.ReadOnly(typeof(MovementComponent)),
-                typeof(UnityEngine.Transform)
-            );
+            _group = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly(typeof(MovementComponent)),
+                    typeof(UnityEngine.Transform)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(AttackComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -55,7 +65,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             var deltaTime = Time.deltaTime;
             return new MovementJob
             {
-                MovementComponents = _group.GetComponentDataArray<MovementComponent>(),
+                MovementComponents = _group.ToComponentDataArray<MovementComponent>(Allocator.TempJob),
                 DeltaTime = deltaTime
             }.Schedule(transformArray, inputDeps);
         }

@@ -2,7 +2,8 @@
     "name": "BeyondPixels.Utilities",
     "references": [
         "Cinemachine",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Unity.Entities"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -11,5 +12,6 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

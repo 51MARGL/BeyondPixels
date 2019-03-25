@@ -11,9 +11,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 {
     public class BoardSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        private class BoardSystemBarrier : BarrierSystem { }
-
         [BurstCompile]
         private struct RandomFillBoardJob : IJobParallelFor
         {
@@ -667,181 +664,207 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        private struct Data
+        [BurstCompile]
+        private struct CleanUpJob : IJob
         {
-            public readonly int Length;
-            public ComponentDataArray<BoardComponent> BoardComponents;
-            public SubtractiveComponent<BoardReadyComponent> BoardReadyComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private Data _data;
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> Chunks;
+            public void Execute()
+            {
 
-        private BoardSystemBarrier _boardSystemBarrier;
+            }
+        }
+
         private NativeList<RoomComponent> RoomList;
         private NativeQueue<CorridorComponent> CorridorsQueue;
         private NativeArray<TileComponent> Tiles;
         private NativeArray<TileComponent> RoomTiles;
         private int CurrentPhase;
 
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private ComponentGroup _boardGroup;
         protected override void OnCreateManager()
         {
-            _boardSystemBarrier = World.Active.GetOrCreateManager<BoardSystemBarrier>();
+            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
             RoomList = new NativeList<RoomComponent>(Allocator.Persistent);
             CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
             CurrentPhase = 0;
+            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(BoardComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(BoardReadyComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            for (int i = 0; i < _data.Length; i++)
+            var boardChunks = _boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (int chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
             {
-                var board = _data.BoardComponents[i];
-                if (CurrentPhase == 0)
+                var chunk = boardChunks[chunkIndex];
+                var boardEntities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
+                var boards = chunk.GetNativeArray(GetArchetypeChunkComponentType<BoardComponent>());
+                for (int i = 0; i < chunk.Count; i++)
                 {
-                    Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                    RoomTiles = new NativeArray<TileComponent>(Tiles.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                    var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-                    RoomList.Clear();
-                    CorridorsQueue.Clear();
-
-                    var randomFillBoardJobHandle = new RandomFillBoardJob
+                    var board = boards[i];
+                    var boardEntity = boardEntities[i];
+                    if (CurrentPhase == 0)
                     {
-                        Tiles = Tiles,
-                        TileStride = board.Size.x,
-                        RandomFillPercent = board.RandomFillPercent,
-                        RandomSeed = random.NextInt()
-                    }.Schedule(board.Size.y, 1, inputDeps);
+                        Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        RoomTiles = new NativeArray<TileComponent>(Tiles.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                        RoomList.Clear();
+                        CorridorsQueue.Clear();
 
-                    var lastGenerationJobHandle = randomFillBoardJobHandle;
-                    for (int geneation = 0; geneation < 5; geneation++)
+                        var randomFillBoardJobHandle = new RandomFillBoardJob
+                        {
+                            Tiles = Tiles,
+                            TileStride = board.Size.x,
+                            RandomFillPercent = board.RandomFillPercent,
+                            RandomSeed = random.NextInt()
+                        }.Schedule(board.Size.y, 1, inputDeps);
+
+                        var lastGenerationJobHandle = randomFillBoardJobHandle;
+                        for (int geneation = 0; geneation < 5; geneation++)
+                        {
+                            var calculateNextGenerationJobHandle = new CalculateNextGenerationJob
+                            {
+                                Tiles = Tiles,
+                                TileStride = board.Size.x
+                            }.Schedule(Tiles.Length, 1, lastGenerationJobHandle);
+
+                            lastGenerationJobHandle = new ProcessNextGenerationJob
+                            {
+                                Tiles = Tiles
+                            }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
+                        }
+
+                        var closeBordersJobHandle = new CloseBordersJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(lastGenerationJobHandle);
+
+                        inputDeps = new GetRoomsJob
+                        {
+                            Board = board,
+                            RoomTiles = RoomTiles,
+                            Tiles = Tiles,
+                            Rooms = RoomList
+                        }.Schedule(closeBordersJobHandle);
+                    }
+                    else if (CurrentPhase == 1)
                     {
+                        var roomCount = RoomList.Length;
+                        var roomsChunkSize = 10;
+                        var concurrentQueue = CorridorsQueue.ToConcurrent();
+                        var connectedRoomsTable = new NativeArray<int>(roomCount * roomCount, Allocator.TempJob);
+
+                        for (int roomIndex = 0; roomIndex < roomCount; roomIndex++)
+                            connectedRoomsTable[roomIndex * roomCount + roomIndex] = 1;
+
+                        var RearangeRoomsJobhandle = new RearangeRoomsJob
+                        {
+                            Board = board,
+                            RoomTiles = RoomTiles,
+                            Rooms = RoomList
+                        }.Schedule(inputDeps);
+
+                        var findClosestRoomsConnectionsJobHandle = new FindClosestRoomsConnectionsJob
+                        {
+                            RoomTiles = RoomTiles,
+                            Rooms = RoomList,
+                            Corridors = concurrentQueue,
+                            ConnectedRoomsTable = connectedRoomsTable,
+                            RoomsChunkSize = roomsChunkSize
+                        }.Schedule(roomCount / roomsChunkSize + 1, 1, RearangeRoomsJobhandle);
+
+                        inputDeps = new FindAllRoomsConnectionsJob
+                        {
+                            RoomTiles = RoomTiles,
+                            Rooms = RoomList,
+                            ConnectedRoomsTable = connectedRoomsTable,
+                            Corridors = concurrentQueue
+                        }.Schedule(findClosestRoomsConnectionsJobHandle);
+                    }
+                    else if (CurrentPhase == 2)
+                    {
+                        var corridorsArray = new NativeArray<CorridorComponent>(CorridorsQueue.Count, Allocator.TempJob);
+
+                        var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
+                        {
+                            CorridorsArray = corridorsArray,
+                            CorridorsQueue = CorridorsQueue
+                        }.Schedule(inputDeps);
+
+                        var createCorridorsJobHandle = new CreateCorridorsJob
+                        {
+                            Tiles = Tiles,
+                            Corridors = corridorsArray,
+                            TileStride = board.Size.x,
+                            PassageRadius = board.PassRadius
+                        }.Schedule(corridorsArray.Length, 1, corridorsQueueToArrayJobHandle);
+
                         var calculateNextGenerationJobHandle = new CalculateNextGenerationJob
                         {
                             Tiles = Tiles,
                             TileStride = board.Size.x
-                        }.Schedule(Tiles.Length, 1, lastGenerationJobHandle);
+                        }.Schedule(Tiles.Length, 1, createCorridorsJobHandle);
 
-                        lastGenerationJobHandle = new ProcessNextGenerationJob
+                        var lastGenerationJobHandle = new ProcessNextGenerationJob
                         {
-                            Tiles = Tiles
+                            Tiles = Tiles,
                         }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
+
+                        var removeThinWallsJobHandle = new RemoveThinWallsJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(lastGenerationJobHandle);
+
+                        var closeBordersJobHandle = new CloseBordersJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(removeThinWallsJobHandle);
+
+                        var instantiateTilesJobHandle = new InstantiateTilesJob
+                        {
+                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                            Tiles = Tiles,
+                            TileStride = board.Size.x,
+                            RoomTiles = RoomTiles
+                        }.Schedule(board.Size.y, 1, closeBordersJobHandle);
+
+                        inputDeps = new TagBoardDoneJob
+                        {
+                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer(),
+                            BoardEntity = boardEntity,
+                            BoardSize = board.Size
+                        }.Schedule(instantiateTilesJobHandle);
+                        _endFrameBarrier.AddJobHandleForProducer(inputDeps);
                     }
-
-                    var closeBordersJobHandle = new CloseBordersJob
+                    else if (CurrentPhase == 3)
                     {
-                        Board = board,
-                        Tiles = Tiles
-                    }.Schedule(lastGenerationJobHandle);
-
-                    inputDeps = new GetRoomsJob
-                    {
-                        Board = board,
-                        RoomTiles = RoomTiles,
-                        Tiles = Tiles,
-                        Rooms = RoomList
-                    }.Schedule(closeBordersJobHandle);
-                }
-                else if (CurrentPhase == 1)
-                {
-                    var roomCount = RoomList.Length;
-                    var roomsChunkSize = 10;
-                    var concurrentQueue = CorridorsQueue.ToConcurrent();
-                    var connectedRoomsTable = new NativeArray<int>(roomCount * roomCount, Allocator.TempJob);
-
-                    for (int roomIndex = 0; roomIndex < roomCount; roomIndex++)
-                        connectedRoomsTable[roomIndex * roomCount + roomIndex] = 1;
-
-                    var RearangeRoomsJobhandle = new RearangeRoomsJob
-                    {
-                        Board = board,
-                        RoomTiles = RoomTiles,
-                        Rooms = RoomList
-                    }.Schedule(inputDeps);
-
-                    var findClosestRoomsConnectionsJobHandle = new FindClosestRoomsConnectionsJob
-                    {
-                        RoomTiles = RoomTiles,
-                        Rooms = RoomList,
-                        Corridors = concurrentQueue,
-                        ConnectedRoomsTable = connectedRoomsTable,
-                        RoomsChunkSize = roomsChunkSize
-                    }.Schedule(roomCount / roomsChunkSize + 1, 1, RearangeRoomsJobhandle);
-
-                    inputDeps = new FindAllRoomsConnectionsJob
-                    {
-                        RoomTiles = RoomTiles,
-                        Rooms = RoomList,
-                        ConnectedRoomsTable = connectedRoomsTable,
-                        Corridors = concurrentQueue
-                    }.Schedule(findClosestRoomsConnectionsJobHandle);
-                }
-                else if (CurrentPhase == 2)
-                {
-                    var corridorsArray = new NativeArray<CorridorComponent>(CorridorsQueue.Count, Allocator.TempJob);
-
-                    var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
-                    {
-                        CorridorsArray = corridorsArray,
-                        CorridorsQueue = CorridorsQueue
-                    }.Schedule(inputDeps);
-
-                    var createCorridorsJobHandle = new CreateCorridorsJob
-                    {
-                        Tiles = Tiles,
-                        Corridors = corridorsArray,
-                        TileStride = board.Size.x,
-                        PassageRadius = board.PassRadius
-                    }.Schedule(corridorsArray.Length, 1, corridorsQueueToArrayJobHandle);
-
-                    var calculateNextGenerationJobHandle = new CalculateNextGenerationJob
-                    {
-                        Tiles = Tiles,
-                        TileStride = board.Size.x
-                    }.Schedule(Tiles.Length, 1, createCorridorsJobHandle);
-
-                    var lastGenerationJobHandle = new ProcessNextGenerationJob
-                    {
-                        Tiles = Tiles,
-                    }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
-
-                    var removeThinWallsJobHandle = new RemoveThinWallsJob
-                    {
-                        Board = board,
-                        Tiles = Tiles
-                    }.Schedule(lastGenerationJobHandle);
-
-                    var closeBordersJobHandle = new CloseBordersJob
-                    {
-                        Board = board,
-                        Tiles = Tiles
-                    }.Schedule(removeThinWallsJobHandle);
-
-                    var instantiateTilesJobHandle = new InstantiateTilesJob
-                    {
-                        CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
-                        Tiles = Tiles,
-                        TileStride = board.Size.x,
-                        RoomTiles = RoomTiles
-                    }.Schedule(board.Size.y, 1, closeBordersJobHandle);
-
-                    inputDeps = new TagBoardDoneJob
-                    {
-                        CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
-                        BoardEntity = _data.EntityArray[i],
-                        BoardSize = _data.BoardComponents[i].Size
-                    }.Schedule(instantiateTilesJobHandle);
-                    _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
-                }
-                else if (CurrentPhase == 3)
-                {
-                    RoomList.Clear();
-                    CorridorsQueue.Clear();
+                        RoomList.Clear();
+                        CorridorsQueue.Clear();
+                    }
                 }
             }
             CurrentPhase = (CurrentPhase + 1) % 4;
 
-            return inputDeps;
+            var cleanUpJobHandle = new CleanUpJob
+            {
+                Chunks = boardChunks
+            }.Schedule(inputDeps);
+            return cleanUpJobHandle;
         }
 
         protected override void OnDestroyManager()

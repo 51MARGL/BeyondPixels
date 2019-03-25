@@ -7,7 +7,7 @@ namespace BeyondPixels.ColliderEvents
     public struct CollisionInfo : IComponentData
     {
         public Entity Sender;
-        public Entity Other;
+        public Entity Target;
         public EventType EventType;
     }
 
@@ -25,8 +25,10 @@ namespace BeyondPixels.ColliderEvents
 
     public struct SpellCollisionComponent : IComponentData
     {
-        public Entity SpellEntity;
-        public float2 ImpactPoint;
-        public float ImpactTime;
+        public Entity Target;
+    }
+    public struct WeaponCollisionComponent : IComponentData
+    {
+        public Entity Target;
     }
 }
