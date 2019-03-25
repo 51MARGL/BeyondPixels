@@ -17,7 +17,9 @@ namespace BeyondPixels.ColliderEvents
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                     return;
 
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(FinalDamageComponent));
+                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), 
+                                                             typeof(WeaponCollisionComponent), 
+                                                             typeof(DamageComponent));
 
                 entityManager.SetComponentData(eventEntity,
                         new CollisionInfo
@@ -27,10 +29,10 @@ namespace BeyondPixels.ColliderEvents
                             EventType = EventType.TriggerEnter
                         });
                 entityManager.SetComponentData(eventEntity,
-                        new FinalDamageComponent
+                        new DamageComponent
                         {
                             DamageType = DamageType.Weapon,
-                            DamageAmount =
+                            DamageOnImpact =
                                 entityManager.GetComponentData<WeaponComponent>(sender).DamageValue
                         });
             }

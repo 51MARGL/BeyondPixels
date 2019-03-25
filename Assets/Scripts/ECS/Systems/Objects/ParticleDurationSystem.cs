@@ -27,7 +27,7 @@ namespace BeyondPixels.ECS.Systems.Objects
         {
             Entities.With(_particlesGroup).ForEach((Entity entity, ParticleSystem particleSystem) =>
             {
-                if (!particleSystem.IsAlive())
+                if (particleSystem != null && !particleSystem.IsAlive())
                     PostUpdateCommands.AddComponent(entity, new DestroyComponent());
             });
         }

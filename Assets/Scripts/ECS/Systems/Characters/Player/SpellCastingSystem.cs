@@ -56,15 +56,15 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                         {
                             if (spellEntities[sI] == spellCastingComponents[i].ActiveSpell)
                             {
-                                var spellPrefab = DungeonBootstrap.spellBook.Spells[spellComponents[sI].SpellIndex];
-                                if (spellCastingComponents[i].StartedAt + spellPrefab.CastTime > CurrentTime)
-                                    return;
-
+                                var spellPrefab = SpellBookManagerComponent.Instance.SpellBook.Spells[spellComponents[sI].SpellIndex];
                                 if (spellPrefab.TargetRequired && !chunk.Has(TargetComponentType))
                                 {
                                     CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
                                     return;
                                 }
+
+                                if (spellCastingComponents[i].StartedAt + spellPrefab.CastTime > CurrentTime)
+                                    return;
 
                                 var target = Entity.Null;
                                 if (spellPrefab.SelfTarget)
@@ -82,6 +82,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                     Caster = entities[i],
                                     Target = target
                                 });
+
+                                return;
                             }
                         }
                     }

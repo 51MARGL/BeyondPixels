@@ -24,7 +24,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 
         protected override void OnUpdate()
         {
-            var spellBookComponent = DungeonBootstrap.spellBook;
+            var spellBookComponent = SpellBookManagerComponent.Instance.SpellBook;
             using (var spellChunks = _spellToCastGroup.CreateArchetypeChunkArray(Allocator.TempJob))
                 for (int s = 0; s < spellChunks.Length; s++)
                 {

@@ -50,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                             if (spellComponents[sI].Owner == entities[i]
                                 && inputComponent.ActionButtonPressed == spellComponents[sI].ActionIndex)
                             {
-                                var spellPrefab = DungeonBootstrap.spellBook.Spells[spellComponents[sI].SpellIndex];
+                                var spellPrefab = SpellBookManagerComponent.Instance.SpellBook.Spells[spellComponents[sI].SpellIndex];
                                 if (spellPrefab.TargetRequired && !chunk.Has(TargetComponentType))
                                 {
                                     inputComponent.ActionButtonPressed = 0;
@@ -65,6 +65,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                     StartedAt = CurrentTime
                                 });
 
+                                inputComponent.ActionButtonPressed = 0;
+                                inputComponents[i] = inputComponent;
+                                return;
                             }
                         }
                         inputComponent.ActionButtonPressed = 0;

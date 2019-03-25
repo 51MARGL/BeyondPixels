@@ -19,9 +19,9 @@ namespace BeyondPixels.UI
         }
         public UIComponent UIComponent;
         public SpellBookComponent SpellBook;
-        public void Initialize(SpellBookComponent spellBook)
+        public void Initialize()
         {
-            this.SpellBook = spellBook;
+            this.SpellBook = SpellBookManagerComponent.Instance.SpellBook;
             this.UIComponent = GetComponent<UIComponent>();
         }
     }

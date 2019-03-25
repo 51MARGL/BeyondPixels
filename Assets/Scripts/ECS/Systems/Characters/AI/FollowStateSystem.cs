@@ -65,6 +65,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                         Target = followStateComponent.Target
                                     });
                             }
+                            return;
                         }
                 }
             }

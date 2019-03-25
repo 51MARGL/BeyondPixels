@@ -42,6 +42,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                                 healthComponent.CurrentValue = healthComponent.MaxValue;
 
                             CommandBuffer.SetComponent(index, entities[i], healthComponent);
+
+                            CommandBuffer.DestroyEntity(index, entity);
+                            return;
                         }
                 }
 

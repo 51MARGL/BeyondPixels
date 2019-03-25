@@ -22,6 +22,7 @@ namespace BeyondPixels.ColliderEvents
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                              typeof(SpellCollisionComponent),
                                                              typeof(DamageComponent));
+
                 var caster = entityManager.GetComponentData<SpellComponent>(spellEntity).Caster;
                 var damageComponent = entityManager.GetComponentData<DamageComponent>(spellEntity);
                 var targetComponent = entityManager.GetComponentData<TargetRequiredComponent>(spellEntity);
@@ -38,8 +39,6 @@ namespace BeyondPixels.ColliderEvents
                         new SpellCollisionComponent
                         {
                             Target = targetComponent.Target,
-                            ImpactPoint = new float2(this.transform.position.x, this.transform.position.y),
-                            ImpactTime = Time.time
                         });
                 totalTime = 0;
             }
@@ -76,8 +75,6 @@ namespace BeyondPixels.ColliderEvents
                             new SpellCollisionComponent
                             {
                                 Target = targetComponent.Target,
-                                ImpactPoint = new float2(this.transform.position.x, this.transform.position.y),
-                                ImpactTime = Time.time
                             });
                     totalTime = 0;
                 }

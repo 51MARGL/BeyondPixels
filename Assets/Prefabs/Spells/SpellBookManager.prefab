@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7135779718213204339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7135779718213204337}
+  - component: {fileID: 7135779718213204338}
+  - component: {fileID: 7135779718213204336}
+  m_Layer: 0
+  m_Name: SpellBookManager
+  m_TagString: SpellBook
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7135779718213204337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7135779718213204339}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.3322434, y: 0.6135536, z: -10.824296}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7135779718213204338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7135779718213204339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5860bf159e40a534b8943f51a94c6a01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Spells:
+  - Prefab: {fileID: 1323627655978938, guid: 2d3bf13eefb3bf644bcd035b85b512db, type: 3}
+    BarColor: {r: 1, g: 0.12869696, b: 0, a: 1}
+    Icon: {fileID: 21300002, guid: 51567f3458543d84a809d05f5557d59d, type: 3}
+    Name: Fire Ring
+    Description: Sets target on fire
+    CastTime: 1
+    Duration: 3
+    CoolDown: 15
+    DamageOnImpact: 3
+    DamagePerSecond: 2
+    DamageType: 1
+    LockOnTarget: 1
+    SelfTarget: 0
+    TargetRequired: 1
+  - Prefab: {fileID: 1323627655978938, guid: 134c93e7cee606f408b481892c0ccf47, type: 3}
+    BarColor: {r: 0, g: 0.52242804, b: 1, a: 1}
+    Icon: {fileID: 21300002, guid: 51567f3458543d84a809d05f5557d59d, type: 3}
+    Name: Ice storm
+    Description: Throws target into ice storm
+    CastTime: 1.5
+    Duration: 0.1
+    CoolDown: 20
+    DamageOnImpact: 10
+    DamagePerSecond: 0
+    DamageType: 2
+    LockOnTarget: 1
+    SelfTarget: 0
+    TargetRequired: 1
+  - Prefab: {fileID: 1323627655978938, guid: 67bd56ce7ddf464408ca38d580ad63e2, type: 3}
+    BarColor: {r: 0, g: 0.5188679, b: 0.09554865, a: 1}
+    Icon: {fileID: 21300002, guid: 51567f3458543d84a809d05f5557d59d, type: 3}
+    Name: Self Heal
+    Description: Gives healing effect to spell's caster
+    CastTime: 7
+    Duration: 10
+    CoolDown: 45
+    DamageOnImpact: 0
+    DamagePerSecond: -5
+    DamageType: 3
+    LockOnTarget: 1
+    SelfTarget: 1
+    TargetRequired: 0
+--- !u!114 &7135779718213204336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7135779718213204339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b10f9a780cbf1984aafd1673206873ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

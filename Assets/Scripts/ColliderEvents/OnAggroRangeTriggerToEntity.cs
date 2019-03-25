@@ -1,5 +1,4 @@
-﻿using BeyondPixels.ECS.Components.Characters.AI;
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -16,15 +15,15 @@ namespace BeyondPixels.ColliderEvents
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                     return;
 
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
+                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), 
+                                                             typeof(AggroRangeCollisionComponent));
 
-                if (!entityManager.HasComponent<FollowStateComponent>(sender))
-                    entityManager.SetComponentData(eventEntity, new CollisionInfo
-                    {
-                        Sender = sender,
-                        Target = target,
-                        EventType = EventType.TriggerEnter
-                    });
+                entityManager.SetComponentData(eventEntity, new CollisionInfo
+                {
+                    Sender = sender,
+                    Target = target,
+                    EventType = EventType.TriggerEnter
+                });
             }
         }
 
@@ -41,13 +40,12 @@ namespace BeyondPixels.ColliderEvents
 
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
 
-                if (entityManager.HasComponent<FollowStateComponent>(sender))
-                    entityManager.SetComponentData(eventEntity, new CollisionInfo
-                    {
-                        Sender = sender,
-                        Target = target,
-                        EventType = EventType.TriggerExit
-                    });
+                entityManager.SetComponentData(eventEntity, new CollisionInfo
+                {
+                    Sender = sender,
+                    Target = target,
+                    EventType = EventType.TriggerExit
+                });
             }
         }
     }

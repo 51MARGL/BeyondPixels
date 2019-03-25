@@ -13,8 +13,6 @@ namespace BeyondPixels.SceneBootstraps
 {
     public class DungeonBootstrap : MonoBehaviour
     {
-
-        public static SpellBookComponent spellBook;
         [Serializable]
         public class DungeonGeneratorSettings
         {
@@ -68,41 +66,39 @@ namespace BeyondPixels.SceneBootstraps
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
 
             #region DungeonGeneration
-            //Entity board;
-            //switch (DungeonGenerators.Switch)
-            //{
-            //    case Switch.Naive:
-            //        board = entityManager.CreateEntity();
-            //        entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
-            //        {
-            //            Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
-            //            RoomCount = DungeonGenerators.Naive.RoomCount,
-            //            MaxRoomSize = DungeonGenerators.Naive.MaxRoomSize,
-            //            MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
-            //            MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
-            //        });
-            //        break;
-            //    case Switch.CellularAutomaton:
-            //        board = entityManager.CreateEntity();
-            //        entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
-            //        {
-            //            Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
-            //            RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
-            //            PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
-            //        });
-            //        break;
-            //    case Switch.BSP:
-            //        board = entityManager.CreateEntity();
-            //        entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.BSP.BoardComponent
-            //        {
-            //            Size = new int2(DungeonGenerators.BSP.BoardWidth, DungeonGenerators.BSP.BoardHeight),
-            //            MinRoomSize = DungeonGenerators.BSP.MinRoomSize
-            //        });
-            //        break;
-            //}
+            Entity board;
+            switch (DungeonGenerators.Switch)
+            {
+                case Switch.Naive:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.Naive.BoardWidth, DungeonGenerators.Naive.BoardHeight),
+                        RoomCount = DungeonGenerators.Naive.RoomCount,
+                        MaxRoomSize = DungeonGenerators.Naive.MaxRoomSize,
+                        MaxCorridorLength = DungeonGenerators.Naive.MaxCorridorLength,
+                        MinCorridorLength = DungeonGenerators.Naive.MinCorridorLength
+                    });
+                    break;
+                case Switch.CellularAutomaton:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.CellularAutomaton.BoardWidth, DungeonGenerators.CellularAutomaton.BoardHeight),
+                        RandomFillPercent = DungeonGenerators.CellularAutomaton.RandomFillPercent,
+                        PassRadius = DungeonGenerators.CellularAutomaton.PassRadius
+                    });
+                    break;
+                case Switch.BSP:
+                    board = entityManager.CreateEntity();
+                    entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.BSP.BoardComponent
+                    {
+                        Size = new int2(DungeonGenerators.BSP.BoardWidth, DungeonGenerators.BSP.BoardHeight),
+                        MinRoomSize = DungeonGenerators.BSP.MinRoomSize
+                    });
+                    break;
+            }
             #endregion
-
-            spellBook = GameObject.FindGameObjectWithTag("SpellBook").GetComponent<SpellBookComponent>();
 
             #region PlayerEntityArchetype
             var player = PrefabManager.Instance.PlayerPrefab;
@@ -135,8 +131,9 @@ namespace BeyondPixels.SceneBootstraps
             });
             GameObject.Destroy(playerInitializeComponent);
             entityManager.RemoveComponent<PlayerInitializeComponent>(playerEntity);
-            #endregion            
+            #endregion
 
+            #region spellInit
             for (int i = 0; i < 3; i++)
             {
                 var spellEntity = entityManager.CreateEntity(typeof(ActiveSpellComponent));
@@ -147,45 +144,10 @@ namespace BeyondPixels.SceneBootstraps
                     SpellIndex = i
                 });
             }
-            #region UI
-            UIManager.Instance.Initialize(spellBook);
             #endregion
-
-            var randomPositon = new Vector3(-1, -1, 0);
-            var enemy = GameObject.Instantiate(PrefabManager.Instance.EnemyPrefab, randomPositon, Quaternion.identity);
-            var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
-            var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
-
-            entityManager.AddComponentData(enemyEntity, new CharacterComponent
-            {
-                CharacterType = CharacterType.Enemy
-            });
-            entityManager.AddComponentData(enemyEntity, new MovementComponent
-            {
-                Direction = float2.zero,
-                Speed = enemyInitializeComponent.MovementSpeed
-            });
-            entityManager.AddComponentData(enemyEntity, new HealthComponent
-            {
-                MaxValue = enemyInitializeComponent.MaxHealth,
-                CurrentValue = enemyInitializeComponent.MaxHealth
-            });
-            entityManager.AddComponentData(enemyEntity, new WeaponComponent
-            {
-                DamageValue = enemyInitializeComponent.WeaponDamage,
-                AttackRange = enemyInitializeComponent.AttackRange,
-                CoolDown = enemyInitializeComponent.AttackCoolDown
-            });
-            entityManager.AddComponentData(enemyEntity, new IdleStateComponent
-            {
-                StartedAt = Time.time
-            });
-            entityManager.AddComponentData(enemyEntity, new PositionComponent
-            {
-                InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
-            });
-            GameObject.Destroy(enemyInitializeComponent);
-            entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
+            #region UI
+            UIManager.Instance.Initialize();
+            #endregion
         }
 
         public void FixedUpdate()
