@@ -43,7 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fe2cd17fe25a1c4c9a7c7a5e858e092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 0}
+  PlayerPrefab: {fileID: 1826596988420284, guid: 2114688a494587a4cbd70b5fb17aafd2,
+    type: 3}
   EnemyPrefab: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b,
     type: 3}
   BloodSplashPrefab: {fileID: 1330043094642214, guid: 2820c598d9786754ca4a397df088a312,

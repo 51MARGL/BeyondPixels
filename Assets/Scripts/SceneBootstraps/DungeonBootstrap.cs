@@ -100,51 +100,8 @@ namespace BeyondPixels.SceneBootstraps
             }
             #endregion
 
-            #region PlayerEntityArchetype
-            var player = PrefabManager.Instance.PlayerPrefab;
-            var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
-            var playerInitializeComponent = player.GetComponent<PlayerInitializeComponent>();
-            entityManager.AddComponent(playerEntity, typeof(PlayerComponent));
-            entityManager.AddComponent(playerEntity, typeof(InputComponent));
-
-            entityManager.AddComponentData(playerEntity, new CharacterComponent
-            {
-                CharacterType = CharacterType.Player
-            });
-            entityManager.AddComponentData(playerEntity, new MovementComponent
-            {
-                Direction = float2.zero,
-                Speed = playerInitializeComponent.MovementSpeed
-            });
-            entityManager.AddComponentData(playerEntity, new HealthComponent
-            {
-                MaxValue = playerInitializeComponent.MaxHealth,
-                CurrentValue = playerInitializeComponent.MaxHealth
-            });
-            entityManager.AddComponentData(playerEntity, new WeaponComponent
-            {
-                DamageValue = playerInitializeComponent.WeaponDamage
-            });
-            entityManager.AddComponentData(playerEntity, new PositionComponent
-            {
-                InitialPosition = new float2(player.transform.position.x, player.transform.position.y)
-            });
-            GameObject.Destroy(playerInitializeComponent);
-            entityManager.RemoveComponent<PlayerInitializeComponent>(playerEntity);
-            #endregion
-
-            #region spellInit
-            for (int i = 0; i < 3; i++)
-            {
-                var spellEntity = entityManager.CreateEntity(typeof(ActiveSpellComponent));
-                entityManager.SetComponentData(spellEntity, new ActiveSpellComponent
-                {
-                    Owner = playerEntity,
-                    ActionIndex = i + 1,
-                    SpellIndex = i
-                });
-            }
-            #endregion
+            
+           
             #region UI
             UIManager.Instance.Initialize();
             #endregion

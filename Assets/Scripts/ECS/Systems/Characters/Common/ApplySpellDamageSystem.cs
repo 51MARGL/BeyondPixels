@@ -1,14 +1,12 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Spells;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
-namespace BeyondPixels.ECS.Systems.Spells
+namespace BeyondPixels.ECS.Systems.Common
 {
-    public class ApplyDamageSystem : JobComponentSystem
+    public class ApplySpellDamageSystem : JobComponentSystem
     {
         private struct ApplyDamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, SpellCollisionComponent, DamageComponent>
         {

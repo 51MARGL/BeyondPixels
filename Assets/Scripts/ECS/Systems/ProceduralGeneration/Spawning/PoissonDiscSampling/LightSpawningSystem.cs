@@ -135,7 +135,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 All = new ComponentType[]
                 {
-                    typeof(DungeonTileMapComponent)
+                    typeof(DungeonTileMapComponent),
+                    typeof(Transform)
                 }
             });
         }
@@ -149,23 +150,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 if (!TileMapSystem.TileMapDrawing && _samplesGroup.CalculateLength() > 0)
                 {
-                    var tileMapChunks = _tileMapGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-                    DungeonTileMapComponent tileMapComponent = null;
-                    Transform tileMapTransform = null;
-                    for (int c = 0; c < tileMapChunks.Length; c++)
-                    {
-                        var chunk = tileMapChunks[c];
-                        var entities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
-                        for (int i = 0; i < chunk.Count; i++)
-                        {
-                            tileMapComponent = EntityManager.GetComponentObject<DungeonTileMapComponent>(entities[i]);
-                            tileMapTransform = EntityManager.GetComponentObject<Transform>(entities[i]);
-                        }
-                    }
+                    var tileMapComponent = _tileMapGroup.ToComponentArray<DungeonTileMapComponent>()[0];
+                    var tileMapTransform = _tileMapGroup.ToComponentArray<Transform>()[0];
 
                     var samplesArray = _samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
                     var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
-                    
+
                     for (int i = 0; i < samplesArray.Length; i++)
                         if (samplesArray[i].RequestID == SystemRequestID)
                             samplesList.Add(samplesArray[i]);
@@ -190,7 +180,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
-                    tileMapChunks.Dispose();
                 }
             }
             return inputDeps;

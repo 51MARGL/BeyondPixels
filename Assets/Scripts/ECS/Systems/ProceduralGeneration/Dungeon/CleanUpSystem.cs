@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using Unity.Collections;
 using Unity.Entities;
@@ -16,7 +17,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 ComponentType.ReadOnly(typeof(FinalBoardComponent)),
                 ComponentType.ReadOnly(typeof(TilemapReadyComponent)),
                 ComponentType.ReadOnly(typeof(EnemiesSpawnedComponent)),
-                ComponentType.ReadOnly(typeof(LightsSpawnedComponent))
+                ComponentType.ReadOnly(typeof(LightsSpawnedComponent)),
+                ComponentType.ReadOnly(typeof(PlayerSpawnedComponent))
             );
             _tileGroup = GetComponentGroup(
                ComponentType.ReadOnly(typeof(FinalTileComponent)));
