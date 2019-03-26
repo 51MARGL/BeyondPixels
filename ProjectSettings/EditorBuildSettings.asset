@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/DungeonScene.unity
+    guid: eff8235c09547664fade9af32123c963
   m_configObjects: {}
