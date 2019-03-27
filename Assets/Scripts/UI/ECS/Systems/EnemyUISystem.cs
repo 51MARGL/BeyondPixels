@@ -37,6 +37,9 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                  SpriteRenderer spriteRenderer,
                  EnemyUIComponent enemyUIComponent) =>
             {
+                if (Camera.main == null)
+                    return;
+
                 // if object is vissible by main camera
                 if (GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(Camera.main),
                                                     spriteRenderer.bounds)) 

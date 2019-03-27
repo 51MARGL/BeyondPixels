@@ -113,50 +113,7 @@ namespace BeyondPixels.SceneBootstraps
         }
 
         public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.KeypadPlus))
-            {
-                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-                for (int i = 0; i < 20; i++)
-                {
-                    var randomPositon = new Vector2(UnityEngine.Random.Range(-25f, 25f), UnityEngine.Random.Range(-25f, 25f));
-                    var enemy = GameObject.Instantiate(PrefabManager.Instance.EnemyPrefab, randomPositon, Quaternion.identity);
-                    var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
-                    var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
-
-                    entityManager.AddComponentData(enemyEntity, new CharacterComponent
-                    {
-                        CharacterType = CharacterType.Enemy
-                    });
-                    entityManager.AddComponentData(enemyEntity, new MovementComponent
-                    {
-                        Direction = float2.zero,
-                        Speed = enemyInitializeComponent.MovementSpeed
-                    });
-                    entityManager.AddComponentData(enemyEntity, new HealthComponent
-                    {
-                        MaxValue = enemyInitializeComponent.MaxHealth,
-                        CurrentValue = enemyInitializeComponent.MaxHealth
-                    });
-                    entityManager.AddComponentData(enemyEntity, new WeaponComponent
-                    {
-                        DamageValue = enemyInitializeComponent.WeaponDamage,
-                        AttackRange = enemyInitializeComponent.AttackRange,
-                        CoolDown = enemyInitializeComponent.AttackCoolDown
-                    });
-                    entityManager.AddComponentData(enemyEntity, new IdleStateComponent
-                    {
-                        StartedAt = Time.time
-                    });
-                    entityManager.AddComponentData(enemyEntity, new PositionComponent
-                    {
-                        InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
-                    });
-                    GameObject.Destroy(enemyInitializeComponent);
-                    entityManager.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
-                }
-            }
-
+        {            
             if (Input.GetKeyDown(KeyCode.M))
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();

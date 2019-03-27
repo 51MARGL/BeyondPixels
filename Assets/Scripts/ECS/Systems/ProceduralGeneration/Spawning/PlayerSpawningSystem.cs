@@ -87,11 +87,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 for (int y = startY; yCond(y, endY); y += yStep)
                     for (int x = startX; xCond(x, endX); x += xStep)
                         if (tiles[y * boardSize.x + x].TileType == TileType.Floor
+                            && tiles[(y + 1) * boardSize.x + x].TileType == TileType.Wall
+                            && tiles[(y + 1) * boardSize.x + (x + 1)].TileType == TileType.Wall
+                            && tiles[(y + 1) * boardSize.x + (x - 1)].TileType == TileType.Wall
                             && tiles[y * boardSize.x + (x + 1)].TileType == TileType.Floor
                             && tiles[y * boardSize.x + (x - 1)].TileType == TileType.Floor
-                            && tiles[(y + 1) * boardSize.x + x].TileType == TileType.Floor
                             && tiles[(y - 1) * boardSize.x + x].TileType == TileType.Floor)
-                            playerPosition = new float3(x + 0.5f, y + 0.5f, 0);
+                            playerPosition = new float3(x + 0.5f, y + 1.3f, 0);
 
                 if (!playerPosition.Equals(float3.zero))
                     PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
@@ -171,7 +173,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             #endregion
 
             #region camera
-            var camera = GameObject.Find("CM vcam1").GetComponent<CinemachineVirtualCamera>();
+            var camera = GameObject.Find("PlayerVCamera").GetComponent<CinemachineVirtualCamera>();
             camera.Follow = player.transform;
             camera.LookAt = player.transform;
             #endregion

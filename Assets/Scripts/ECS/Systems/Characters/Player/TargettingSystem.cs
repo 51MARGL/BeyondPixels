@@ -24,9 +24,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         }
 
         protected override void OnUpdate()
-        {
+        {            
             Entities.With(_playerGroup).ForEach((Entity entity, ref InputComponent inputComponent, ref PositionComponent positionComponent) =>
             {
+                if (Camera.main == null)
+                    return;
+
                 if (inputComponent.MouseButtonClicked == 1
                      && !EventSystem.current.IsPointerOverGameObject())
                 {
