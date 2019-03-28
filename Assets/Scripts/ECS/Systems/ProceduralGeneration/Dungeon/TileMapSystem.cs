@@ -8,7 +8,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
+namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class TileMapSystem : ComponentSystem

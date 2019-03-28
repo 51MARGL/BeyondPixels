@@ -1,7 +1,7 @@
 ﻿using BeyondPixels.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP;
+using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;

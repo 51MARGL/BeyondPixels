@@ -259,7 +259,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         private struct InstantiateTilesJob : IJobParallelFor
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
-            [DeallocateOnJobCompletion]
             [ReadOnly]
             public NativeArray<TileType> Tiles;
 
@@ -268,15 +267,28 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute(int index)
             {
-                for (int x = 0; x < TileStride; x++)
-                {
-                    var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, new FinalTileComponent
+                if (IsBoardValid())
+                    for (int x = 0; x < TileStride; x++)
                     {
-                        TileType = Tiles[(index * TileStride) + x],
-                        Position = new int2(x, index)
-                    });
-                }
+                        var entity = CommandBuffer.CreateEntity(index);
+                        CommandBuffer.AddComponent(index, entity, new FinalTileComponent
+                        {
+                            TileType = Tiles[(index * TileStride) + x],
+                            Position = new int2(x, index)
+                        });
+                    }
+            }
+
+            private bool IsBoardValid()
+            {
+                var freeTilesCount = 0;
+                for (int i = 0; i < Tiles.Length; i++)
+                    if (Tiles[i] == TileType.Floor)
+                        freeTilesCount++;
+
+                if (freeTilesCount < 50)
+                    return false;
+                return true;
             }
         }
 
@@ -286,18 +298,53 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             [ReadOnly]
             public Entity BoardEntity;
             [ReadOnly]
-            public int2 BoardSize;
+            public BoardComponent BoardComponent;
             [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<TileType> Tiles;
+            [ReadOnly]
+            public int RandomSeed;
+
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
             public NativeArray<NodeComponent> TreeArray;
 
             public void Execute()
             {
-                CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
-                var finalBoardComponent = CommandBuffer.CreateEntity();
-                CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                if (IsBoardValid())
                 {
-                    Size = BoardSize
-                });
+                    CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
+                    var finalBoardComponent = CommandBuffer.CreateEntity();
+                    CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    {
+                        Size = BoardComponent.Size
+                    });
+                }
+                else
+                {
+                    var random = new Random((uint)RandomSeed);
+
+                    var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 175));
+                    var board = CommandBuffer.CreateEntity();
+                    CommandBuffer.AddComponent(board, new BoardComponent
+                    {
+                        Size = randomSize,
+                        MinRoomSize = BoardComponent.MinRoomSize
+                    });
+                    CommandBuffer.DestroyEntity(BoardEntity);
+                }
+            }
+
+            private bool IsBoardValid()
+            {
+                var freeTilesCount = 0;
+                for (int i = 0; i < Tiles.Length; i++)
+                    if (Tiles[i] == TileType.Floor)
+                        freeTilesCount++;
+
+                if (freeTilesCount < 50)
+                    return false;
+                return true;
             }
         }
 
@@ -423,8 +470,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         {
                             CommandBuffer = _endFrameBarrier.CreateCommandBuffer(),
                             BoardEntity = boardEntity,
-                            BoardSize = board.Size,
-                            TreeArray = TreeArray
+                            BoardComponent = board,
+                            TreeArray = TreeArray,
+                            Tiles = Tiles,
+                            RandomSeed = random.NextInt()
                         }.Schedule(instantiateTilesJobHandle);
                         _endFrameBarrier.AddJobHandleForProducer(inputDeps);
                     }

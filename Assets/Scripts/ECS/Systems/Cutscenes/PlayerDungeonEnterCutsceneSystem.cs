@@ -59,11 +59,15 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 {
                     var player = transform.gameObject;
                     var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonEnter;
+                    if (!director.enabled)
+                        director.enabled = true;
+
                     void onStop(PlayableDirector aDirector)
                     {
                         cutsceneDone = true;
                         rigidbody.isKinematic = false;
                         director.stopped -= onStop;
+                        director.enabled = false;
                     }
                     director.stopped += onStop;
 

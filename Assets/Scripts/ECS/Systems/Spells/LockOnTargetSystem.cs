@@ -45,25 +45,26 @@ namespace BeyondPixels.ECS.Systems.Spells
         }
         private ComponentGroup _spellGroup;
         private ComponentGroup _targetGroup;
-        private NativeArray<ComponentType> _spellComponentArray;
-        private NativeArray<ComponentType> _targetComponentArray;
 
         protected override void OnCreateManager()
         {
-            _spellComponentArray = new NativeArray<ComponentType>(5, Allocator.Persistent);
-            _spellComponentArray[0] = typeof(SpellComponent);
-            _spellComponentArray[1] = typeof(LockOnTargetComponent);
-            _spellComponentArray[2] = typeof(TargetRequiredComponent);
-            _spellComponentArray[3] = typeof(UnityEngine.Transform);
-            _spellComponentArray[4] = ComponentType.Exclude(typeof(DestroyComponent));
-
-            _spellGroup = GetComponentGroup(_spellComponentArray);
-
-            _targetComponentArray = new NativeArray<ComponentType>(2, Allocator.Persistent);
-            _targetComponentArray[0] = typeof(PositionComponent);
-            _targetComponentArray[1] = typeof(CharacterComponent);
-
-            _targetGroup = GetComponentGroup(_targetComponentArray);
+            _spellGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(SpellComponent), typeof(LockOnTargetComponent),
+                    typeof(TargetRequiredComponent), typeof(Transform)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(DestroyComponent)
+                }
+            });
+            _targetGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[] {
+                    typeof(CharacterComponent), typeof(PositionComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -75,12 +76,6 @@ namespace BeyondPixels.ECS.Systems.Spells
                 EntityType = GetArchetypeChunkEntityType(),
                 PositionComponentType = GetArchetypeChunkComponentType<PositionComponent>()
             }.Schedule(_spellGroup.GetTransformAccessArray(), inputDeps);
-        }
-
-        protected override void OnDestroyManager()
-        {
-            _spellComponentArray.Dispose();
-            _targetComponentArray.Dispose();
         }
     }
 }

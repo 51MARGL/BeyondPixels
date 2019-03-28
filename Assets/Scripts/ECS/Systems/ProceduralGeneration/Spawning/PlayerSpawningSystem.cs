@@ -109,7 +109,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 
         private void RemoveEnemiesAround(float3 position, int radius)
         {
-            var layerMask = LayerMask.GetMask("Clickable");
+            var layerMask = LayerMask.GetMask("Enemy");
 
             var hits = Physics2D.OverlapCircleAll(new Vector2(position.x, position.y),
                                                   radius, layerMask);

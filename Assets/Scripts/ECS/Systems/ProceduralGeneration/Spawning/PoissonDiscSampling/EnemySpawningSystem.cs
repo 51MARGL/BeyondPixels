@@ -2,7 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP;
+using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
 using Unity.Entities;
@@ -177,6 +177,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
             var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
 
+            commandBuffer.AddComponent(enemyEntity, new Disabled());
             commandBuffer.AddComponent(enemyEntity, new CharacterComponent
             {
                 CharacterType = CharacterType.Enemy

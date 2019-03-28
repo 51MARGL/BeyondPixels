@@ -33,6 +33,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         }
         protected override void OnUpdate()
         {
+            if (_damageGroup.CalculateLength() == 0)
+                return;
+
             var positions = new NativeArray<float2>(_damageGroup.CalculateLength(), Allocator.TempJob);
 
             var k = 0;

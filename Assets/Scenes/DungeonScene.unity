@@ -33,9 +33,9 @@ RenderSettings:
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
-  m_DefaultReflectionResolution: 128
+  m_DefaultReflectionResolution: 16
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
@@ -70,7 +70,7 @@ LightmapSettings:
     m_FinalGather: 0
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
-    m_ReflectionCompression: 2
+    m_ReflectionCompression: 1
     m_MixedBakeMode: 2
     m_BakeBackend: 1
     m_PVRSampling: 1
@@ -2629,12 +2629,27 @@ PrefabInstance:
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
       propertyPath: DungeonGenerators.BSP.BoardHeight
-      value: 50
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
       propertyPath: DungeonGenerators.BSP.BoardWidth
-      value: 50
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
+        type: 3}
+      propertyPath: DungeonGenerators.CellularAutomaton.BoardWidth
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
+        type: 3}
+      propertyPath: DungeonGenerators.CellularAutomaton.BoardHeight
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
+        type: 3}
+      propertyPath: DungeonGenerators.CellularAutomaton.RandomFillPercent
+      value: 70
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
@@ -3293,6 +3308,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TileMapVCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 6845050222596926516, guid: 5ac937f450a3ab04d881514fc0216f2c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6845050222596926517, guid: 5ac937f450a3ab04d881514fc0216f2c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3513,12 +3533,12 @@ PrefabInstance:
     - target: {fileID: 8461676774943256122, guid: 01048d769dcf677438cbc9c822ce1c69,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.145565
+      value: -2.364315
       objectReference: {fileID: 0}
     - target: {fileID: 8461676774943256122, guid: 01048d769dcf677438cbc9c822ce1c69,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -49.125267
+      value: -50.687767
       objectReference: {fileID: 0}
     - target: {fileID: 8461676774943256122, guid: 01048d769dcf677438cbc9c822ce1c69,
         type: 3}
@@ -3528,7 +3548,7 @@ PrefabInstance:
     - target: {fileID: 8461676774943256122, guid: 01048d769dcf677438cbc9c822ce1c69,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.13052624
+      value: -0.1305262
       objectReference: {fileID: 0}
     - target: {fileID: 8461676774943256122, guid: 01048d769dcf677438cbc9c822ce1c69,
         type: 3}
@@ -3564,6 +3584,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8423085316355450444, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_Follow
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8423085316355450444, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_LookAt
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01048d769dcf677438cbc9c822ce1c69, type: 3}

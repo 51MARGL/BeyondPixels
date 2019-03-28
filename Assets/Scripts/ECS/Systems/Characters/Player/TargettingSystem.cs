@@ -34,26 +34,24 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                      && !EventSystem.current.IsPointerOverGameObject())
                 {
                     var ray = Camera.main.ScreenPointToRay(inputComponent.MousePosition);
-                    var layerMask = LayerMask.GetMask("Clickable");
+                    var layerMask = LayerMask.GetMask("Enemy");
                     var raycastHit = Physics2D.GetRayIntersection(ray, 100f, layerMask);
 
                     if (raycastHit.transform != null)
                     {
-                        if (raycastHit.transform.CompareTag("Enemy"))
-                        {
-                            if (!EntityManager.HasComponent<TargetComponent>(entity))
-                                PostUpdateCommands.AddComponent(entity,
-                                    new TargetComponent
-                                    {
-                                        Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
-                                    });
-                            else
-                                PostUpdateCommands.SetComponent(entity,
-                                    new TargetComponent
-                                    {
-                                        Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
-                                    });
-                        }
+
+                        if (!EntityManager.HasComponent<TargetComponent>(entity))
+                            PostUpdateCommands.AddComponent(entity,
+                                new TargetComponent
+                                {
+                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                });
+                        else
+                            PostUpdateCommands.SetComponent(entity,
+                                new TargetComponent
+                                {
+                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                });
                     }
                     else
                         PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
@@ -61,11 +59,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 }
                 else if (inputComponent.SelectTargetButtonPressed == 1)
                 {
-                    var layerMask = LayerMask.GetMask("Clickable");
+                    var layerMask = LayerMask.GetMask("Enemy");
 
-                    var width = (Camera.main.ViewportToWorldPoint(new Vector3(1.0F, 0.0F, 10)) 
+                    var width = (Camera.main.ViewportToWorldPoint(new Vector3(1.0F, 0.0F, -Camera.main.transform.position.z)) 
                                 - Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 0.0F, -Camera.main.transform.position.z))).x;
-                    var heigth = (Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 1.0F, 10)) 
+                    var heigth = (Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 1.0F, -Camera.main.transform.position.z)) 
                                 - Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 0.0F, -Camera.main.transform.position.z))).y;
 
                     var hits = Physics2D.BoxCastAll(Camera.main.transform.position, 
