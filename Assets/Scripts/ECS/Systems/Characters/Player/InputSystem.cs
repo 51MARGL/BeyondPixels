@@ -11,6 +11,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
     public class InputSystem : JobComponentSystem
     {
         [BurstCompile]
+        [ExcludeComponent(typeof(InCutsceneComponent))]
         private struct InputJob : IJobProcessComponentData<InputComponent, MovementComponent>
         {
             public float2 Direction;

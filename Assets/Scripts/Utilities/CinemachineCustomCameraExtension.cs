@@ -14,6 +14,8 @@ namespace BeyondPixels.Utilities
     {
         [Tooltip("Lock the camera's Z position to this value")]
         public float m_ZPosition = -9;
+        [Tooltip("Lock the camera's X rotation to this value")]
+        public float m_XRotation = -15;
         [Tooltip("PPU value")]
         public float m_PixelsPerUnit = 32;
 
@@ -24,8 +26,11 @@ namespace BeyondPixels.Utilities
             if (enabled && stage == CinemachineCore.Stage.Body)
             {
                 var pos = state.RawPosition;
+                var rot = state.RawOrientation;
                 pos = new Vector3(Round(pos.x), Round(pos.y), this.m_ZPosition);
+                rot = Quaternion.Euler(m_XRotation, 0, 0);
                 state.RawPosition = pos;
+                state.RawOrientation = rot;
             }
         }
 

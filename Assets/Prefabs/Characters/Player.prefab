@@ -451,6 +451,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c17d4724700e444298c9d0a89c12dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MovementSpeed: 5
+  MovementSpeed: 4
   MaxHealth: 125
   WeaponDamage: 10

@@ -47,7 +47,7 @@ namespace BeyondPixels.UI.ECS.Systems
         {
             var deltaTime = Time.deltaTime;
             var uiComponent = UIManager.Instance.UIComponent;
-            var spellBook = UIManager.Instance.SpellBook;
+            var spellBook = SpellBookManagerComponent.Instance.SpellBook;
 
             Entities.With(_playerGroup).ForEach((Entity palyerEntity, ref HealthComponent healthComponent) =>
             {

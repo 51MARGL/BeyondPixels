@@ -1,18 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using BeyondPixels.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.Characters.Player;
+﻿using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Cutscenes;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using Cinemachine;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Tilemaps;
 
 namespace BeyondPixels.ECS.Systems.Cutscenes
 {
@@ -23,7 +16,8 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
 
         private ComponentGroup _boardCameraGroup;
         private ComponentGroup _playerGroup;
-
+        private ComponentGroup _playerDoneCutSceneGroup;
+        private bool cutsceneDone;
         protected override void OnCreateManager()
         {
             _boardCameraGroup = GetComponentGroup(new EntityArchetypeQuery
@@ -42,6 +36,17 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 All = new ComponentType[]
                 {
                     typeof(Transform), typeof(PlayerComponent), typeof(Rigidbody2D)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(InCutsceneComponent)
+                }
+            });
+            _playerDoneCutSceneGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(InCutsceneComponent), typeof(PlayerComponent), typeof(Rigidbody2D)
                 }
             });
         }
@@ -54,7 +59,9 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 {
                     var player = transform.gameObject;
                     var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonEnter;
-                    void onStop(PlayableDirector aDirector) {
+                    void onStop(PlayableDirector aDirector)
+                    {
+                        cutsceneDone = true;
                         rigidbody.isKinematic = false;
                         director.stopped -= onStop;
                     }
@@ -71,10 +78,18 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                             director.SetGenericBinding(playableAssetOutput.sourceObject, player);
                         }
                     }
+                    cutsceneDone = false;
                     rigidbody.isKinematic = true;
+                    PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
                     director.Play();
                 });
                 PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());
+            });
+
+            Entities.With(_playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
+            {
+                if (cutsceneDone)
+                    PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
             });
         }
     }

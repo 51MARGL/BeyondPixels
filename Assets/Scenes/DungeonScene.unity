@@ -2629,12 +2629,12 @@ PrefabInstance:
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
       propertyPath: DungeonGenerators.BSP.BoardHeight
-      value: 75
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
       propertyPath: DungeonGenerators.BSP.BoardWidth
-      value: 130
+      value: 50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
