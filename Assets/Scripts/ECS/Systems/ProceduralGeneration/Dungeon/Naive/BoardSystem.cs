@@ -498,7 +498,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             if (first && forceDirection != -1)
                 direction = (Direction)forceDirection;
-            else if (!first && random.NextInt(0, 100) > 50) //50% chance to go further from center
+            else if (!first && random.NextInt(0, 100) > 25) //25% chance to go further from center
             {
                 var centerX = (int)math.round(board.Size.x / 2f);
                 var centerY = (int)math.round(board.Size.y / 2f);

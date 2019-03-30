@@ -184,8 +184,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                var widthStep = Board.Size.x / math.clamp(Board.Size.x / 50, 10, Board.Size.x);
-                var heightStep = Board.Size.y / math.clamp(Board.Size.y / 50, 10, Board.Size.y);
+                var widthStep = Board.Size.x / math.clamp(Board.Size.x / 50, 1, Board.Size.x);
+                var heightStep = Board.Size.y / math.clamp(Board.Size.y / 50, 1, Board.Size.y);
                 var currentIndex = 0;
                 for (int y = 0; y < Board.Size.y; y += heightStep)
                 {

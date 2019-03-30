@@ -68,7 +68,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 15, y: 10}
+  m_Size: {x: 18, y: 16}
   m_EdgeRadius: 0
 --- !u!1 &1046374558792940
 GameObject:
@@ -132,7 +132,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 2304
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 1b2a87cee44d35e468a41f8ed6a437b2, type: 2}
   m_TargetDisplay: 0
@@ -223,7 +223,7 @@ Light:
   m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 2816
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -246,7 +246,7 @@ GameObject:
   - component: {fileID: 4369704550959168}
   - component: {fileID: 70570521028159862}
   - component: {fileID: 114944815126228672}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: Weapon
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -305,7 +305,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4566278323330194}
   - component: {fileID: 70492073133497494}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: HitBox
   m_TagString: Hitbox
   m_Icon: {fileID: 0}
@@ -357,7 +357,7 @@ GameObject:
   - component: {fileID: 95341007333754256}
   - component: {fileID: 114867925024508442}
   - component: {fileID: 3495159259676345203}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
