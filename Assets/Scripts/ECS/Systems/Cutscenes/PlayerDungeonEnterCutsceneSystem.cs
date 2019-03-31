@@ -3,6 +3,7 @@ using BeyondPixels.ECS.Components.Cutscenes;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
+using BeyondPixels.SceneBootstraps;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -15,7 +16,6 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
         private struct PlayerEnterCutsceneTriggeredComponent : IComponentData { }
 
         private ComponentGroup _boardCameraGroup;
-        private ComponentGroup _playerGroup;
         private ComponentGroup _playerDoneCutSceneGroup;
         private bool cutsceneDone;
         protected override void OnCreateManager()
@@ -31,17 +31,6 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                     typeof(PlayerEnterCutsceneTriggeredComponent)
                 }
             });
-            _playerGroup = GetComponentGroup(new EntityArchetypeQuery
-            {
-                All = new ComponentType[]
-                {
-                    typeof(Transform), typeof(PlayerComponent), typeof(Rigidbody2D)
-                },
-                None = new ComponentType[]
-                {
-                    typeof(InCutsceneComponent)
-                }
-            });
             _playerDoneCutSceneGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
@@ -55,38 +44,42 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
         {
             Entities.With(_boardCameraGroup).ForEach((Entity boardEntity, ref FinalBoardComponent finalBoardComponent) =>
             {
-                Entities.With(_playerGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
+                var player = GameObject.FindGameObjectWithTag("Player");
+                var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
+                var rigidbody = player.GetComponent<Rigidbody2D>();
+                var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonEnter;
+                var levelEnter = GameObject.Instantiate(PrefabManager.Instance.DungeonLevelEnter, player.transform.position, Quaternion.identity);
+                if (!director.enabled)
+                    director.enabled = true;
+
+                void onStop(PlayableDirector aDirector)
                 {
-                    var player = transform.gameObject;
-                    var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonEnter;
-                    if (!director.enabled)
-                        director.enabled = true;
+                    cutsceneDone = true;
+                    rigidbody.isKinematic = false;
+                    director.stopped -= onStop;
+                    director.enabled = false;
+                }
+                director.stopped += onStop;
 
-                    void onStop(PlayableDirector aDirector)
+                foreach (var playableAssetOutput in director.playableAsset.outputs)
+                {
+                    if (playableAssetOutput.streamName == "PlayerAnim")
                     {
-                        cutsceneDone = true;
-                        rigidbody.isKinematic = false;
-                        director.stopped -= onStop;
-                        director.enabled = false;
+                        director.SetGenericBinding(playableAssetOutput.sourceObject, player);
                     }
-                    director.stopped += onStop;
-
-                    foreach (var playableAssetOutput in director.playableAsset.outputs)
+                    else if (playableAssetOutput.streamName == "PlayerMove")
                     {
-                        if (playableAssetOutput.streamName == "PlayerAnim")
-                        {
-                            director.SetGenericBinding(playableAssetOutput.sourceObject, player);
-                        }
-                        else if (playableAssetOutput.streamName == "PlayerMove")
-                        {
-                            director.SetGenericBinding(playableAssetOutput.sourceObject, player);
-                        }
+                        director.SetGenericBinding(playableAssetOutput.sourceObject, player);
                     }
-                    cutsceneDone = false;
-                    rigidbody.isKinematic = true;
-                    PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
-                    director.Play();
-                });
+                    else if (playableAssetOutput.streamName == "CaveFall")
+                    {
+                        director.SetGenericBinding(playableAssetOutput.sourceObject, levelEnter);
+                    }
+                }
+                cutsceneDone = false;
+                rigidbody.isKinematic = true;
+                PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                director.Play();
                 PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());
             });
 

@@ -9,7 +9,9 @@ namespace BeyondPixels.Components.ProceduralGeneration.Dungeon
         public Tilemap TilemapWalls;
         public Tilemap TilemapWallsTop;
         public Tilemap TilemapWallsAnimated;
+        public Tilemap TilemapMinimap;
         public Tile GroundTile;
+        public Tile MinimapTile;
         public RuleTile WallTile;
         public RuleTile WallTileTop;
         public AnimatedTile WallTorchAnimatedTile;

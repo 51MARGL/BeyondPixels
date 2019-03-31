@@ -52,10 +52,10 @@ MonoBehaviour:
     Description: Sets target on fire
     CastTime: 1
     Duration: 3
-    CoolDown: 15
-    DamageOnImpact: 3
-    DamagePerSecond: 2
-    DamageType: 1
+    CoolDown: 25
+    DamageOnImpact: 15
+    DamagePerSecond: 5
+    DamageType: 3
     LockOnTarget: 1
     SelfTarget: 0
     TargetRequired: 1
@@ -67,9 +67,9 @@ MonoBehaviour:
     CastTime: 1.5
     Duration: 0.1
     CoolDown: 20
-    DamageOnImpact: 10
+    DamageOnImpact: 25
     DamagePerSecond: 0
-    DamageType: 2
+    DamageType: 3
     LockOnTarget: 1
     SelfTarget: 0
     TargetRequired: 1

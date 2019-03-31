@@ -143,8 +143,9 @@ namespace BeyondPixels.SceneBootstraps
             }
             #endregion
 
-            
-           
+
+            var initPrefabManager = PrefabManager.Instance;
+            var initSpellBookManager = SpellBookManagerComponent.Instance;
             #region UI
             UIManager.Instance.Initialize();
             #endregion

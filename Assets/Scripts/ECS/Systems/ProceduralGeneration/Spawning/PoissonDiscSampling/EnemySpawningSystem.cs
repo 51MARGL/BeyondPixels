@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Characters.AI;
+﻿using System.Linq;
+using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
@@ -32,10 +33,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 {
                     GridSize = boardSize,
                     SamplesLimit = 30,
-                    Radius = 7,
-                    RequestID = SystemRequestID
-
+                    RequestID = SystemRequestID,
+                    RadiusFromArray = 1
                 });
+                for (int i = 0; i < PrefabManager.Instance.EnemyPrefabs.Length; i++)
+                {
+                    var entity = CommandBuffer.CreateEntity(index);
+                    CommandBuffer.AddComponent(index, entity, new PoissonRadiusComponent
+                    {
+                        Radius = PrefabManager.Instance.EnemyPrefabs[i].SpawnRadius,
+                        RequestID = SystemRequestID
+                    });
+                }
                 for (int y = 0; y < boardSize.y; y++)
                     for (int x = 0; x < boardSize.x; x++)
                     {
@@ -149,7 +158,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                     inputDeps.Complete();
                     for (int i = 0; i < samplesList.Length; i++)
-                        InstantiateEnemy(samplesList[i].Position);
+                        InstantiateEnemy(samplesList[i].Position, samplesList[i].Radius);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -169,10 +178,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateEnemy(int2 position)
+        private void InstantiateEnemy(int2 position, int radius)
         {
             var commandBuffer = _endFrameBarrier.CreateCommandBuffer();
-            var enemy = Object.Instantiate(PrefabManager.Instance.EnemyPrefab,
+            var enemy = Object.Instantiate(PrefabManager.Instance.EnemyPrefabs.FirstOrDefault(e => e.SpawnRadius == radius).Prefab,
                 new Vector3(position.x + 0.5f, position.y + 0.5f, 0), Quaternion.identity);
             var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
             var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();

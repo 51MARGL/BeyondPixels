@@ -1,13 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using BeyondPixels.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using Cinemachine;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace BeyondPixels.ECS.Systems.Cutscenes
 {

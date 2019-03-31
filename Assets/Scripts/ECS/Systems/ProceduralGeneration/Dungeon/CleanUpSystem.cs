@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.Components.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using Unity.Collections;
@@ -10,6 +11,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
     {
         private ComponentGroup _boardGroup;
         private ComponentGroup _tileGroup;
+        private ComponentGroup _tilemapGroup;
 
         protected override void OnCreateManager()
         {
@@ -22,6 +24,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             );
             _tileGroup = GetComponentGroup(
                ComponentType.ReadOnly(typeof(FinalTileComponent)));
+            _tilemapGroup = GetComponentGroup(
+               ComponentType.ReadOnly(typeof(DungeonTileMapComponent)));
         }
 
         protected override void OnUpdate()
@@ -31,6 +35,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
             DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
             DeleteAllEntities(this._tileGroup.CreateArchetypeChunkArray(Allocator.TempJob));
+
+            Entities.With(_tilemapGroup).ForEach((Entity entity) =>
+            {
+                PostUpdateCommands.AddComponent(entity, new Disabled());
+            });
         }
 
         private void DeleteAllEntities(NativeArray<ArchetypeChunk> chunks)
