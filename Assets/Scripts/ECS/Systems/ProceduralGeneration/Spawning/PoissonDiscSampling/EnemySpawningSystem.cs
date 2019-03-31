@@ -49,15 +49,26 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     for (int x = 0; x < boardSize.x; x++)
                     {
                         var entity = CommandBuffer.CreateEntity(index);
+                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize);
                         CommandBuffer.AddComponent(index, entity, new PoissonCellComponent
                         {
-                            SampleIndex = Tiles[y * boardSize.x + x].TileType == TileType.Floor ? -1 : -2,
+                            SampleIndex = validationIndex,
                             Position = Tiles[y * boardSize.x + x].Position,
                             RequestID = SystemRequestID
                         });
                     }
 
                 CommandBuffer.AddComponent(index, boardEntity, new EnemiesSpawnStartedComponent());
+            }
+
+            private int GetValidationIndex(int tileIndex, int2 boardSize)
+            {
+                var tile = Tiles[tileIndex];
+                if (tile.TileType == TileType.Floor
+                    && Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor)
+                    return -1;
+
+                return -2;
             }
         }
 

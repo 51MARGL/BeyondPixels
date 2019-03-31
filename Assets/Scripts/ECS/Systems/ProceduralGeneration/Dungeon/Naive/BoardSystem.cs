@@ -266,7 +266,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     var random = new Random((uint)RandomSeed);
 
                     var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 175));
-                    var roomCount = randomSize.x * randomSize.y / 100;
+                    var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(10, 20);
                     var board = CommandBuffer.CreateEntity();
                     CommandBuffer.AddComponent(board, new BoardComponent
                     {

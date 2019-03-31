@@ -50,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 mapCamTargetGroup.m_Targets[3].target = rt.transform;
 
                 groupCamera.Follow = mapCamTargetGroup.transform;
-                groupCamera.LookAt = mapCamTargetGroup.transform;
+                //groupCamera.LookAt = mapCamTargetGroup.transform;
 
                 PostUpdateCommands.AddComponent(entity, new BoardCameraInitializedComponent());
             });

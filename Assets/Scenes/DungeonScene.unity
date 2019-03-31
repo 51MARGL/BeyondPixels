@@ -447,7 +447,7 @@ MonoBehaviour:
   updateColor: 1
   allowDrag: 1
   frequency: 0.5
-  nbDecimal: 1
+  nbDecimal: 0
 --- !u!4 &515830687
 Transform:
   m_ObjectHideFlags: 0
@@ -1110,11 +1110,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TileMapVCamera
-      objectReference: {fileID: 0}
-    - target: {fileID: 6845050222596926516, guid: 5ac937f450a3ab04d881514fc0216f2c,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6845050222596926517, guid: 5ac937f450a3ab04d881514fc0216f2c,
         type: 3}

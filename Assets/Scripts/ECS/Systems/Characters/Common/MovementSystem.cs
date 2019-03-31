@@ -3,7 +3,6 @@ using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.Utilities;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Jobs;
@@ -11,36 +10,8 @@ using UnityEngine.Jobs;
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     [UpdateInGroup(typeof(FixedUpdateSystemGroup))]
-    public class MovementSystem : JobComponentSystem
+    public class MovementSystem : ComponentSystem
     {
-        public struct MovementJob : IJobParallelForTransform
-        {
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<MovementComponent> MovementComponents;
-
-            public float DeltaTime;
-
-            public void Execute(int index, TransformAccess transform)
-            {
-                if (MovementComponents[index].Direction.Equals(float2.zero))
-                    return;
-
-                var velocity =
-                    math.normalize(MovementComponents[index].Direction) *
-                    MovementComponents[index].Speed *
-                    DeltaTime;
-
-                transform.position += new Vector3(velocity.x, velocity.y, 0f);
-
-                var scale = math.abs(transform.localScale.x);
-                if (velocity.x < 0f)
-                    transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
-                else if (velocity.x > 0f)
-                    transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
-            }
-        }
-
         private ComponentGroup _group;
 
         protected override void OnCreateManager()
@@ -50,24 +21,40 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 All = new ComponentType[]
                 {
                     ComponentType.ReadOnly(typeof(MovementComponent)),
-                    typeof(UnityEngine.Transform)
+                    typeof(UnityEngine.Transform),
+                    typeof(UnityEngine.Rigidbody2D)
                 },
                 None = new ComponentType[]
                 {
-                    typeof(AttackComponent)
-                }
+                    ComponentType.ReadOnly(typeof(InCutsceneComponent))
+                },
             });
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            var transformArray = _group.GetTransformAccessArray();
-            var deltaTime = Time.deltaTime;
-            return new MovementJob
+            Entities.With(_group).ForEach((Entity entity, ref MovementComponent movementComponent, Rigidbody2D rigidbody, Transform transform) =>
             {
-                MovementComponents = _group.ToComponentDataArray<MovementComponent>(Allocator.TempJob),
-                DeltaTime = deltaTime
-            }.Schedule(transformArray, inputDeps);
+                var newPosition = new float2(transform.position.x, transform.position.y);
+
+                if (!EntityManager.HasComponent<AttackComponent>(entity) 
+                    && !movementComponent.Direction.Equals(float2.zero))
+                {
+                    var velocity = math.normalize(movementComponent.Direction) *
+                        movementComponent.Speed *
+                        Time.deltaTime;
+
+                    newPosition += velocity;
+
+                    var scale = math.abs(transform.localScale.x);
+                    if (velocity.x < 0f)
+                        transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
+                    else if (velocity.x > 0f)
+                        transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
+                }
+
+                rigidbody.MovePosition(newPosition);
+            });
         }
     }
 }

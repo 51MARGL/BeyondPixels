@@ -52,12 +52,13 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
                             movementComponent.Direction = targetPosition.CurrentPosition - positionComponent.CurrentPosition;
                             var distance = math.distance(targetPosition.CurrentPosition, positionComponent.CurrentPosition);
+                            if (distance <= weaponComponent.AttackRange)
+                                movementComponent.Direction = float2.zero;
 
                             if (distance <= weaponComponent.AttackRange
                                 && CurrentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
                             {
                                 followStateComponent.LastTimeAttacked = CurrentTime;
-                                movementComponent.Direction = float2.zero;
                                 CommandBuffer.AddComponent(index, entity,
                                     new AttackStateComponent
                                     {
