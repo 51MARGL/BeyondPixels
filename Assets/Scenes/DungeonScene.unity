@@ -1037,6 +1037,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 1538367443916898170, guid: d90062516bbc3d343a0c313cfce8ecc4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1538367443916898167, guid: d90062516bbc3d343a0c313cfce8ecc4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1096,6 +1101,11 @@ PrefabInstance:
         type: 3}
       propertyPath: far clip plane
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1538367443916898164, guid: d90062516bbc3d343a0c313cfce8ecc4,
+        type: 3}
+      propertyPath: m_Depth
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d90062516bbc3d343a0c313cfce8ecc4, type: 3}
@@ -1382,6 +1392,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8424832116419011868, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_LookaheadSmoothing
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8424832116419011868, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_LookaheadTime
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8424832116419011868, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_DeadZoneHeight
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8424832116419011868, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_XDamping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8424832116419011868, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_YDamping
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01048d769dcf677438cbc9c822ce1c69, type: 3}

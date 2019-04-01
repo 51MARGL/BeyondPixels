@@ -35,16 +35,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         {
             Entities.With(_group).ForEach((Entity entity, ref MovementComponent movementComponent, Rigidbody2D rigidbody, Transform transform) =>
             {
-                var newPosition = new float2(transform.position.x, transform.position.y);
+                var velocity = new float2();
 
                 if (!EntityManager.HasComponent<AttackComponent>(entity) 
                     && !movementComponent.Direction.Equals(float2.zero))
                 {
-                    var velocity = math.normalize(movementComponent.Direction) *
-                        movementComponent.Speed *
-                        Time.deltaTime;
-
-                    newPosition += velocity;
+                    velocity = math.normalize(movementComponent.Direction) *
+                        movementComponent.Speed;
 
                     var scale = math.abs(transform.localScale.x);
                     if (velocity.x < 0f)
@@ -53,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                         transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
                 }
 
-                rigidbody.MovePosition(newPosition);
+                rigidbody.velocity = velocity;
             });
         }
     }

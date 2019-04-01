@@ -175,7 +175,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             #region camera
             var camera = GameObject.Find("PlayerVCamera").GetComponent<CinemachineVirtualCamera>();
             camera.Follow = player.transform;
-            //camera.LookAt = player.transform;
+            camera.LookAt = player.transform;
             #endregion
         }
     }
