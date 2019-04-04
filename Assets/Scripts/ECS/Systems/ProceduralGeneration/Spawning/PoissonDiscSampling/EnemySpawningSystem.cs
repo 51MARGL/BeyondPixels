@@ -10,6 +10,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
 {
@@ -196,6 +197,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 new Vector3(position.x + 0.5f, position.y + 0.5f, 0), Quaternion.identity);
             var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
             var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
+            var navMeshAgent = enemy.GetComponent<NavMeshAgent>();
+            navMeshAgent.updatePosition = false;
+            navMeshAgent.updateRotation = false;
+            navMeshAgent.updateUpAxis = false;
 
             commandBuffer.AddComponent(enemyEntity, new Disabled());
             commandBuffer.AddComponent(enemyEntity, new CharacterComponent

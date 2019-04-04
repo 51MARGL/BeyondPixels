@@ -29,8 +29,7 @@ namespace BeyondPixels.ColliderEvents
 
         private void OnTriggerExit2D(Collider2D collider)
         {
-            if (collider.gameObject.CompareTag("Player")
-                && this.gameObject.layer == collider.gameObject.layer)
+            if (collider.gameObject.CompareTag("Player"))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
                 var sender = GetComponentInParent<GameObjectEntity>().Entity;

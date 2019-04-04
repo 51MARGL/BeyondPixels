@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b4cc0c69f6ec29b489d1c984b42e7634
+guid: 862e726d66e2dcd46b888114315562d9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 21300000
-    second: wall-top-corner-right_0
+      213: -4570104441738109162
+    second: wall-ddown-corner-right-top_0
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -46,8 +46,8 @@ TextureImporter:
   spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.55, y: 0.65}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -85,50 +85,26 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: iPhone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
-  - serializedVersion: 3
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: wall-top-corner-right_0
+      name: wall-ddown-corner-right-top_0
       rect:
         serializedVersion: 2
-        x: 4
-        y: 0
+        x: 0
+        y: 16
         width: 32
-        height: 54
+        height: 16
       alignment: 9
-      pivot: {x: 0.5, y: 0.7037037}
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 14390c73491a66846801a65393620970
-      internalID: 21300000
+      spriteID: d927ba5f702647243aa14abc2e8ee0fb
+      internalID: -4570104441738109162
       vertices: []
       indices: 
       edges: []
@@ -136,7 +112,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 7f2ee7b41d2af0e40aee1279db0a08b3
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 

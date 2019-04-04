@@ -18,6 +18,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             public NativeArray<ArchetypeChunk> TargetChunks;
             [ReadOnly]
             public ArchetypeChunkEntityType EntityType;
+            [ReadOnly]
+            public ArchetypeChunkComponentType<FollowStateComponent> FollowStateComponentType;
 
             public void Execute(Entity entity,
                                 int index,
@@ -34,14 +36,16 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                             switch (collisionInfo.EventType)
                             {
                                 case EventType.TriggerEnter:
-                                    CommandBuffer.AddComponent(index, collisionInfo.Sender,
-                                        new FollowStateComponent
-                                        {
-                                            Target = collisionInfo.Target
-                                        });
+                                    if (!chunk.Has(FollowStateComponentType))
+                                        CommandBuffer.AddComponent(index, collisionInfo.Sender,
+                                            new FollowStateComponent
+                                            {
+                                                Target = collisionInfo.Target
+                                            });
                                     break;
                                 case EventType.TriggerExit:
-                                    CommandBuffer.RemoveComponent<FollowStateComponent>(index, collisionInfo.Sender);
+                                    if (chunk.Has(FollowStateComponentType))
+                                        CommandBuffer.RemoveComponent<FollowStateComponent>(index, collisionInfo.Sender);
                                     break;
                             }
                             CommandBuffer.DestroyEntity(index, entity);
@@ -67,7 +71,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 },
                 None = new ComponentType[]
                 {
-                    typeof(PlayerComponent), typeof(FollowStateComponent)
+                    typeof(PlayerComponent)
                 }
             });
         }
@@ -78,7 +82,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             {
                 CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 TargetChunks = _targetGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = GetArchetypeChunkEntityType()
+                EntityType = GetArchetypeChunkEntityType(),
+                FollowStateComponentType = GetArchetypeChunkComponentType<FollowStateComponent>()
             }.Schedule(this, inputDeps);
             _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;

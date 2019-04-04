@@ -93,7 +93,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                             && tiles[y * boardSize.x + (x + 1)].TileType == TileType.Floor
                             && tiles[y * boardSize.x + (x - 1)].TileType == TileType.Floor
                             && tiles[(y - 1) * boardSize.x + x].TileType == TileType.Floor)
-                            playerPosition = new float3(x + 0.5f, y + 1.3f, 0);
+                            playerPosition = new float3(x + 0.5f, y + 1.75f, 0);
 
                 if (!playerPosition.Equals(float3.zero))
                     PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());

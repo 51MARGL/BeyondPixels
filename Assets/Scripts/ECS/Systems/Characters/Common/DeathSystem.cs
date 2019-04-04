@@ -1,44 +1,55 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Objects;
+using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
+using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    public class DeathSystem : JobComponentSystem
-    {
-        [ExcludeComponent(typeof(DestroyComponent))]
-        private struct DamageJob : IJobProcessComponentDataWithEntity<HealthComponent, CharacterComponent>
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-
-            public void Execute(Entity entity, int index,
-                                [ReadOnly] ref HealthComponent healthComponent,
-                                [ReadOnly] ref CharacterComponent characterComponent)
-            {
-                if (healthComponent.CurrentValue <= 0)
-                {
-                    CommandBuffer.AddComponent(index, entity, new DestroyComponent());
-                    return;
-                }
-            }
-        }
-        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+    public class DeathSystem : ComponentSystem
+    {       
+        private ComponentGroup _group;
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            _group = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(HealthComponent), typeof(CharacterComponent),
+                    typeof(PositionComponent)
+                }
+            });
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            var handle = new DamageJob
+            if (_group.CalculateLength() == 0)
+                return;
+
+            var positions = new NativeArray<float2>(_group.CalculateLength(), Allocator.TempJob);
+
+            var k = 0;
+            Entities.With(_group).ForEach((Entity entity, ref HealthComponent healthComponent, ref PositionComponent positionComponent) =>
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-            }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
-            return handle;
+                if (healthComponent.CurrentValue <= 0)
+                {
+                    PostUpdateCommands.AddComponent(entity, new DestroyComponent());
+                    positions[k++] = positionComponent.CurrentPosition;
+                }
+            });
+
+            for (int i = 0; i < k; i++)
+            {
+                GameObject.Instantiate(PrefabManager.Instance.BloodDecalsPrefabs[UnityEngine.Random.Range(0, PrefabManager.Instance.BloodDecalsPrefabs.Length)],
+                                       new float3(positions[i].x, positions[i].y, 0),
+                                       Quaternion.identity);
+
+            }
+            positions.Dispose();
         }
     }
 }

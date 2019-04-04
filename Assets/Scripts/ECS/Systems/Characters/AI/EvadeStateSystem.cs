@@ -1,64 +1,62 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     [UpdateBefore(typeof(FollowStateSystem))]
-    public class EvadeStateSystem : JobComponentSystem
+    public class EvadeStateSystem : ComponentSystem
     {
-        [ExcludeComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
-        private struct EvadeStateJob :
-            IJobProcessComponentDataWithEntity<MovementComponent, PositionComponent, EvadeStateComponent>
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            public float CurrentTime;
+        private ComponentGroup _evadeGroup;
 
-            public void Execute(Entity entity,
-                                int index,
-                                ref MovementComponent movementComponent,
-                                [ReadOnly] ref PositionComponent positionComponent,
-                                [ReadOnly] ref EvadeStateComponent evadeComponent)
+        protected override void OnCreateManager()
+        {
+            _evadeGroup = GetComponentGroup(new EntityArchetypeQuery
             {
-                //If the distance is larger than trashold then keep moving                
-                if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) > 1f)
-                    movementComponent.Direction =
-                        positionComponent.InitialPosition - positionComponent.CurrentPosition;
+                All = new ComponentType[]
+                {
+                    typeof(MovementComponent), typeof(EvadeStateComponent),
+                    typeof(PositionComponent), typeof(NavMeshAgent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(AttackStateComponent), typeof(FollowStateComponent)
+                }
+            });
+        }
+
+        protected override void OnUpdate()
+        {
+            Entities.With(_evadeGroup).ForEach((Entity entity,
+                                                NavMeshAgent navMeshAgent,
+                                                ref MovementComponent movementComponent,
+                                                ref PositionComponent positionComponent) =>
+            {
+                if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) > 0.5f)
+                {
+                    var curr = new Vector3(positionComponent.CurrentPosition.x, positionComponent.CurrentPosition.y, 0);
+                    var dest = new Vector3(positionComponent.InitialPosition.x, positionComponent.InitialPosition.y, 0);
+                    navMeshAgent.nextPosition = curr;
+                    navMeshAgent.SetDestination(dest);
+
+                    if (navMeshAgent.path.status == NavMeshPathStatus.PathComplete)
+                        movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                }
                 else
                 {
                     movementComponent.Direction = float2.zero;
 
-                    CommandBuffer.RemoveComponent(index, entity, typeof(EvadeStateComponent));
-                    CommandBuffer.AddComponent(index, entity,
+                    PostUpdateCommands.RemoveComponent(entity, typeof(EvadeStateComponent));
+                    PostUpdateCommands.AddComponent(entity,
                         new IdleStateComponent
                         {
-                            StartedAt = CurrentTime
+                            StartedAt = Time.time
                         });
                 }
-            }
-        }
-
-        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-
-        protected override void OnCreateManager()
-        {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-        }
-
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
-        {
-            var handle = new EvadeStateJob
-            {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                CurrentTime = Time.time
-            }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
-            return handle;
+            });
         }
     }
 }

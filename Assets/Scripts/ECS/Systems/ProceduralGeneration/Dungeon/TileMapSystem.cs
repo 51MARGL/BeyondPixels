@@ -94,6 +94,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             var centerY = (int)math.floor(boardSize.y / 2f);
             var count = (int)math.ceil(math.max(boardSize.x, boardSize.y) / 2f);
 
+            yield return null;
+
             for (int i = 0; i < count; i++)
             {
                 var yTop = centerY + i > boardSize.y - 1 ? boardSize.y - 1 : centerY + i;

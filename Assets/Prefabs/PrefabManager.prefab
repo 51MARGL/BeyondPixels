@@ -47,13 +47,18 @@ MonoBehaviour:
     type: 3}
   BloodSplashPrefab: {fileID: 1330043094642214, guid: 2820c598d9786754ca4a397df088a312,
     type: 3}
+  BloodDecalsPrefabs:
+  - {fileID: 6250254475546219725, guid: 51e431f8966d5a54c955c60a070b4a3b, type: 3}
+  - {fileID: 2983014437520916021, guid: 6a8904e38b210604da385229f2278a63, type: 3}
+  - {fileID: 6748265837116855380, guid: bb67993ceca48a24bae829ca0dfd8613, type: 3}
+  - {fileID: 8000130385975943323, guid: cc2e4f8020a663044a6654b0c6575c69, type: 3}
   DungeonLevelEnter: {fileID: 4273776425823705421, guid: 83fbeabbf6a33954e80e0efc586820b5,
     type: 3}
   EnemyPrefabs:
   - SpawnRadius: 7
     Prefab: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}
   - SpawnRadius: 9
-    Prefab: {fileID: 5052099226303656509, guid: e510273cf265b2847ba3016f90012046,
+    Prefab: {fileID: 5052851933621197252, guid: e510273cf265b2847ba3016f90012046,
       type: 3}
   - SpawnRadius: 15
-    Prefab: {fileID: 309658852677841168, guid: c402636d0ea6df84490f5cb75078f516, type: 3}
+    Prefab: {fileID: 310711406105402089, guid: c402636d0ea6df84490f5cb75078f516, type: 3}

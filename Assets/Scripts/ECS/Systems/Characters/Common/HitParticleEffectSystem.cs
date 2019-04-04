@@ -51,9 +51,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             });
 
             for (int i = 0; i < k; i++)
+            {
                 GameObject.Instantiate(PrefabManager.Instance.BloodSplashPrefab,
                                        new float3(positions[i].x, positions[i].y, -1),
                                        Quaternion.identity);
+            }
             positions.Dispose();
         }
     }

@@ -2,83 +2,32 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
-    public class FollowStateSystem : JobComponentSystem
+    public class FollowStateSystem : ComponentSystem
     {
-        [ExcludeComponent(typeof(AttackStateComponent))]
-        private struct FollowStateJob :
-            IJobProcessComponentDataWithEntity<MovementComponent, FollowStateComponent, WeaponComponent, PositionComponent>
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> TargetChunks;
-            [ReadOnly]
-            public ArchetypeChunkEntityType EntityType;
-            [ReadOnly]
-            public ArchetypeChunkComponentType<PositionComponent> PositionComponentType;
-            [ReadOnly]
-            public float CurrentTime;
-
-            public void Execute(Entity entity,
-                                int index,
-                                ref MovementComponent movementComponent,
-                                ref FollowStateComponent followStateComponent,
-                                [ReadOnly] ref WeaponComponent weaponComponent,
-                                [ReadOnly] ref PositionComponent positionComponent)
-            {
-                if (TargetChunks.Length == 0)
-                {
-                    CommandBuffer.RemoveComponent<FollowStateComponent>(index, entity);
-                    return;
-                }
-
-                for (int c = 0; c < TargetChunks.Length; c++)
-                {
-                    var chunk = TargetChunks[c];
-                    var entities = chunk.GetNativeArray(EntityType);
-                    var positionComponents = chunk.GetNativeArray(PositionComponentType);
-                    for (int i = 0; i < chunk.Count; i++)
-                        if (entities[i] == followStateComponent.Target)
-                        {
-                            var targetPosition = positionComponents[i];
-
-                            movementComponent.Direction = targetPosition.CurrentPosition - positionComponent.CurrentPosition;
-                            var distance = math.distance(targetPosition.CurrentPosition, positionComponent.CurrentPosition);
-                            if (distance <= weaponComponent.AttackRange)
-                                movementComponent.Direction = float2.zero;
-
-                            if (distance <= weaponComponent.AttackRange
-                                && CurrentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
-                            {
-                                followStateComponent.LastTimeAttacked = CurrentTime;
-                                CommandBuffer.AddComponent(index, entity,
-                                    new AttackStateComponent
-                                    {
-                                        StartedAt = CurrentTime,
-                                        Target = followStateComponent.Target
-                                    });
-                            }
-                            return;
-                        }
-                }
-            }
-        }
-
-        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-
+        private ComponentGroup _followGroup;
         private ComponentGroup _targetGroup;
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            _followGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(MovementComponent), typeof(FollowStateComponent),
+                    typeof(WeaponComponent), typeof(PositionComponent), typeof(NavMeshAgent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(AttackStateComponent)
+                }
+            });
             _targetGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
@@ -92,18 +41,62 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             });
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            var handle = new FollowStateJob
+            Entities.With(_followGroup).ForEach((Entity entity,
+                                                NavMeshAgent navMeshAgent,
+                                                ref MovementComponent movementComponent,
+                                                ref FollowStateComponent followStateComponent,
+                                                ref WeaponComponent weaponComponent,
+                                                ref PositionComponent positionComponent) =>
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                TargetChunks = _targetGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = GetArchetypeChunkEntityType(),
-                PositionComponentType = GetArchetypeChunkComponentType<PositionComponent>(),
-                CurrentTime = Time.time
-            }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
-            return handle;
+                if (_targetGroup.CalculateLength() == 0)
+                {
+                    PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
+                    return;
+                }
+
+                var flwStateComponent = followStateComponent;
+                var wpnComponent = weaponComponent;
+                var currentPosition = positionComponent.CurrentPosition;
+                var mvmComponent = movementComponent;
+
+                Entities.With(_targetGroup).ForEach((Entity playerEntity, ref PositionComponent playerPositionComponent) =>
+                {
+                    if (playerEntity == flwStateComponent.Target)
+                    {
+                        var distance = math.distance(playerPositionComponent.CurrentPosition, currentPosition);
+                        if (distance <= wpnComponent.AttackRange)
+                            mvmComponent.Direction = float2.zero;
+                        else
+                        {
+                            var curr = new Vector3(currentPosition.x, currentPosition.y, 0);
+                            var dest = new Vector3(playerPositionComponent.CurrentPosition.x, playerPositionComponent.CurrentPosition.y, 0);
+                            navMeshAgent.nextPosition = curr;
+                            navMeshAgent.SetDestination(dest);
+
+                            if (navMeshAgent.path.status == NavMeshPathStatus.PathComplete)
+                                mvmComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                        }
+
+                        var currentTime = Time.time;
+                        if (distance <= wpnComponent.AttackRange
+                            && currentTime - flwStateComponent.LastTimeAttacked > wpnComponent.CoolDown)
+                        {
+                            flwStateComponent.LastTimeAttacked = currentTime;
+                            PostUpdateCommands.AddComponent(entity,
+                                new AttackStateComponent
+                                {
+                                    StartedAt = currentTime,
+                                    Target = flwStateComponent.Target
+                                });
+                        }
+                        return;
+                    }
+                });
+                followStateComponent = flwStateComponent;
+                movementComponent = mvmComponent;
+            });
         }
     }
 }
