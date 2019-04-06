@@ -23,11 +23,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                     ComponentType.ReadOnly(typeof(MovementComponent)),
                     typeof(UnityEngine.Transform),
                     typeof(UnityEngine.Rigidbody2D)
-                },
-                None = new ComponentType[]
-                {
-                    ComponentType.ReadOnly(typeof(InCutsceneComponent))
-                },
+                }
             });
         }
 

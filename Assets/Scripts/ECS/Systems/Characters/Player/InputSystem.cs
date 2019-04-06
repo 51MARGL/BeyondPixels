@@ -54,7 +54,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 direction += new float2(0, -1);
             if (Input.GetKeyDown(KeyCode.Space))
                 attackPressed = 1;
-            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.E))
+            if (Input.GetMouseButtonDown(0))
                 mouseClicked = 1;
             if (Input.GetKeyDown(KeyCode.Alpha1))
                 actionButtonPressed = 1;

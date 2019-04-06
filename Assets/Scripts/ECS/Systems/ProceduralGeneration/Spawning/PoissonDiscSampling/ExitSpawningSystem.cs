@@ -1,30 +1,27 @@
-﻿using System.Linq;
-using BeyondPixels.ECS.Components.Characters.AI;
-using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
 {
-    public class EnemySpawningSystem : JobComponentSystem
+    public class ExitSpawningSystem : JobComponentSystem
     {
-        private const int SystemRequestID = 1;
+        private const int SystemRequestID = 3;
 
-        private struct EnemiesSpawnStartedComponent : IComponentData { }
+        private struct ExitSpawnStartedComponent : IComponentData { }
         private struct InitializeValidationGridJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<FinalTileComponent> Tiles;
+            public float2 PlayerPosition;
 
             public void Execute(Entity boardEntity, int index, ref FinalBoardComponent finalBoardComponent)
             {
@@ -35,17 +32,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     GridSize = boardSize,
                     SamplesLimit = 30,
                     RequestID = SystemRequestID,
-                    RadiusFromArray = 1
+                    Radius = 30
                 });
-                for (int i = 0; i < PrefabManager.Instance.EnemyPrefabs.Length; i++)
-                {
-                    var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, new PoissonRadiusComponent
-                    {
-                        Radius = PrefabManager.Instance.EnemyPrefabs[i].SpawnRadius,
-                        RequestID = SystemRequestID
-                    });
-                }
                 for (int y = 0; y < boardSize.y; y++)
                     for (int x = 0; x < boardSize.x; x++)
                     {
@@ -59,13 +47,22 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                         });
                     }
 
-                CommandBuffer.AddComponent(index, boardEntity, new EnemiesSpawnStartedComponent());
+                CommandBuffer.AddComponent(index, boardEntity, new ExitSpawnStartedComponent());
             }
 
             private int GetValidationIndex(int tileIndex, int2 boardSize)
             {
                 var tile = Tiles[tileIndex];
-                if (tile.TileType == TileType.Floor)
+                if (tile.TileType == TileType.Wall
+                    && math.distance(PlayerPosition, tile.Position) >= 30
+                    && tile.Position.x > 2 && tile.Position.x < boardSize.x - 2
+                    && tile.Position.y > 2 && tile.Position.y < boardSize.y - 2
+                    && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor
+                    && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
+                    && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
+                    && Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
+                    && Tiles[(tile.Position.y) * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
+                    && Tiles[(tile.Position.y) * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall)
                     return -1;
 
                 return -2;
@@ -78,7 +75,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             public void Execute(Entity entity, int index, [ReadOnly] ref FinalBoardComponent finalBoardComponent)
             {
-                CommandBuffer.AddComponent(index, entity, new EnemiesSpawnedComponent());
+                CommandBuffer.AddComponent(index, entity, new ExitSpawnedComponent());
             }
         }
 
@@ -113,22 +110,23 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 All = new ComponentType[]
                 {
-                    typeof(FinalBoardComponent)
+                    typeof(FinalBoardComponent),
+                    typeof(PlayerSpawnedComponent)
                 },
                 None = new ComponentType[]
                 {
-                    typeof(EnemiesSpawnStartedComponent)
+                    typeof(ExitSpawnStartedComponent)
                 }
             });
             _boardSpawnReadyGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
-                    typeof(FinalBoardComponent), typeof(EnemiesSpawnStartedComponent)
+                    typeof(FinalBoardComponent), typeof(ExitSpawnStartedComponent)
                 },
                 None = new ComponentType[]
                 {
-                    typeof(EnemiesSpawnedComponent)
+                    typeof(ExitSpawnedComponent)
                 }
             });
             _samplesGroup = GetComponentGroup(new EntityArchetypeQuery
@@ -147,7 +145,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             if (_boardSpawnReadyGroup.CalculateLength() > 0)
             {
-                if (!TileMapSystem.TileMapDrawing && _samplesGroup.CalculateLength() > 0)
+                if (_samplesGroup.CalculateLength() > 0)
                 {
                     var samplesArray = _samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
                     var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
@@ -169,7 +167,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                     inputDeps.Complete();
                     for (int i = 0; i < samplesList.Length; i++)
-                        InstantiateEnemy(samplesList[i].Position, samplesList[i].Radius);
+                        InstantiateExit(samplesList[i].Position);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -180,58 +178,22 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         private JobHandle SetupValidationGrid(JobHandle inputDeps)
         {
+            var playerPos = GameObject.FindGameObjectWithTag("Player").transform.position;
+            var playerPosition = new float2(playerPos.x, playerPos.y);
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {
                 CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 Tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
+                PlayerPosition = playerPosition
             }.Schedule(this, inputDeps);
             _endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateEnemy(int2 position, int radius)
+        private void InstantiateExit(int2 position)
         {
-            var commandBuffer = _endFrameBarrier.CreateCommandBuffer();
-            var enemy = Object.Instantiate(PrefabManager.Instance.EnemyPrefabs.FirstOrDefault(e => e.SpawnRadius == radius).Prefab,
-                new Vector3(position.x + 0.5f, position.y + 0.5f, 0), Quaternion.identity);
-            var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
-            var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
-            var navMeshAgent = enemy.GetComponent<NavMeshAgent>();
-            navMeshAgent.updatePosition = false;
-            navMeshAgent.updateRotation = false;
-            navMeshAgent.updateUpAxis = false;
-
-            commandBuffer.AddComponent(enemyEntity, new Disabled());
-            commandBuffer.AddComponent(enemyEntity, new CharacterComponent
-            {
-                CharacterType = CharacterType.Enemy
-            });
-            commandBuffer.AddComponent(enemyEntity, new MovementComponent
-            {
-                Direction = float2.zero,
-                Speed = enemyInitializeComponent.MovementSpeed
-            });
-            commandBuffer.AddComponent(enemyEntity, new HealthComponent
-            {
-                MaxValue = enemyInitializeComponent.MaxHealth,
-                CurrentValue = enemyInitializeComponent.MaxHealth
-            });
-            commandBuffer.AddComponent(enemyEntity, new WeaponComponent
-            {
-                DamageValue = enemyInitializeComponent.WeaponDamage,
-                AttackRange = enemyInitializeComponent.AttackRange,
-                CoolDown = enemyInitializeComponent.AttackCoolDown
-            });
-            commandBuffer.AddComponent(enemyEntity, new IdleStateComponent
-            {
-                StartedAt = Time.time
-            });
-            commandBuffer.AddComponent(enemyEntity, new PositionComponent
-            {
-                InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
-            });
-            Object.Destroy(enemyInitializeComponent);
-            commandBuffer.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
+            var exit = Object.Instantiate(PrefabManager.Instance.DungeonLevelExit,
+                new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);
         }
     }
 }

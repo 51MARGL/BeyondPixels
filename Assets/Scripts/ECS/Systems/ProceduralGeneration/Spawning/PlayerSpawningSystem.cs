@@ -57,10 +57,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 var tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob);
                 var bottom = random.NextBool();
                 var left = random.NextBool();
-                var startX = 2;
-                var endX = boardSize.x - 2;
-                var startY = 2;
-                var endY = boardSize.y - 2;
+                var startX = 3;
+                var endX = boardSize.x - 3;
+                var startY = 3;
+                var endY = boardSize.y - 3;
                 var xStep = 1;
                 var yStep = 1;
 
@@ -70,16 +70,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 if (!bottom)
                 {
                     yStep = -1;
-                    startY = boardSize.y - 2;
-                    endY = 2;
+                    startY = boardSize.y - 3;
+                    endY = 3;
 
                     yCond = (int current, int end) => current > end;
                 }
                 if (!left)
                 {
                     xStep = -1;
-                    startX = boardSize.x - 2;
-                    endX = 2;
+                    startX = boardSize.x - 3;
+                    endX = 3;
 
                     xCond = (int current, int end) => current > end;
                 }

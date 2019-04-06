@@ -1,42 +1,41 @@
-﻿using BeyondPixels.ECS.Components.Characters.Player;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Cutscenes;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using BeyondPixels.SceneBootstraps;
+using BeyondPixels.ECS.Components.Objects;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 namespace BeyondPixels.ECS.Systems.Cutscenes
 {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class PlayerDungeonEnterCutsceneSystem : ComponentSystem
+    public class PlayerDungeonExitCutsceneSystem : ComponentSystem
     {
-        private struct PlayerEnterCutsceneTriggeredComponent : IComponentData { }
-        private struct PlayerEnterCutscenePlaying : IComponentData { }
+        private struct PlayerExitCutscenePlaying : IComponentData { }
 
-        private ComponentGroup _boardCameraGroup;
+        private ComponentGroup _triggerCutsceneGroup;
         private ComponentGroup _playerDoneCutSceneGroup;
         private bool cutsceneDone;
         protected override void OnCreateManager()
         {
-            _boardCameraGroup = GetComponentGroup(new EntityArchetypeQuery
+            _triggerCutsceneGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
-                    typeof(FinalBoardComponent), typeof(PlayerSpawnedComponent), typeof(EnemiesSpawnedComponent)
+                    typeof(PlayerExitCutsceneComponent)
                 },
                 None = new ComponentType[]
                 {
-                    typeof(PlayerEnterCutsceneTriggeredComponent)
+                    typeof(DestroyComponent)
                 }
             });
             _playerDoneCutSceneGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
-                    typeof(InCutsceneComponent), typeof(PlayerEnterCutscenePlaying),
+                    typeof(InCutsceneComponent), typeof(PlayerExitCutscenePlaying),
                     typeof(PlayerComponent), typeof(Rigidbody2D)
                 }
             });
@@ -44,13 +43,32 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
 
         protected override void OnUpdate()
         {
-            Entities.With(_boardCameraGroup).ForEach((Entity boardEntity, ref FinalBoardComponent finalBoardComponent) =>
+            Entities.With(_triggerCutsceneGroup).ForEach((Entity triggerEntity, PlayerExitCutsceneComponent playerExitCutsceneComponent) =>
             {
                 var player = GameObject.FindGameObjectWithTag("Player");
                 var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
                 var rigidbody = player.GetComponent<Rigidbody2D>();
-                var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonEnter;
-                var levelEnter = GameObject.Instantiate(PrefabManager.Instance.DungeonLevelEnter, player.transform.position, Quaternion.identity);
+                var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonExit;
+                var levelExit = playerExitCutsceneComponent.ExitCaveDoor;
+
+                var playerPosition = new float2(player.transform.position.x, player.transform.position.y);
+                var desiredPosition = new float2(levelExit.transform.position.x, levelExit.transform.position.y);
+                desiredPosition.y -= 1f;
+
+                if (!EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                    PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+
+                var movementComponent = EntityManager.GetComponentData<MovementComponent>(playerEntity);
+                if (math.abs(playerPosition.x - desiredPosition.x) > 0.05f
+                    || math.abs(playerPosition.y - desiredPosition.y) > 0.05f)
+                {
+                    movementComponent.Direction = desiredPosition - playerPosition;
+                    PostUpdateCommands.SetComponent(playerEntity, movementComponent);
+                    return;
+                }
+                movementComponent.Direction = float2.zero;
+                PostUpdateCommands.SetComponent(playerEntity, movementComponent);
+
                 if (!director.enabled)
                     director.enabled = true;
 
@@ -75,15 +93,14 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                     }
                     else if (playableAssetOutput.streamName == "CaveFall")
                     {
-                        director.SetGenericBinding(playableAssetOutput.sourceObject, levelEnter);
+                        director.SetGenericBinding(playableAssetOutput.sourceObject, levelExit);
                     }
                 }
                 cutsceneDone = false;
                 rigidbody.isKinematic = true;
-                PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
-                PostUpdateCommands.AddComponent(playerEntity, new PlayerEnterCutscenePlaying());
+                PostUpdateCommands.AddComponent(playerEntity, new PlayerExitCutscenePlaying());
                 director.Play();
-                PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());
+                PostUpdateCommands.AddComponent(triggerEntity, new DestroyComponent());
             });
 
             Entities.With(_playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
@@ -91,7 +108,8 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 if (cutsceneDone)
                 {
                     PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
-                    PostUpdateCommands.RemoveComponent<PlayerEnterCutscenePlaying>(playerEntity);
+                    PostUpdateCommands.RemoveComponent<PlayerExitCutscenePlaying>(playerEntity);
+                    SceneManager.LoadScene("DungeonScene", LoadSceneMode.Single);
                 }
             });
         }

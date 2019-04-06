@@ -45,7 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 1826596988420284, guid: 2114688a494587a4cbd70b5fb17aafd2,
     type: 3}
-  BloodSplashPrefab: {fileID: 1330043094642214, guid: 2820c598d9786754ca4a397df088a312,
+  BloodSplashPrefab: {fileID: 7299546968045762223, guid: 2d259b158f5c6bc4db9b55981c8123c6,
     type: 3}
   BloodDecalsPrefabs:
   - {fileID: 6250254475546219725, guid: 51e431f8966d5a54c955c60a070b4a3b, type: 3}
@@ -53,6 +53,8 @@ MonoBehaviour:
   - {fileID: 6748265837116855380, guid: bb67993ceca48a24bae829ca0dfd8613, type: 3}
   - {fileID: 8000130385975943323, guid: cc2e4f8020a663044a6654b0c6575c69, type: 3}
   DungeonLevelEnter: {fileID: 4273776425823705421, guid: 83fbeabbf6a33954e80e0efc586820b5,
+    type: 3}
+  DungeonLevelExit: {fileID: 6663314661412270260, guid: 595a6413d666ccb468dc63dfc6454de2,
     type: 3}
   EnemyPrefabs:
   - SpawnRadius: 7

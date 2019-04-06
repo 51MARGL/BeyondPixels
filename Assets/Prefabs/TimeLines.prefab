@@ -1,5 +1,103 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &305888359
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 305888360}
+  - component: {fileID: 305888361}
+  m_Layer: 0
+  m_Name: PlayerDungeonExit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &305888360
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305888359}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6056611791419842791}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!320 &305888361
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305888359}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+  m_InitialState: 0
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings:
+  - key: {fileID: -1816711675533181304, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -249570055614468284, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -2620132822709163942, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 8502323279622438186, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -5833949128104723921, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 4158868583377839500, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 7880170764176264471, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -3864958657145251404, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -8300253742861321429, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -8487978960889002972, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 7169693845639477831, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 2128256557735286935, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 142536244466551415, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -5933675312993357333, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -7669764910922827354, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -781086089155821096, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -6264299987080756499, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 8086318780030548306, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -851226656590179684, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -4642895493761738961, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -4674935947445656062, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -7630973889737447375, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 4842546550198053754, guid: 67291d5b1ce69444f8e1ebe3be18f5c3, type: 2}
+    value: {fileID: 0}
+  m_ExposedReferences:
+    m_References:
+    - c5ff50a847cdd1a4f8e1d66b5f0adf46: {fileID: 0}
+    - 9e3108528f0d0704eaa0483856163426: {fileID: 0}
+    - 6efa14f004a49644986855d709d010a3: {fileID: 0}
+    - 029ae82aad2c03346a4009aa8410425f: {fileID: 0}
 --- !u!1 &5301414369137495554
 GameObject:
   m_ObjectHideFlags: 0
@@ -62,10 +160,18 @@ PlayableDirector:
     value: {fileID: 0}
   - key: {fileID: -3864958657145251404, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
     value: {fileID: 0}
+  - key: {fileID: -8300253742861321429, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -8487978960889002972, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 7169693845639477831, guid: 346ab6d0a29f41340abf6a298c4f8c5d, type: 2}
+    value: {fileID: 0}
   m_ExposedReferences:
     m_References:
     - c5ff50a847cdd1a4f8e1d66b5f0adf46: {fileID: 0}
     - 9e3108528f0d0704eaa0483856163426: {fileID: 0}
+    - 6efa14f004a49644986855d709d010a3: {fileID: 0}
+    - 029ae82aad2c03346a4009aa8410425f: {fileID: 0}
 --- !u!1 &6056611791419842790
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,6 +202,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7663356497025944598}
+  - {fileID: 305888360}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -112,6 +219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerDungeonEnter: {fileID: 1937484679266385612}
+  PlayerDungeonExit: {fileID: 305888361}
 --- !u!114 &83048148
 MonoBehaviour:
   m_ObjectHideFlags: 0

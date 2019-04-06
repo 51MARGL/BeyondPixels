@@ -36,7 +36,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 },
                 None = new ComponentType[]
                 {
-                    typeof(DestroyComponent)
+                    typeof(DestroyComponent), typeof(InCutsceneComponent)
                 }
             });
         }

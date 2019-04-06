@@ -18,6 +18,7 @@ TagManager:
   - PlayerSword
   - SpellBook
   - Light
+  - UseTrigger
   layers:
   - Default
   - TransparentFX

@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 4273776425823705420}
   - component: {fileID: 4273776425823705409}
   m_Layer: 8
-  m_Name: CaveEnter
+  m_Name: CaveDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -233,7 +233,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -991866837
   m_SortingLayer: 1
-  m_SortingOrder: 40
+  m_SortingOrder: 35
   m_Sprite: {fileID: -8458036432322356483, guid: 026796b136546a94fb021c31aee5085e,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

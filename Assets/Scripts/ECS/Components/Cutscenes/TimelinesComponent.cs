@@ -6,5 +6,6 @@ namespace BeyondPixels.ECS.Components.Cutscenes
     public class TimelinesComponent : MonoBehaviour
     {
         public PlayableDirector PlayerDungeonEnter;
+        public PlayableDirector PlayerDungeonExit;
     }
 }

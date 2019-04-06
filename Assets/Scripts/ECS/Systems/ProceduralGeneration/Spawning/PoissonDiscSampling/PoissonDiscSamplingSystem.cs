@@ -24,9 +24,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             public void Execute(Entity entity, int index, [ReadOnly] ref PoissonDiscSamplingComponent poissonDiscSamplingComponent)
             {
                 var gridSize = poissonDiscSamplingComponent.GridSize;
-                var finalSamplesList = new NativeList<SampleComponent>(Allocator.Temp);
                 var requestCells = GetCellsByRequestID(poissonDiscSamplingComponent.RequestID, gridSize);
                 var validCellList = GetValidCells(requestCells);
+                var finalSamplesList = new NativeList<SampleComponent>(Allocator.Temp);
+                var currentSamplesList = new NativeList<SampleComponent>(Allocator.Temp);
                 var random = new Random((uint)RandomSeed + 1);
                 var maxRadius = poissonDiscSamplingComponent.Radius;
                 var requestRadiuses = new NativeList<int>(Allocator.Temp);
@@ -40,11 +41,37 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                                 maxRadius = Radiuses[i].Radius;
                         }
 
+                var randomIndex = random.NextInt(0, validCellList.Length);
+                var randomCell = validCellList[randomIndex];
+                var randomSample = new SampleComponent
+                {
+                    Radius = maxRadius,
+                    RequestID = poissonDiscSamplingComponent.RequestID,
+                    Position = randomCell.Position
+                };
+                currentSamplesList.Add(randomSample);
+                finalSamplesList.Add(randomSample);
+                RemoveFromValid(randomSample, validCellList);
+                var cell = requestCells[randomSample.Position.y * gridSize.x + randomSample.Position.x];
+                cell.SampleIndex = finalSamplesList.Length;
+                requestCells[randomSample.Position.y * gridSize.x + randomSample.Position.x] = cell;
 
                 while (validCellList.Length > 0)
                 {
-                    var randomCellIndex = random.NextInt(0, validCellList.Length);
-                    var randomCell = validCellList[randomCellIndex];
+                    if (currentSamplesList.Length == 0)
+                    {
+                        randomIndex = random.NextInt(0, validCellList.Length);
+                        randomCell = validCellList[randomIndex];
+                        currentSamplesList.Add(new SampleComponent
+                        {
+                            Radius = maxRadius,
+                            RequestID = poissonDiscSamplingComponent.RequestID,
+                            Position = randomCell.Position
+                        });
+                    }
+                    randomIndex = random.NextInt(0, currentSamplesList.Length);
+                    randomSample = currentSamplesList[randomIndex];
+
                     var candidateFound = false;
 
                     for (int i = 0; i < poissonDiscSamplingComponent.SamplesLimit; i++)
@@ -60,14 +87,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                             Radius = radius,
                             RequestID = poissonDiscSamplingComponent.RequestID,
                             Position =
-                            (int2)(randomCell.Position + randomDirection *
+                            (int2)(randomSample.Position + randomDirection *
                                    random.NextInt(radius, 2 * radius))
                         };
 
                         if (IsValid(candidate, gridSize, finalSamplesList, requestCells, maxRadius))
                         {
                             finalSamplesList.Add(candidate);
-                            var cell = requestCells[candidate.Position.y * gridSize.x + candidate.Position.x];
+                            RemoveFromValid(candidate, validCellList);
+                            cell = requestCells[candidate.Position.y * gridSize.x + candidate.Position.x];
                             cell.SampleIndex = finalSamplesList.Length;
                             requestCells[candidate.Position.y * gridSize.x + candidate.Position.x] = cell;
                             candidateFound = true;
@@ -75,7 +103,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                         }
                     }
                     if (!candidateFound)
-                        validCellList.RemoveAtSwapBack(randomCellIndex);
+                    {
+                        currentSamplesList.RemoveAtSwapBack(randomIndex);
+                        RemoveFromValid(randomSample, validCellList);
+                    }
                 }
 
                 for (int i = 0; i < finalSamplesList.Length; i++)
@@ -118,6 +149,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                         validCellList.Add(cells[i]);
 
                 return validCellList;
+            }
+
+            private void RemoveFromValid(SampleComponent sample, NativeList<PoissonCellComponent> validList)
+            {
+                for (int i = 0; i < validList.Length; i++)
+                    if (sample.Position.Equals(validList[i].Position))
+                    {
+                        validList.RemoveAtSwapBack(i);
+                        return;
+                    }
             }
 
             private bool IsValid(SampleComponent candidate, int2 gridSize, NativeList<SampleComponent> samples, NativeArray<PoissonCellComponent> cells, int maxRadius)
