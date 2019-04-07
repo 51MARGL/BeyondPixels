@@ -35,7 +35,7 @@ TagManager:
   - EntityEnabler
   - MiniMap
   - NavMesh
-  - 
+  - MapTopView
   - 
   - 
   - 

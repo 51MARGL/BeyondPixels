@@ -6,6 +6,7 @@ namespace BeyondPixels.SceneBootstraps
     {
         private void OnApplicationQuit()
         {
+            StopAllCoroutines();
             if (!Application.isEditor)
             {
                 System.Diagnostics.Process.GetCurrentProcess().Kill();

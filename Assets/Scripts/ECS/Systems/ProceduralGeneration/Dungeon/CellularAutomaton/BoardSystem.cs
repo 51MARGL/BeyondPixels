@@ -685,7 +685,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 {
                     var random = new Random((uint)RandomSeed);
 
-                    var randomSize = new int2(random.NextInt(150, 250), random.NextInt(100, 200));
+                    var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 150));
                     var randomFillPercent = random.NextInt(60, 75);
                     var board = CommandBuffer.CreateEntity();
                     CommandBuffer.AddComponent(board, new BoardComponent

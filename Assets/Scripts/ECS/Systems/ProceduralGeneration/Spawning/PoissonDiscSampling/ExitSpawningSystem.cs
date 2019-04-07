@@ -31,7 +31,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
                     GridSize = boardSize,
-                    SamplesLimit = 30,
+                    SamplesLimit = 50,
                     RequestID = SystemRequestID,
                     Radius = radius
                 });

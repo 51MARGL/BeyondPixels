@@ -52,7 +52,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 direction += new float2(0, 1);
             if (Input.GetKey(KeyCode.S))
                 direction += new float2(0, -1);
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.F))
                 attackPressed = 1;
             if (Input.GetMouseButtonDown(0))
                 mouseClicked = 1;

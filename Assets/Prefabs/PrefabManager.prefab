@@ -57,9 +57,9 @@ MonoBehaviour:
   DungeonLevelExit: {fileID: 6663314661412270260, guid: 595a6413d666ccb468dc63dfc6454de2,
     type: 3}
   EnemyPrefabs:
-  - SpawnRadius: 7
+  - SpawnRadius: 5
     Prefab: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}
-  - SpawnRadius: 9
+  - SpawnRadius: 6
     Prefab: {fileID: 5052851933621197252, guid: e510273cf265b2847ba3016f90012046,
       type: 3}
   - SpawnRadius: 15
