@@ -5,6 +5,9 @@ TextureImporter:
   - first:
       213: 5238810560836855311
     second: caveFallHead_5
+  - first:
+      213: 553908750372588855
+    second: caveFallHead_0
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -97,7 +100,7 @@ TextureImporter:
         width: 32
         height: 23
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -105,6 +108,27 @@ TextureImporter:
       bones: []
       spriteID: c8a28627e104d8e469506efabd7ce894
       internalID: 5238810560836855311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: caveFallHead_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 25
+        width: 32
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abac8ccece7b02a46962ea1ae65500bd
+      internalID: 553908750372588855
       vertices: []
       indices: 
       edges: []

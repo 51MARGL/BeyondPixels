@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.UI.ECS.Components;
+using TMPro;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,7 +13,7 @@ namespace BeyondPixels.UI
     public class SpellActionButton : MonoBehaviour, IPointerClickHandler
     {
         public Image CoolDownImage;
-        public Text CoolDownText;
+        public TextMeshProUGUI CoolDownText;
 
         private Image _spellIcon;
 

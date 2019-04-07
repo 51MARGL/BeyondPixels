@@ -14188,6 +14188,11 @@ PrefabInstance:
       propertyPath: m_ChunkCullingBounds.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1530352841892843695, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
+        type: 3}
+      propertyPath: OuterWallWidth
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c6ba44e23ce61349b5d405e1ee69ac1, type: 3}
 --- !u!4 &70728690 stripped
@@ -14957,6 +14962,30 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1485594333, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1485594333, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1485594332, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1485594332, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1485594331, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1485594331, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}

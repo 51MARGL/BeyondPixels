@@ -27,19 +27,38 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 var poissonDiscEntity = CommandBuffer.CreateEntity(index);
                 var boardSize = finalBoardComponent.Size;
+                var radius = 30;
                 CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
                     GridSize = boardSize,
                     SamplesLimit = 30,
                     RequestID = SystemRequestID,
-                    Radius = 30
+                    Radius = radius
                 });
+
+                var cellList = GetCells(boardSize, radius);
+                while (cellList.Length == 0)
+                {
+                    radius -= 5;
+                    cellList = GetCells(boardSize, radius);
+                }
+
+                for (int i = 0; i < cellList.Length; i++)
+                {
+                    var entity = CommandBuffer.CreateEntity(index);
+                    CommandBuffer.AddComponent(index, entity, cellList[i]);
+                }
+                CommandBuffer.AddComponent(index, boardEntity, new ExitSpawnStartedComponent());
+            }
+
+            private NativeList<PoissonCellComponent> GetCells(int2 boardSize, int radius)
+            {
+                var cellList = new NativeList<PoissonCellComponent>(Allocator.Temp);
                 for (int y = 0; y < boardSize.y; y++)
                     for (int x = 0; x < boardSize.x; x++)
                     {
-                        var entity = CommandBuffer.CreateEntity(index);
-                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize);
-                        CommandBuffer.AddComponent(index, entity, new PoissonCellComponent
+                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize, radius);
+                        cellList.Add(new PoissonCellComponent
                         {
                             SampleIndex = validationIndex,
                             Position = Tiles[y * boardSize.x + x].Position,
@@ -47,14 +66,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                         });
                     }
 
-                CommandBuffer.AddComponent(index, boardEntity, new ExitSpawnStartedComponent());
+                return cellList;
             }
 
-            private int GetValidationIndex(int tileIndex, int2 boardSize)
+            private int GetValidationIndex(int tileIndex, int2 boardSize, int radius)
             {
                 var tile = Tiles[tileIndex];
                 if (tile.TileType == TileType.Wall
-                    && math.distance(PlayerPosition, tile.Position) >= 30
+                    && math.distance(PlayerPosition, tile.Position) >= radius
                     && tile.Position.x > 2 && tile.Position.x < boardSize.x - 2
                     && tile.Position.y > 2 && tile.Position.y < boardSize.y - 2
                     && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor

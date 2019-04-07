@@ -1,4 +1,5 @@
 ﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,16 +15,16 @@ namespace BeyondPixels.UI.ECS.Components
         public class HealthGroupWrapper
         {
             public Image HealthImage;
-            public Text HealthText;
+            public TextMeshProUGUI HealthText;
         }
 
         [Serializable]
         public class SpellCastBarGroupWrapper {
             public CanvasGroup SpellCastCanvasGroup;
             public Image SpellCastBar;
-            public Text SpellCastTime;
+            public TextMeshProUGUI SpellCastTime;
             public Image SpellCastIcon;
-            public Text SpellCastName;
+            public TextMeshProUGUI SpellCastName;
         }
 
         [Serializable]
