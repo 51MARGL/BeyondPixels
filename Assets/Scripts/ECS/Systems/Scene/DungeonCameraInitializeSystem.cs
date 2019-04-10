@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace BeyondPixels.ECS.Systems.Cutscenes
+namespace BeyondPixels.ECS.Systems.Scenes
 {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class DungeonCameraInitializeSystem : ComponentSystem
@@ -23,7 +23,7 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 },
                 None = new ComponentType[]
                 {
-                    typeof(TilemapReadyComponent), typeof(BoardCameraInitializedComponent)
+                    typeof(BoardCameraInitializedComponent)
                 }
             });
         }

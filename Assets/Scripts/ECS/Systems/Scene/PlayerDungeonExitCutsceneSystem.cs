@@ -1,14 +1,14 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Cutscenes;
 using BeyondPixels.ECS.Components.Objects;
+using BeyondPixels.ECS.Components.Scenes;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
-namespace BeyondPixels.ECS.Systems.Cutscenes
+namespace BeyondPixels.ECS.Systems.Scenes
 {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class PlayerDungeonExitCutsceneSystem : ComponentSystem
@@ -109,7 +109,11 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 {
                     PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
                     PostUpdateCommands.RemoveComponent<PlayerExitCutscenePlaying>(playerEntity);
-                    SceneManager.LoadScene("DungeonScene", LoadSceneMode.Single);
+
+                    var sceneLoadEntity = PostUpdateCommands.CreateEntity();
+                    PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent {
+                        SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
+                    });
                 }
             });
         }

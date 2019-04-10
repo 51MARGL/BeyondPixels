@@ -65,12 +65,12 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                     // Heatlh 
                     var currentHealth = healthComponent.CurrentValue;
                     var maxHealth = healthComponent.MaxValue;
-                    var currentFill = (float)currentHealth / maxHealth;
+                    var currentFill = currentHealth / maxHealth;
 
                     enemyUIComponent.HealthImage.fillAmount
                         = math.lerp(enemyUIComponent.HealthImage.fillAmount, currentFill, deltaTime * 10f);
                     var displayedValue = currentHealth < 0 ? 0 : currentHealth;
-                    enemyUIComponent.HealthText.text = displayedValue + "/" + maxHealth;
+                    enemyUIComponent.HealthText.text = displayedValue.ToString("F1") + "/" + maxHealth.ToString("F1");
 
                     //Targetting image
                     enemyUIComponent.TargettingCircle.SetActive(false);

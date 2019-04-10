@@ -6,7 +6,7 @@ namespace BeyondPixels.ECS.Components.Characters.Common
 {
     public struct HealthComponent : IComponentData
     {
-        public int MaxValue;
-        public int CurrentValue;
+        public float MaxValue;
+        public float CurrentValue;
     } 
 }

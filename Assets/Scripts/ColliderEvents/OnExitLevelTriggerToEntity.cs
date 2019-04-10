@@ -1,6 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Cutscenes;
+﻿using BeyondPixels.ECS.Components.Scenes;
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents

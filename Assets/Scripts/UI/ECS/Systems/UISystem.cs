@@ -55,11 +55,11 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 var currentHealth = healthComponent.CurrentValue;
                 var maxHealth = healthComponent.MaxValue;
-                var currentFill = (float)currentHealth / maxHealth;
+                var currentFill = currentHealth / maxHealth;
 
                 playerUIHealthGroup.HealthImage.fillAmount
                     = math.lerp(playerUIHealthGroup.HealthImage.fillAmount, currentFill, deltaTime * 10f);
-                playerUIHealthGroup.HealthText.text = currentHealth + " / " + maxHealth;
+                playerUIHealthGroup.HealthText.text = currentHealth.ToString("F1") + " / " + maxHealth.ToString("F1");
 
                 if (EntityManager.HasComponent<SpellCastingComponent>(palyerEntity))
                 {

@@ -18,6 +18,7 @@ namespace BeyondPixels.SceneBootstraps
         }
 
         public GameObject PlayerPrefab;
+        public GameObject LevelUpEffectPrefab;
         public GameObject BloodSplashPrefab;
         public GameObject[] BloodDecalsPrefabs;
         public GameObject DungeonLevelEnter;

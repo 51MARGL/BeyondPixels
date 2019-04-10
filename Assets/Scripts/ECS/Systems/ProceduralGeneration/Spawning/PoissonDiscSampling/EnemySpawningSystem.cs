@@ -1,7 +1,10 @@
 ﻿using System.Linq;
 using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Level;
+using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
@@ -25,6 +28,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<FinalTileComponent> Tiles;
+            public float2 PlayerPosition;
 
             public void Execute(Entity boardEntity, int index, ref FinalBoardComponent finalBoardComponent)
             {
@@ -50,7 +54,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     for (int x = 0; x < boardSize.x; x++)
                     {
                         var entity = CommandBuffer.CreateEntity(index);
-                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize);
+                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize, 10);
                         CommandBuffer.AddComponent(index, entity, new PoissonCellComponent
                         {
                             SampleIndex = validationIndex,
@@ -62,10 +66,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 CommandBuffer.AddComponent(index, boardEntity, new EnemiesSpawnStartedComponent());
             }
 
-            private int GetValidationIndex(int tileIndex, int2 boardSize)
+            private int GetValidationIndex(int tileIndex, int2 boardSize, int radius)
             {
                 var tile = Tiles[tileIndex];
-                if (tile.TileType == TileType.Floor)
+                if (tile.TileType == TileType.Floor
+                    && math.distance(PlayerPosition, tile.Position) >= radius)
                     return -1;
 
                 return -2;
@@ -113,7 +118,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 All = new ComponentType[]
                 {
-                    typeof(FinalBoardComponent)
+                    typeof(FinalBoardComponent),
+                    typeof(PlayerSpawnedComponent)
                 },
                 None = new ComponentType[]
                 {
@@ -145,9 +151,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             if (_boardSpawnInitGroup.CalculateLength() > 0)
                 return SetupValidationGrid(inputDeps);
 
-            if (_boardSpawnReadyGroup.CalculateLength() > 0)
+            if (_boardSpawnReadyGroup.CalculateLength() > 0
+                && PlayerSpawningSystem.PlayerInstantiated)
             {
-                if (!TileMapSystem.TileMapDrawing && _samplesGroup.CalculateLength() > 0)
+                if (_samplesGroup.CalculateLength() > 0)
                 {
                     var samplesArray = _samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
                     var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
@@ -168,8 +175,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     _endFrameBarrier.AddJobHandleForProducer(inputDeps);
 
                     inputDeps.Complete();
+
+                    var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                    var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
+                    var playerLvlComponent = EntityManager.GetComponentData<LevelComponent>(playerEntity);
                     for (int i = 0; i < samplesList.Length; i++)
-                        InstantiateEnemy(samplesList[i].Position, samplesList[i].Radius);
+                        InstantiateEnemy(samplesList[i].Position, samplesList[i].Radius, playerLvlComponent, ref random);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -180,16 +191,19 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         private JobHandle SetupValidationGrid(JobHandle inputDeps)
         {
+            var playerPos = PlayerSpawningSystem.PlayerPosition;
+            var playerPosition = new float2(playerPos.x, playerPos.y);
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {
                 CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 Tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
+                PlayerPosition = playerPosition
             }.Schedule(this, inputDeps);
             _endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateEnemy(int2 position, int radius)
+        private void InstantiateEnemy(int2 position, int radius, LevelComponent playerLvlComponent, ref Unity.Mathematics.Random random)
         {
             var commandBuffer = _endFrameBarrier.CreateCommandBuffer();
             var enemy = Object.Instantiate(PrefabManager.Instance.EnemyPrefabs.FirstOrDefault(e => e.SpawnRadius == radius).Prefab,
@@ -231,6 +245,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
             });
             Object.Destroy(enemyInitializeComponent);
+
+            #region statsInit
+            var statsInitializeComponent = enemy.GetComponent<StatsInitializeComponent>();
+            var lvlComponent = statsInitializeComponent.LevelComponent;
+            lvlComponent.CurrentLevel = 
+                math.max(0, random.NextInt(playerLvlComponent.CurrentLevel - 2, 
+                                           playerLvlComponent.CurrentLevel + 2));
+
+            commandBuffer.AddComponent(enemyEntity, lvlComponent);
+            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.HealthStatComponent);
+            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.AttackStatComponent);
+            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.DefenceStatComponent);
+            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.MagicStatComponent);            
+            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.XPReawardComponent);
+            commandBuffer.AddComponent(enemyEntity, new LevelUpComponent());
+            Object.Destroy(statsInitializeComponent);
+            #endregion
+
             commandBuffer.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
         }
     }

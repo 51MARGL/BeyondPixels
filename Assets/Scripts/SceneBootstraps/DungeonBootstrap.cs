@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI;
 using BeyondPixels.Utilities;
@@ -159,7 +160,15 @@ namespace BeyondPixels.SceneBootstraps
         public void Update()
         {            
             if (Input.GetKeyDown(KeyCode.M))
-                SceneManager.LoadScene("DungeonScene", LoadSceneMode.Single);
+            {
+                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+
+                var sceneLoadEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(sceneLoadEntity, new SceneLoadComponent
+                {
+                    SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
+                });
+            }
         }
     }
 }

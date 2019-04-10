@@ -162,7 +162,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             if (_boardSpawnInitGroup.CalculateLength() > 0)
                 return SetupValidationGrid(inputDeps);
 
-            if (_boardSpawnReadyGroup.CalculateLength() > 0)
+            if (_boardSpawnReadyGroup.CalculateLength() > 0
+                && PlayerSpawningSystem.PlayerInstantiated)
             {
                 if (_samplesGroup.CalculateLength() > 0)
                 {
@@ -197,7 +198,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         private JobHandle SetupValidationGrid(JobHandle inputDeps)
         {
-            var playerPos = GameObject.FindGameObjectWithTag("Player").transform.position;
+            var playerPos = PlayerSpawningSystem.PlayerPosition;
             var playerPosition = new float2(playerPos.x, playerPos.y);
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {

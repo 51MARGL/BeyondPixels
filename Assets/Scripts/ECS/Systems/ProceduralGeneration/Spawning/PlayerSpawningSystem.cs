@@ -1,11 +1,14 @@
 ﻿using System;
 using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.Spells;
+using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
 using Cinemachine;
 using Unity.Collections;
@@ -19,6 +22,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
     {
         private ComponentGroup _tilesGroup;
         private ComponentGroup _boardGroup;
+        private ComponentGroup _boardReadyGroup;
 
         protected override void OnCreateManager()
         {
@@ -34,24 +38,38 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 All = new ComponentType[]
                 {
                     typeof(FinalBoardComponent),
-                    typeof(EnemiesSpawnedComponent),
-                    typeof(FinalBoardComponent)
+                    typeof(TilemapReadyComponent)
                 },
                 None = new ComponentType[]
                 {
                     typeof(PlayerSpawnedComponent)
                 }
             });
+            _boardReadyGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(FinalBoardComponent),
+                    typeof(PlayerSpawnedComponent),
+                    typeof(TilemapReadyComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(EnemiesSpawnedComponent)
+                }
+            });
         }
+
+        public static bool PlayerInstantiated = false;
+        public static float3 PlayerPosition = float3.zero;
 
         protected override void OnUpdate()
         {
-            if (_boardGroup.CalculateLength() == 0)
-                return;
-
-            var playerPosition = float3.zero;
             Entities.With(_boardGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
             {
+                PlayerInstantiated = false;
+                PlayerPosition = float3.zero;
+
                 var boardSize = finalBoardComponent.Size;
                 var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
                 var tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob);
@@ -93,33 +111,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                             && tiles[y * boardSize.x + (x + 1)].TileType == TileType.Floor
                             && tiles[y * boardSize.x + (x - 1)].TileType == TileType.Floor
                             && tiles[(y - 1) * boardSize.x + x].TileType == TileType.Floor)
-                            playerPosition = new float3(x + 0.5f, y + 1.75f, 0);
+                            PlayerPosition = new float3(x + 0.5f, y + 1.75f, 0);
 
-                if (!playerPosition.Equals(float3.zero))
+                if (!PlayerPosition.Equals(float3.zero))
                     PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
                 tiles.Dispose();
             });
-
-            if (playerPosition.Equals(float3.zero))
-                return;
-
-            RemoveEnemiesAround(playerPosition, 10);
-            SpawnPlayer(playerPosition);
-        }
-
-        private void RemoveEnemiesAround(float3 position, int radius)
-        {
-            var layerMask = LayerMask.GetMask("Enemy");
-
-            var hits = Physics2D.OverlapCircleAll(new Vector2(position.x, position.y),
-                                                  radius, layerMask);
-            if (hits.Length > 0)
+            if (_boardReadyGroup.CalculateLength() > 0 && !PlayerInstantiated && !TileMapSystem.TileMapDrawing)
             {
-                foreach (var collider in hits)
-                {
-                    var enemyEntity = collider.GetComponent<GameObjectEntity>().Entity;
-                    PostUpdateCommands.AddComponent(enemyEntity, new DestroyComponent());
-                }
+                SpawnPlayer(PlayerPosition);
+                PlayerInstantiated = true;
             }
         }
 
@@ -157,6 +158,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             });
             GameObject.Destroy(playerInitializeComponent);
             PostUpdateCommands.RemoveComponent<PlayerInitializeComponent>(playerEntity);
+
+            #region statsInit
+            var statsInitializeComponent = player.GetComponent<StatsInitializeComponent>();
+            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.LevelComponent);
+            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.HealthStatComponent);
+            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.AttackStatComponent);
+            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.DefenceStatComponent);
+            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.MagicStatComponent);
+            PostUpdateCommands.AddComponent(playerEntity, new XPComponent());
+            PostUpdateCommands.AddComponent(playerEntity, new LevelUpComponent());
+            GameObject.Destroy(statsInitializeComponent);
+            #endregion
             #endregion
 
             #region spellInit
@@ -177,6 +190,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             camera.Follow = player.transform;
             camera.LookAt = player.transform;
             #endregion
+
+
+            PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
         }
     }
 }

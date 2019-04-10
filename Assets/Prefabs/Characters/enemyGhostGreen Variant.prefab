@@ -62,6 +62,56 @@ PrefabInstance:
       propertyPath: AttackRange
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: HealthStatComponent.CurrentValue
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: HealthStatComponent.PerLevelValue
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: AttackStatComponent.CurrentValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: DefenceStatComponent.CurrentValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: HealthStatComponent.BaseValue
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: AttackStatComponent.BaseValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: DefenceStatComponent.BaseValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: MagicStatComponent.CurrentValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: MagicStatComponent.BaseValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: XPReawardComponent.XPAmount
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 309658852677841198, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_Name

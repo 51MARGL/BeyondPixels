@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Playables;
 
-namespace BeyondPixels.ECS.Components.Cutscenes
+namespace BeyondPixels.ECS.Components.Scenes
 {
     public class TimelinesComponent : MonoBehaviour
     {

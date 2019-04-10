@@ -1,14 +1,14 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Cutscenes;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
+using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.SceneBootstraps;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace BeyondPixels.ECS.Systems.Cutscenes
+namespace BeyondPixels.ECS.Systems.Scenes
 {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class PlayerDungeonEnterCutsceneSystem : ComponentSystem
@@ -80,7 +80,8 @@ namespace BeyondPixels.ECS.Systems.Cutscenes
                 }
                 cutsceneDone = false;
                 rigidbody.isKinematic = true;
-                PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                if (!EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                    PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
                 PostUpdateCommands.AddComponent(playerEntity, new PlayerEnterCutscenePlaying());
                 director.Play();
                 PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());

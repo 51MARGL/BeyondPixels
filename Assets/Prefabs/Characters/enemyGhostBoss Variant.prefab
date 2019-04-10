@@ -103,5 +103,45 @@ PrefabInstance:
       propertyPath: AttackRange
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: HealthStatComponent.CurrentValue
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: HealthStatComponent.PerLevelValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: AttackStatComponent.CurrentValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: DefenceStatComponent.CurrentValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: HealthStatComponent.BaseValue
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: AttackStatComponent.BaseValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: DefenceStatComponent.BaseValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: XPReawardComponent.XPAmount
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}

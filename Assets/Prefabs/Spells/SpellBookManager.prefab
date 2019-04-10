@@ -55,7 +55,7 @@ MonoBehaviour:
     CoolDown: 25
     DamageOnImpact: 5
     DamagePerSecond: 5
-    DamageType: 3
+    DamageType: 1
     LockOnTarget: 1
     SelfTarget: 0
     TargetRequired: 1
@@ -69,7 +69,7 @@ MonoBehaviour:
     CoolDown: 20
     DamageOnImpact: 25
     DamagePerSecond: 0
-    DamageType: 3
+    DamageType: 1
     LockOnTarget: 1
     SelfTarget: 0
     TargetRequired: 1
@@ -83,7 +83,7 @@ MonoBehaviour:
     CoolDown: 45
     DamageOnImpact: 0
     DamagePerSecond: -5
-    DamageType: 3
+    DamageType: 1
     LockOnTarget: 1
     SelfTarget: 1
     TargetRequired: 0
