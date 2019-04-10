@@ -251,7 +251,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             var lvlComponent = statsInitializeComponent.LevelComponent;
             lvlComponent.CurrentLevel = 
                 math.max(0, random.NextInt(playerLvlComponent.CurrentLevel - 2, 
-                                           playerLvlComponent.CurrentLevel + 2));
+                                           playerLvlComponent.CurrentLevel + 3));
 
             commandBuffer.AddComponent(enemyEntity, lvlComponent);
             commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.HealthStatComponent);
