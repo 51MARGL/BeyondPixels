@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
@@ -20,7 +22,8 @@ namespace BeyondPixels.UI.ECS.Systems
             _playerGroup = GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
-                    typeof(HealthComponent), typeof(PlayerComponent)
+                    typeof(HealthComponent), typeof(PlayerComponent),
+                    typeof(MagicStatComponent), typeof(LevelComponent), typeof(XPComponent)
                 }
             });
             _playerSpellCastingGroup = GetComponentGroup(new EntityArchetypeQuery
@@ -49,17 +52,36 @@ namespace BeyondPixels.UI.ECS.Systems
             var uiComponent = UIManager.Instance.UIComponent;
             var spellBook = SpellBookManagerComponent.Instance.SpellBook;
 
-            Entities.With(_playerGroup).ForEach((Entity palyerEntity, ref HealthComponent healthComponent) =>
+            Entities.With(_playerGroup).ForEach((Entity palyerEntity, 
+                ref HealthComponent healthComponent, 
+                ref MagicStatComponent magicStatComponent, 
+                ref LevelComponent levelComponent, 
+                ref XPComponent xpComponent) =>
             {
                 var playerUIHealthGroup = uiComponent.HealthGroup;
 
                 var currentHealth = healthComponent.CurrentValue;
                 var maxHealth = healthComponent.MaxValue;
-                var currentFill = currentHealth / maxHealth;
+                var currentHPFill = currentHealth / maxHealth;
 
                 playerUIHealthGroup.HealthImage.fillAmount
-                    = math.lerp(playerUIHealthGroup.HealthImage.fillAmount, currentFill, deltaTime * 10f);
-                playerUIHealthGroup.HealthText.text = currentHealth.ToString("F1") + " / " + maxHealth.ToString("F1");
+                    = math.lerp(playerUIHealthGroup.HealthImage.fillAmount, currentHPFill, deltaTime * 10f);
+                playerUIHealthGroup.HealthText.text = currentHealth.ToString("F1") + "/" + maxHealth.ToString("F1");
+
+
+                var playerUILevelGroup = uiComponent.LevelGroup;
+
+                var currentLevel =  levelComponent.CurrentLevel;
+                var xpToNextLevel = levelComponent.NextLevelXP;
+                var currentXP = xpComponent.CurrentXP;
+                var prevLevelXP = xpToNextLevel / 2f;
+                var currentXPFill = (currentXP - prevLevelXP) / (xpToNextLevel - prevLevelXP);
+                if (currentLevel == 1)
+                    currentXPFill = currentXP / (float)xpToNextLevel;
+
+                playerUILevelGroup.XPProgressImage.fillAmount
+                    = math.lerp(playerUILevelGroup.XPProgressImage.fillAmount, currentXPFill, deltaTime * 10f);
+                playerUILevelGroup.LevelText.text = currentLevel.ToString();
 
                 if (EntityManager.HasComponent<SpellCastingComponent>(palyerEntity))
                 {
@@ -67,14 +89,17 @@ namespace BeyondPixels.UI.ECS.Systems
                     var spellCastingComponent = EntityManager.GetComponentData<SpellCastingComponent>(palyerEntity);
                     var spellIndex = spellCastingComponent.SpellIndex;
                     var spell = spellBook.Spells[spellIndex];
-                    var timePassed = (spell.CastTime - (Time.time - spellCastingComponent.StartedAt));
+                    var castTime = math.max(1f, spell.CastTime -
+                                (spell.CastTime / 100f * magicStatComponent.CurrentValue));
+
+                    var timePassed = (castTime - (Time.time - spellCastingComponent.StartedAt));
 
                     playerUISpellBarGroup.SpellCastCanvasGroup.alpha = 1;
                     playerUISpellBarGroup.SpellCastBar.color = spell.BarColor;
                     playerUISpellBarGroup.SpellCastIcon.sprite = spell.Icon;
                     playerUISpellBarGroup.SpellCastName.text = spell.Name;
 
-                    playerUISpellBarGroup.SpellCastBar.fillAmount += 1.0f / spell.CastTime * Time.deltaTime;
+                    playerUISpellBarGroup.SpellCastBar.fillAmount += 1.0f / castTime * Time.deltaTime;
                     if (timePassed < 0)
                         playerUISpellBarGroup.SpellCastTime.text = "0";
                     else

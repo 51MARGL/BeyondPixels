@@ -1,6 +1,5 @@
-﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
-using BeyondPixels.ECS.Components.Spells;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine.SceneManagement;
@@ -11,6 +10,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
     public class SceneLoadSystem : ComponentSystem
     {
         private ComponentGroup _sceneSwitchGroup;
+        private ComponentGroup _saveGameGroup;
         protected override void OnCreateManager()
         {
             _sceneSwitchGroup = GetComponentGroup(new EntityArchetypeQuery
@@ -20,10 +20,20 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     typeof(SceneLoadComponent)
                 }
             });
+            _saveGameGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(SaveGameComponent)
+                }
+            });
         }
 
         protected override void OnUpdate()
         {
+            if (_saveGameGroup.CalculateLength() > 0)
+                return;
+
             Entities.With(_sceneSwitchGroup).ForEach((Entity entity, ref SceneLoadComponent sceneLoadComponent) =>
             {
                 SceneManager.LoadScene(sceneLoadComponent.SceneIndex, LoadSceneMode.Single);

@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
+using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -109,6 +110,9 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 {
                     PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
                     PostUpdateCommands.RemoveComponent<PlayerExitCutscenePlaying>(playerEntity);
+
+                    var saveGameEntity = PostUpdateCommands.CreateEntity();
+                    PostUpdateCommands.AddComponent(saveGameEntity, new SaveGameComponent());
 
                     var sceneLoadEntity = PostUpdateCommands.CreateEntity();
                     PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent {

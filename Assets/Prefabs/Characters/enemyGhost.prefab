@@ -243,7 +243,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementSpeed: 3
-  MaxHealth: 25
   WeaponDamage: 10
   AttackCoolDown: 2
   AttackRange: 1
@@ -260,25 +259,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LevelComponent:
-    CurrentLevel: 0
+    CurrentLevel: 1
     NextLevelXP: 100
+    SkillPoints: 0
   HealthStatComponent:
     CurrentValue: 25
     BaseValue: 25
-    PerLevelValue: 9
+    PerPointValue: 5
+    PointsSpent: 1
   AttackStatComponent:
     CurrentValue: 2
     BaseValue: 2
-    PerLevelValue: 1
+    PerPointValue: 1
+    PointsSpent: 1
   DefenceStatComponent:
     CurrentValue: 2
     BaseValue: 2
-    PerLevelValue: 1
+    PerPointValue: 1
+    PointsSpent: 1
   MagicStatComponent:
     CurrentValue: 1
     BaseValue: 1
-    PerLevelValue: 1
-  XPReawardComponent:
+    PerPointValue: 1
+    PointsSpent: 1
+  XPRewardComponent:
     XPAmount: 5
 --- !u!114 &8980004571312218138
 MonoBehaviour:
@@ -399,7 +403,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4118170767352874}
   - component: {fileID: 70124455846446018}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Hitbox
   m_TagString: Hitbox
   m_Icon: {fileID: 0}

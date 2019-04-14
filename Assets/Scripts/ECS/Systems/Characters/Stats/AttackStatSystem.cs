@@ -1,23 +1,21 @@
-﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Level;
+﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Stats
-{    
+{
     public class AttackStatSystem : JobComponentSystem
     {
-        [RequireComponentTag(typeof(LevelUpComponent))]
-        private struct AttackStatJob : IJobProcessComponentData<AttackStatComponent, LevelComponent>
+        [RequireComponentTag(typeof(AdjustStatsComponent))]
+        private struct AttackStatJob : IJobProcessComponentData<AttackStatComponent>
         {
-            public void Execute(ref AttackStatComponent attackStatComponent,
-                                [ReadOnly] ref LevelComponent levelComponent)
+            public void Execute(ref AttackStatComponent attackStatComponent)
             {
                 var properValue = attackStatComponent.BaseValue
-                                  + attackStatComponent.PerLevelValue
-                                  * (levelComponent.CurrentLevel - 1);
+                                  + attackStatComponent.PerPointValue
+                                  * (attackStatComponent.PointsSpent - 1);
                 if (attackStatComponent.CurrentValue != properValue)
                     attackStatComponent.CurrentValue = properValue;
             }

@@ -10,9 +10,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
 {
     public class LevelUpSystem : ComponentSystem
     {
-        private struct LevelUpProcessedComponent : IComponentData { }
         private ComponentGroup _characterGroup;
-        private ComponentGroup _characterReadyGroup;
 
         protected override void OnCreateManager()
         {
@@ -22,30 +20,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
                 {
                     typeof(LevelComponent), typeof(LevelUpComponent),
                     typeof(PositionComponent), typeof(CharacterComponent)
-                },
-                None = new ComponentType[]
-                {
-                    typeof(LevelUpProcessedComponent)
-                },
-            });
-            _characterReadyGroup = GetComponentGroup(new EntityArchetypeQuery
-            {
-                All = new ComponentType[]
-                {
-                    typeof(LevelComponent), typeof(LevelUpComponent), typeof(LevelUpProcessedComponent)
                 }
             });
         }
         protected override void OnUpdate()
         {
-            if (_characterReadyGroup.CalculateLength() != 0)
-            {
-                Entities.With(_characterReadyGroup).ForEach((Entity entity) =>
-                {
-                    PostUpdateCommands.RemoveComponent<LevelUpProcessedComponent>(entity);
-                    PostUpdateCommands.RemoveComponent<LevelUpComponent>(entity);
-                });
-            }
             if (_characterGroup.CalculateLength() != 0)
             {
                 var positions = new NativeArray<float2>(_characterGroup.CalculateLength(), Allocator.TempJob);
@@ -57,8 +36,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
 
                     levelComponent.CurrentLevel++;
                     levelComponent.NextLevelXP *= 2;
+                    levelComponent.SkillPoints++;
 
-                    PostUpdateCommands.AddComponent(entity, new LevelUpProcessedComponent());
+                    PostUpdateCommands.RemoveComponent<LevelUpComponent>(entity);
                 });
 
                 for (int i = 0; i < k; i++)

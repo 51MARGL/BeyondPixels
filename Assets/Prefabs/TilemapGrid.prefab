@@ -151,23 +151,23 @@ Tilemap:
     m_Data:
       e00: NaN
       e01: NaN
-      e02: 3.4680445e+34
-      e03: 0
+      e02: 0
+      e03: 710718460
       e10: NaN
       e11: NaN
-      e12: 1.9e-43
-      e13: 0
+      e12: 0
+      e13: 6.87e-43
       e20: 0
-      e21: 3.4680405e+34
+      e21: 0
       e22: 0
       e23: 0
       e30: 0
-      e31: 1.9e-43
+      e31: 0
       e32: 0
-      e33: 0
+      e33: 1.75
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 9.902616e+14, g: 9.902616e+14, b: 9.902616e+14, a: 9.902616e+14}
+    m_Data: {r: -1.2065684e+30, g: -1.2065684e+30, b: -1.2065684e+30, a: -1.2065684e+30}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -5, y: -6, z: 0}
@@ -386,24 +386,24 @@ Tilemap:
   - m_RefCount: 0
     m_Data:
       e00: NaN
-      e01: NaN
-      e02: 2879062
+      e01: 0
+      e02: 1.05e-43
       e03: 0
       e10: NaN
-      e11: NaN
-      e12: 2.07e-43
+      e11: 0
+      e12: NaN
       e13: 0
-      e20: 0
-      e21: 2879058
+      e20: 1.05e-43
+      e21: 0
       e22: 0
       e23: 0
-      e30: 0
-      e31: 2.07e-43
+      e30: 6.42e-43
+      e31: NaN
       e32: 0
-      e33: 0
+      e33: 4.89e-42
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 6.0745877e-30, g: 6.0745877e-30, b: 6.0745877e-30, a: 6.0745877e-30}
+    m_Data: {r: -1.4632817e+9, g: -1.4632817e+9, b: -1.4632817e+9, a: -1.4632817e+9}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -18, y: -3, z: 0}
@@ -803,11 +803,11 @@ MonoBehaviour:
   GroundTile: {fileID: 11400000, guid: 4cea3a48375f8f742a8fc8cec9412b0d, type: 2}
   MinimapTile: {fileID: 11400000, guid: 2592b397fb74598498fa7f7badc71ab6, type: 2}
   WallTile: {fileID: 11400000, guid: 75d7314cc6fc94c4687a0cbc7a401a43, type: 2}
-  WallTileTop: {fileID: 11400000, guid: 383321da729ee5e4cad8f451b2f20f8e, type: 2}
+  WallTileTop: {fileID: 11400000, guid: cba7885d7f0628b4b9b48ef630300dc3, type: 2}
   WallTorchAnimatedTile: {fileID: 11400000, guid: f6e706679eb2c2f44abe9e6970684149,
     type: 2}
   TorchLight: {fileID: 1666490691780722, guid: 6008bca52bc12264f877c59e79aae336, type: 3}
-  OuterWallWidth: 0
+  OuterWallWidth: 5
 --- !u!1 &1657661229634000
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,23 +959,23 @@ Tilemap:
     m_Data:
       e00: NaN
       e01: NaN
-      e02: 3.4680445e+34
+      e02: 0
       e03: 0
       e10: NaN
       e11: NaN
-      e12: 1.9e-43
+      e12: 0
       e13: 0
       e20: 0
-      e21: 3.4680405e+34
+      e21: 0
       e22: 0
       e23: 0
       e30: 0
-      e31: 1.9e-43
+      e31: 0
       e32: 0
       e33: 0
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: 9.902616e+14, g: 9.902616e+14, b: 9.902616e+14, a: 9.902616e+14}
+    m_Data: {r: -4.8892248e+30, g: -4.8892248e+30, b: -4.8892248e+30, a: -4.8892248e+30}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -5, y: -6, z: 0}

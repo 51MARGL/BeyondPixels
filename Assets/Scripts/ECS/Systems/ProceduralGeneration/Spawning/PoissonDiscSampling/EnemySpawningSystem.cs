@@ -6,7 +6,7 @@ using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
+using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
 using Unity.Entities;
@@ -103,6 +103,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private ComponentGroup _boardSpawnInitGroup;
         private ComponentGroup _boardSpawnReadyGroup;
         private ComponentGroup _samplesGroup;
+        private ComponentGroup _loadGameGroup;
 
         protected override void OnCreateManager()
         {
@@ -144,6 +145,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     typeof(SampleComponent)
                 }
             });
+            _loadGameGroup = GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(LoadGameComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -152,6 +160,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 return SetupValidationGrid(inputDeps);
 
             if (_boardSpawnReadyGroup.CalculateLength() > 0
+                && _loadGameGroup.CalculateLength() == 0
                 && PlayerSpawningSystem.PlayerInstantiated)
             {
                 if (_samplesGroup.CalculateLength() > 0)
@@ -225,11 +234,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 Direction = float2.zero,
                 Speed = enemyInitializeComponent.MovementSpeed
             });
-            commandBuffer.AddComponent(enemyEntity, new HealthComponent
-            {
-                MaxValue = enemyInitializeComponent.MaxHealth,
-                CurrentValue = enemyInitializeComponent.MaxHealth
-            });
+
             commandBuffer.AddComponent(enemyEntity, new WeaponComponent
             {
                 DamageValue = enemyInitializeComponent.WeaponDamage,
@@ -249,21 +254,60 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             #region statsInit
             var statsInitializeComponent = enemy.GetComponent<StatsInitializeComponent>();
             var lvlComponent = statsInitializeComponent.LevelComponent;
-            lvlComponent.CurrentLevel = 
-                math.max(0, random.NextInt(playerLvlComponent.CurrentLevel - 2, 
+            lvlComponent.CurrentLevel =
+                math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
                                            playerLvlComponent.CurrentLevel + 3));
 
+            var healthStatComponent = statsInitializeComponent.HealthStatComponent;
+            var attackStatComponent = statsInitializeComponent.AttackStatComponent;
+            var defenceStatComponent = statsInitializeComponent.DefenceStatComponent;
+            var magicStatComponent = statsInitializeComponent.MagicStatComponent;
+
+            InitializeRandomStats(lvlComponent.CurrentLevel, ref random, ref healthStatComponent,
+                                ref attackStatComponent, ref defenceStatComponent, ref magicStatComponent);
+
             commandBuffer.AddComponent(enemyEntity, lvlComponent);
-            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.HealthStatComponent);
-            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.AttackStatComponent);
-            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.DefenceStatComponent);
-            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.MagicStatComponent);            
-            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.XPReawardComponent);
-            commandBuffer.AddComponent(enemyEntity, new LevelUpComponent());
+            commandBuffer.AddComponent(enemyEntity, healthStatComponent);
+            commandBuffer.AddComponent(enemyEntity, new HealthComponent
+            {
+                MaxValue = healthStatComponent.CurrentValue,
+                CurrentValue = healthStatComponent.CurrentValue
+            });
+            commandBuffer.AddComponent(enemyEntity, attackStatComponent);
+            commandBuffer.AddComponent(enemyEntity, defenceStatComponent);
+            commandBuffer.AddComponent(enemyEntity, magicStatComponent);
+            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.XPRewardComponent);
+            commandBuffer.AddComponent(enemyEntity, new AdjustStatsComponent());
             Object.Destroy(statsInitializeComponent);
             #endregion
 
             commandBuffer.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
+        }
+        private void InitializeRandomStats(int currentLevel, ref Unity.Mathematics.Random random,
+                                           ref HealthStatComponent healthStatComponent,
+                                           ref AttackStatComponent attackStatComponent,
+                                           ref DefenceStatComponent defenceStatComponent,
+                                           ref MagicStatComponent magicStatComponent)
+        {
+            for (int i = 1; i < currentLevel; i++)
+            {
+                var randomStat = random.NextInt(0, 100);
+                switch (randomStat)
+                {
+                    case var _ when randomStat < 25:
+                        healthStatComponent.PointsSpent++;
+                        break;
+                    case var _ when randomStat < 50:
+                        attackStatComponent.PointsSpent++;
+                        break;
+                    case var _ when randomStat < 75:
+                        defenceStatComponent.PointsSpent++;
+                        break;
+                    case var _ when randomStat < 100:
+                        magicStatComponent.PointsSpent++;
+                        break;
+                }
+            }
         }
     }
 }

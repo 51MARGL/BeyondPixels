@@ -5174,7 +5174,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.25}
+  m_Offset: {x: 0, y: -0.1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.54149234, y: 0.50688815}
@@ -5185,7 +5185,7 @@ BoxCollider2D:
     adaptiveTiling: 1
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.5, y: 0.3}
   m_EdgeRadius: 0
 --- !u!212 &212653569385222136
 SpriteRenderer:
@@ -5268,7 +5268,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementSpeed: 4
-  MaxHealth: 125
   WeaponDamage: 10
 --- !u!114 &4444492588875631888
 MonoBehaviour:
@@ -5283,25 +5282,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LevelComponent:
-    CurrentLevel: 0
+    CurrentLevel: 1
     NextLevelXP: 25
+    SkillPoints: 0
   HealthStatComponent:
     CurrentValue: 100
     BaseValue: 100
-    PerLevelValue: 10
+    PerPointValue: 10
+    PointsSpent: 1
   AttackStatComponent:
     CurrentValue: 1
     BaseValue: 1
-    PerLevelValue: 1
+    PerPointValue: 1
+    PointsSpent: 1
   DefenceStatComponent:
     CurrentValue: 1
     BaseValue: 1
-    PerLevelValue: 1
+    PerPointValue: 1
+    PointsSpent: 1
   MagicStatComponent:
     CurrentValue: 1
     BaseValue: 1
-    PerLevelValue: 1
-  XPReawardComponent:
+    PerPointValue: 1
+    PointsSpent: 1
+  XPRewardComponent:
     XPAmount: 0
 --- !u!114 &3495159259676345203
 MonoBehaviour:

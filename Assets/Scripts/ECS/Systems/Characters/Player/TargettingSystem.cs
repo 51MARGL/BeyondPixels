@@ -24,7 +24,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         }
 
         protected override void OnUpdate()
-        {            
+        {
             Entities.With(_playerGroup).ForEach((Entity entity, ref InputComponent inputComponent, ref PositionComponent positionComponent) =>
             {
                 if (Camera.main == null)
@@ -39,21 +39,27 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
                     if (raycastHit.transform != null)
                     {
+                        var targetPosition = new float2(raycastHit.transform.position.x, raycastHit.transform.position.y);
+                        if (!InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                            return;
+
+                        var targetEntity = (raycastHit.transform.GetComponent<GameObjectEntity>() 
+                                            ?? raycastHit.transform.GetComponentInParent<GameObjectEntity>()).Entity;
 
                         if (!EntityManager.HasComponent<TargetComponent>(entity))
                             PostUpdateCommands.AddComponent(entity,
                                 new TargetComponent
                                 {
-                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                    Target = targetEntity
                                 });
                         else
                             PostUpdateCommands.SetComponent(entity,
                                 new TargetComponent
                                 {
-                                    Target = raycastHit.transform.GetComponent<GameObjectEntity>().Entity
+                                    Target = targetEntity
                                 });
                     }
-                    else
+                    else if (EntityManager.HasComponent<TargetComponent>(entity))
                         PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
 
                 }
@@ -61,13 +67,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 {
                     var layerMask = LayerMask.GetMask("Enemy");
 
-                    var width = (Camera.main.ViewportToWorldPoint(new Vector3(1.0F, 0.0F, -Camera.main.transform.position.z)) 
+                    var width = (Camera.main.ViewportToWorldPoint(new Vector3(1.0F, 0.0F, -Camera.main.transform.position.z))
                                 - Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 0.0F, -Camera.main.transform.position.z))).x;
-                    var heigth = (Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 1.0F, -Camera.main.transform.position.z)) 
+                    var heigth = (Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 1.0F, -Camera.main.transform.position.z))
                                 - Camera.main.ViewportToWorldPoint(new Vector3(0.0F, 0.0F, -Camera.main.transform.position.z))).y;
 
-                    var hits = Physics2D.BoxCastAll(Camera.main.transform.position, 
-                                                    new Vector2(width, heigth), 0, 
+                    var hits = Physics2D.BoxCastAll(Camera.main.transform.position,
+                                                    new Vector2(width, heigth), 0,
                                                     Camera.main.transform.forward, -Camera.main.transform.position.z, layerMask);
                     if (hits.Length > 0)
                     {
@@ -83,28 +89,46 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
                             foreach (var collider in colliders)
                             {
+                                var targetPosition = new float2(collider.transform.position.x, collider.transform.position.y);
+                                if (!InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                                    continue;
+
+                                var targetEntity = (collider.GetComponent<GameObjectEntity>()
+                                            ?? collider.GetComponentInParent<GameObjectEntity>()).Entity;
+
                                 if (collider.GetComponent<GameObjectEntity>().Entity != targetComponent.Target)
                                 {
                                     PostUpdateCommands.SetComponent(entity,
-                                    new TargetComponent
-                                    {
-                                        Target = collider.GetComponent<GameObjectEntity>().Entity
-                                    });
-                                    break;
+                                        new TargetComponent
+                                        {
+                                            Target = targetEntity
+                                        });
+
+                                    return;
                                 }
                             }
                         }
                         else
                         {
-                            PostUpdateCommands.AddComponent(entity,
-                                    new TargetComponent
-                                    {
-                                        Target = colliders[0].GetComponent<GameObjectEntity>().Entity
-                                    });
+                            foreach (var collider in colliders)
+                            {
+                                var targetPosition = new float2(collider.transform.position.x, collider.transform.position.y);
+                                if (!InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                                    continue;
+
+                                var targetEntity = (collider.GetComponent<GameObjectEntity>()
+                                               ?? collider.GetComponentInParent<GameObjectEntity>()).Entity;
+
+                                PostUpdateCommands.AddComponent(entity,
+                                        new TargetComponent
+                                        {
+                                            Target = targetEntity
+                                        });
+                                return;
+                            }
                         }
                     }
                 }
-
                 if (EntityManager.HasComponent<TargetComponent>(entity))
                 {
                     var targetComponent = EntityManager.GetComponentData<TargetComponent>(entity);
@@ -112,9 +136,32 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     if (!EntityManager.Exists(targetComponent.Target)
                         || !GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(Camera.main),
                                                     EntityManager.GetComponentObject<SpriteRenderer>(targetComponent.Target).bounds))
+                    {
                         PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
+                        return;
+                    }
+
+                    var targetPosition = EntityManager.GetComponentData<PositionComponent>(targetComponent.Target);
+
+                    if (!InLineOfSigth(positionComponent.CurrentPosition, targetPosition.CurrentPosition))
+                            PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
                 }
             });
+        }
+
+        private bool InLineOfSigth(float2 position, float2 targetPosition)
+        {
+            var wallLayer = LayerMask.GetMask("World");
+            var distance = math.distance(position, targetPosition);
+            var hits = Physics2D.RaycastAll(position,
+                                            targetPosition - position,
+                                            distance, wallLayer);
+
+            foreach (var hit in hits)
+                if (hit.transform.tag == "Wall")
+                    return false;
+
+            return true;
         }
     }
 }

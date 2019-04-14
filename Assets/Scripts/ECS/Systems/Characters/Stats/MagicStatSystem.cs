@@ -1,5 +1,4 @@
-﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Level;
+﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,20 +8,16 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class MagicStatSystem : JobComponentSystem
     {
-        [RequireComponentTag(typeof(LevelUpComponent))]
-        private struct DefenceStatJob : IJobProcessComponentData<MagicStatComponent, LevelComponent>
+        [RequireComponentTag(typeof(AdjustStatsComponent))]
+        private struct DefenceStatJob : IJobProcessComponentData<MagicStatComponent>
         {
-            public void Execute(ref MagicStatComponent magicStatComponent,
-                                [ReadOnly] ref LevelComponent levelComponent)
+            public void Execute(ref MagicStatComponent magicStatComponent)
             {
                 var properValue = magicStatComponent.BaseValue
-                                  + magicStatComponent.PerLevelValue
-                                  * (levelComponent.CurrentLevel - 1);
+                                  + magicStatComponent.PerPointValue
+                                  * (magicStatComponent.PointsSpent - 1);
                 if (magicStatComponent.CurrentValue != properValue)
                     magicStatComponent.CurrentValue = properValue;
-
-                if (magicStatComponent.CurrentValue != magicStatComponent.PerLevelValue * levelComponent.CurrentLevel)
-                    magicStatComponent.CurrentValue = magicStatComponent.PerLevelValue * levelComponent.CurrentLevel;
             }
         }
 

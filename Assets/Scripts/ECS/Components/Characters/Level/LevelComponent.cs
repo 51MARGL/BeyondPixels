@@ -8,5 +8,6 @@ namespace BeyondPixels.ECS.Components.Characters.Level
     {
         public int CurrentLevel;
         public int NextLevelXP;
+        public int SkillPoints;
     }
 }

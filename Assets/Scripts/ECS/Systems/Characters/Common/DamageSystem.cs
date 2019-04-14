@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
 using Unity.Collections;
 using Unity.Entities;
@@ -19,6 +20,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             [ReadOnly]
             public ArchetypeChunkEntityType EntityType;
             public ArchetypeChunkComponentType<HealthComponent> HealthComponentType;
+            [ReadOnly]
+            public ArchetypeChunkComponentType<InCutsceneComponent> InCutsceneComponentType;
 
             public void Execute(Entity entity,
                                 int index,
@@ -30,22 +33,23 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                     var chunk = Chunks[c];
                     var entities = chunk.GetNativeArray(EntityType);
                     var healthComponents = chunk.GetNativeArray(HealthComponentType);
-                    for (int i = 0; i < chunk.Count; i++)
-                        if (entities[i] == collisionInfo.Target)
-                        {
-                            var healthComponent = healthComponents[i];
+                    if (!chunk.Has(InCutsceneComponentType))
+                        for (int i = 0; i < chunk.Count; i++)
+                            if (entities[i] == collisionInfo.Target)
+                            {
+                                var healthComponent = healthComponents[i];
 
-                            healthComponent.CurrentValue -= damageComponent.DamageAmount;
-                            if (healthComponent.CurrentValue < 0)
-                                healthComponent.CurrentValue = 0;
-                            else if (healthComponent.CurrentValue > healthComponent.MaxValue)
-                                healthComponent.CurrentValue = healthComponent.MaxValue;
+                                healthComponent.CurrentValue -= damageComponent.DamageAmount;
+                                if (healthComponent.CurrentValue < 0)
+                                    healthComponent.CurrentValue = 0;
+                                else if (healthComponent.CurrentValue > healthComponent.MaxValue)
+                                    healthComponent.CurrentValue = healthComponent.MaxValue;
 
-                            CommandBuffer.SetComponent(index, entities[i], healthComponent);
+                                CommandBuffer.SetComponent(index, entities[i], healthComponent);
 
-                            CommandBuffer.DestroyEntity(index, entity);
-                            return;
-                        }
+                                CommandBuffer.DestroyEntity(index, entity);
+                                return;
+                            }
                 }
 
                 CommandBuffer.DestroyEntity(index, entity);
@@ -77,7 +81,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 Chunks = _healthGroup.CreateArchetypeChunkArray(Allocator.TempJob),
                 EntityType = GetArchetypeChunkEntityType(),
-                HealthComponentType = GetArchetypeChunkComponentType<HealthComponent>()
+                HealthComponentType = GetArchetypeChunkComponentType<HealthComponent>(),
+                InCutsceneComponentType = GetArchetypeChunkComponentType<InCutsceneComponent>()
             }.Schedule(this, inputDeps);
             _endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;

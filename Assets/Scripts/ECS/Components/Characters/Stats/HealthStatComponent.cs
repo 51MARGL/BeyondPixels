@@ -4,10 +4,11 @@ using Unity.Entities;
 namespace BeyondPixels.ECS.Components.Characters.Stats
 {
     [Serializable]
-    public struct AttackStatComponent : IComponentData
+    public struct HealthStatComponent : IComponentData
     {
         public int CurrentValue;
         public int BaseValue;
-        public int PerLevelValue;
+        public int PerPointValue;
+        public int PointsSpent;
     }
 }

@@ -10,6 +10,6 @@ namespace BeyondPixels.ECS.Components.Characters.Stats
         public AttackStatComponent AttackStatComponent;
         public DefenceStatComponent DefenceStatComponent;
         public MagicStatComponent MagicStatComponent;
-        public XPRewardComponent XPReawardComponent;
+        public XPRewardComponent XPRewardComponent;
     }
 }

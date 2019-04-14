@@ -75,7 +75,7 @@ PrefabInstance:
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackStatComponent.CurrentValue
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
@@ -90,7 +90,7 @@ PrefabInstance:
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackStatComponent.BaseValue
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
@@ -111,6 +111,16 @@ PrefabInstance:
         type: 3}
       propertyPath: XPReawardComponent.XPAmount
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: XPRewardComponent.XPAmount
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: HealthStatComponent.PerPointValue
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 309658852677841198, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}

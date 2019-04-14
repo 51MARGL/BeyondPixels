@@ -143,5 +143,15 @@ PrefabInstance:
       propertyPath: XPReawardComponent.XPAmount
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: XPRewardComponent.XPAmount
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 131499347851034211, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: HealthStatComponent.PerPointValue
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}

@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
@@ -23,6 +24,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             public ArchetypeChunkEntityType EntityType;
             [ReadOnly]
             public ArchetypeChunkComponentType<TargetComponent> TargetComponentType;
+            [ReadOnly]
+            public ArchetypeChunkComponentType<MagicStatComponent> MagicStatComponentType;
             public ArchetypeChunkComponentType<InputComponent> InputComponentType;
             [ReadOnly]
             public ArchetypeChunkComponentType<SpellCastingComponent> SpellCastingComponentType;
@@ -38,6 +41,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 var inputComponents = chunk.GetNativeArray(InputComponentType);
                 var spellCastingComponents = chunk.GetNativeArray(SpellCastingComponentType);
                 var targetComponents = chunk.GetNativeArray(TargetComponentType);
+                var magicStatComponents = chunk.GetNativeArray(MagicStatComponentType);
 
                 for (int i = 0; i < chunk.Count; i++)
                 {
@@ -63,7 +67,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                     return;
                                 }
 
-                                if (spellCastingComponents[i].StartedAt + spellPrefab.CastTime > CurrentTime)
+                                var magicStatComponent = magicStatComponents[i];
+                                var castTime = math.max(1f, spellPrefab.CastTime - 
+                                                            (spellPrefab.CastTime / 100f * magicStatComponent.CurrentValue));
+
+                                if (spellCastingComponents[i].StartedAt + castTime > CurrentTime)
                                     return;
 
                                 var target = Entity.Null;
@@ -72,10 +80,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                 else if (spellPrefab.TargetRequired)
                                     target = targetComponents[i].Target;
 
+                                var coolDown = math.max(1f, spellPrefab.CoolDown -
+                                                            (spellPrefab.CoolDown / 100f * magicStatComponent.CurrentValue));
+
                                 CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
                                 CommandBuffer.AddComponent(chunkIndex, spellEntities[sI], new CoolDownComponent
                                 {
-                                    CoolDownTime = spellPrefab.CoolDown
+                                    CoolDownTime = coolDown
                                 });
                                 CommandBuffer.AddComponent(chunkIndex, spellEntities[sI], new InstantiateSpellComponent
                                 {
@@ -102,6 +113,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             {
                 All = new ComponentType[] {
                     typeof(InputComponent),
+                    ComponentType.ReadOnly<MagicStatComponent>(),
                     ComponentType.ReadOnly<CharacterComponent>(),
                     ComponentType.ReadOnly<SpellCastingComponent>()
                 },
@@ -131,6 +143,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 ActiveSpellChunks = _activeSpellGroup.CreateArchetypeChunkArray(Allocator.TempJob),
                 EntityType = GetArchetypeChunkEntityType(),
                 InputComponentType = GetArchetypeChunkComponentType<InputComponent>(),
+                MagicStatComponentType = GetArchetypeChunkComponentType<MagicStatComponent>(true),
                 SpellCastingComponentType = GetArchetypeChunkComponentType<SpellCastingComponent>(true),
                 TargetComponentType = GetArchetypeChunkComponentType<TargetComponent>(true),
                 ActiveSpellComponentType = GetArchetypeChunkComponentType<ActiveSpellComponent>(true),

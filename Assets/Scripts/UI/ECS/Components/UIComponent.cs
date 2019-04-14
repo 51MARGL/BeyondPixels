@@ -8,6 +8,7 @@ namespace BeyondPixels.UI.ECS.Components
     public class UIComponent : MonoBehaviour
     {
         public HealthGroupWrapper HealthGroup;
+        public LevelGroupWrapper LevelGroup;
         public SpellCastBarGroupWrapper SpellCastBarGroup;
         public SpellButtonsGroupWrapper SpellButtonsGroup;
 
@@ -16,6 +17,13 @@ namespace BeyondPixels.UI.ECS.Components
         {
             public Image HealthImage;
             public TextMeshProUGUI HealthText;
+        }
+
+        [Serializable]
+        public class LevelGroupWrapper
+        {
+            public Image XPProgressImage;
+            public TextMeshProUGUI LevelText;
         }
 
         [Serializable]

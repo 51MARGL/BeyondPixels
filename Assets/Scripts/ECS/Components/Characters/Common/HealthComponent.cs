@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Components.Characters.Common
 {
+    [Serializable]
     public struct HealthComponent : IComponentData
     {
         public float MaxValue;

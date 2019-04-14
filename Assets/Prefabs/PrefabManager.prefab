@@ -45,6 +45,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 1826596988420284, guid: 2114688a494587a4cbd70b5fb17aafd2,
     type: 3}
+  LevelUpEffectPrefab: {fileID: 6319165700159288238, guid: 1a62cc9cc78ffc44aa6b70dc75915630,
+    type: 3}
   BloodSplashPrefab: {fileID: 7299546968045762223, guid: 2d259b158f5c6bc4db9b55981c8123c6,
     type: 3}
   BloodDecalsPrefabs:
@@ -62,5 +64,5 @@ MonoBehaviour:
   - SpawnRadius: 6
     Prefab: {fileID: 5052851933621197252, guid: e510273cf265b2847ba3016f90012046,
       type: 3}
-  - SpawnRadius: 15
+  - SpawnRadius: 10
     Prefab: {fileID: 310711406105402089, guid: c402636d0ea6df84490f5cb75078f516, type: 3}

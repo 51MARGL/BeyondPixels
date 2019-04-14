@@ -9,25 +9,22 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class HealthStatSystem : JobComponentSystem
     {
-        [RequireComponentTag(typeof(LevelUpComponent))]
-        private struct HealthStatJob : IJobProcessComponentData<HealthComponent, HealthStatComponent, LevelComponent>
+        [RequireComponentTag(typeof(AdjustStatsComponent))]
+        private struct HealthStatJob : IJobProcessComponentData<HealthComponent, HealthStatComponent>
         {
             public void Execute(ref HealthComponent healthComponent,
-                                ref HealthStatComponent healthStatComponent,
-                                [ReadOnly] ref LevelComponent levelComponent)
+                                ref HealthStatComponent healthStatComponent)
             {
                 var properValue = healthStatComponent.BaseValue
-                                  + healthStatComponent.PerLevelValue
-                                  * (levelComponent.CurrentLevel - 1);
+                                  + healthStatComponent.PerPointValue
+                                  * (healthStatComponent.PointsSpent - 1);
 
                 if (healthStatComponent.CurrentValue != properValue)
-                    healthStatComponent.CurrentValue = properValue;
-
-                if (healthStatComponent.CurrentValue != healthComponent.MaxValue)
                 {
+                    healthStatComponent.CurrentValue = properValue;
                     healthComponent.MaxValue = healthStatComponent.CurrentValue;
                     healthComponent.CurrentValue = healthStatComponent.CurrentValue;
-                }
+                }                
             }
         }
 

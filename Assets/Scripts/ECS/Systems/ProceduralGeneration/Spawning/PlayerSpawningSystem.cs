@@ -7,6 +7,7 @@ using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
+using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
@@ -120,6 +121,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             if (_boardReadyGroup.CalculateLength() > 0 && !PlayerInstantiated && !TileMapSystem.TileMapDrawing)
             {
                 SpawnPlayer(PlayerPosition);
+                var loadGameEntity = PostUpdateCommands.CreateEntity();
+                PostUpdateCommands.AddComponent(loadGameEntity, new LoadGameComponent());
                 PlayerInstantiated = true;
             }
         }
@@ -143,11 +146,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 Direction = float2.zero,
                 Speed = playerInitializeComponent.MovementSpeed
             });
-            PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
-            {
-                MaxValue = playerInitializeComponent.MaxHealth,
-                CurrentValue = playerInitializeComponent.MaxHealth
-            });
             PostUpdateCommands.AddComponent(playerEntity, new WeaponComponent
             {
                 DamageValue = playerInitializeComponent.WeaponDamage
@@ -163,11 +161,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             var statsInitializeComponent = player.GetComponent<StatsInitializeComponent>();
             PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.LevelComponent);
             PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.HealthStatComponent);
+            PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
+            {
+                MaxValue = statsInitializeComponent.HealthStatComponent.CurrentValue,
+                CurrentValue = statsInitializeComponent.HealthStatComponent.CurrentValue
+            });
             PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.AttackStatComponent);
             PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.DefenceStatComponent);
             PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.MagicStatComponent);
             PostUpdateCommands.AddComponent(playerEntity, new XPComponent());
-            PostUpdateCommands.AddComponent(playerEntity, new LevelUpComponent());
+            PostUpdateCommands.AddComponent(playerEntity, new AdjustStatsComponent());
             GameObject.Destroy(statsInitializeComponent);
             #endregion
             #endregion

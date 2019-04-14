@@ -8,6 +8,7 @@ namespace BeyondPixels.ECS.Components.Characters.Stats
     {
         public int CurrentValue;
         public int BaseValue;
-        public int PerLevelValue;
+        public int PerPointValue;
+        public int PointsSpent;
     }
 }
