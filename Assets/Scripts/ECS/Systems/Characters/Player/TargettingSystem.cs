@@ -96,7 +96,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                 var targetEntity = (collider.GetComponent<GameObjectEntity>()
                                             ?? collider.GetComponentInParent<GameObjectEntity>()).Entity;
 
-                                if (collider.GetComponent<GameObjectEntity>().Entity != targetComponent.Target)
+                                if (targetEntity != targetComponent.Target)
                                 {
                                     PostUpdateCommands.SetComponent(entity,
                                         new TargetComponent

@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace BeyondPixels.UI
+namespace BeyondPixels.UI.Buttons
 {
     public class SpellActionButton : MonoBehaviour, IPointerClickHandler
     {
@@ -40,7 +40,7 @@ namespace BeyondPixels.UI
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
                 var eventEntity = entityManager.CreateEntity();
-                var index = Array.IndexOf(UIManager.Instance.UIComponent.SpellButtonsGroup.ActionButtons, this);
+                var index = Array.IndexOf(UIManager.Instance.GameUIComponent.SpellButtonsGroup.ActionButtons, this);
                 entityManager.AddComponentData(eventEntity, new ActionButtonPressedComponent
                 {
                     ActionIndex = index

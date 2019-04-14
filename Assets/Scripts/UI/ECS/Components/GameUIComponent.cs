@@ -1,11 +1,12 @@
 ﻿using System;
+using BeyondPixels.UI.Buttons;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace BeyondPixels.UI.ECS.Components
 {
-    public class UIComponent : MonoBehaviour
+    public class GameUIComponent : MonoBehaviour
     {
         public HealthGroupWrapper HealthGroup;
         public LevelGroupWrapper LevelGroup;

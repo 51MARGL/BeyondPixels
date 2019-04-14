@@ -11,7 +11,7 @@ using UnityEngine;
 namespace BeyondPixels.UI.ECS.Systems
 {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class UISystem : ComponentSystem
+    public class GameUISystem : ComponentSystem
     {
         private ComponentGroup _playerGroup;
         private ComponentGroup _playerSpellCastingGroup;
@@ -49,10 +49,10 @@ namespace BeyondPixels.UI.ECS.Systems
         protected override void OnUpdate()
         {
             var deltaTime = Time.deltaTime;
-            var uiComponent = UIManager.Instance.UIComponent;
+            var uiComponent = UIManager.Instance.GameUIComponent;
             var spellBook = SpellBookManagerComponent.Instance.SpellBook;
 
-            Entities.With(_playerGroup).ForEach((Entity palyerEntity, 
+            Entities.With(_playerGroup).ForEach((Entity playerEntity, 
                 ref HealthComponent healthComponent, 
                 ref MagicStatComponent magicStatComponent, 
                 ref LevelComponent levelComponent, 
@@ -83,10 +83,10 @@ namespace BeyondPixels.UI.ECS.Systems
                     = math.lerp(playerUILevelGroup.XPProgressImage.fillAmount, currentXPFill, deltaTime * 10f);
                 playerUILevelGroup.LevelText.text = currentLevel.ToString();
 
-                if (EntityManager.HasComponent<SpellCastingComponent>(palyerEntity))
+                if (EntityManager.HasComponent<SpellCastingComponent>(playerEntity))
                 {
                     var playerUISpellBarGroup = uiComponent.SpellCastBarGroup;
-                    var spellCastingComponent = EntityManager.GetComponentData<SpellCastingComponent>(palyerEntity);
+                    var spellCastingComponent = EntityManager.GetComponentData<SpellCastingComponent>(playerEntity);
                     var spellIndex = spellCastingComponent.SpellIndex;
                     var spell = spellBook.Spells[spellIndex];
                     var castTime = math.max(1f, spell.CastTime -

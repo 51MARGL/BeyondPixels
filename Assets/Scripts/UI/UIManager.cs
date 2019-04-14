@@ -1,5 +1,4 @@
-﻿using BeyondPixels.ECS.Components.Spells;
-using BeyondPixels.UI.ECS.Components;
+﻿using BeyondPixels.UI.ECS.Components;
 using UnityEngine;
 
 namespace BeyondPixels.UI
@@ -17,10 +16,11 @@ namespace BeyondPixels.UI
                 return _instance;
             }
         }
-        public UIComponent UIComponent;
+        public GameUIComponent GameUIComponent;
+        public PlayerInfoMenuUIComponent PlayerInfoMenuUIComponent;
+
         public void Initialize()
         {
-            this.UIComponent = GetComponent<UIComponent>();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                         PostUpdateCommands.SetComponent(playerEntity, playerData.LevelComponent);
                         PostUpdateCommands.SetComponent(playerEntity, playerData.HealthComponent);
                         PostUpdateCommands.SetComponent(playerEntity, playerData.XPComponent);
-                        PostUpdateCommands.SetComponent(playerEntity, playerData.HealthComponent);
+                        PostUpdateCommands.SetComponent(playerEntity, playerData.HealthStatComponent);
                         PostUpdateCommands.SetComponent(playerEntity, playerData.AttackStatComponent);
                         PostUpdateCommands.SetComponent(playerEntity, playerData.DefenceStatComponent);
                         PostUpdateCommands.SetComponent(playerEntity, playerData.MagicStatComponent);

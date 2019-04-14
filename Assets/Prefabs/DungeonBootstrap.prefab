@@ -53,11 +53,11 @@ MonoBehaviour:
       MaxCorridorLength: 10
       MinCorridorLength: 5
     CellularAutomaton:
-      BoardWidth: 150
+      BoardWidth: 100
       BoardHeight: 100
       RandomFillPercent: 70
       PassRadius: 1
     BSP:
-      BoardWidth: 110
+      BoardWidth: 50
       BoardHeight: 50
       MinRoomSize: 10
