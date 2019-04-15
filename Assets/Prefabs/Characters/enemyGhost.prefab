@@ -245,7 +245,7 @@ MonoBehaviour:
   MovementSpeed: 3
   WeaponDamage: 10
   AttackCoolDown: 2
-  AttackRange: 1
+  AttackRange: 0.7
 --- !u!114 &131499347851034211
 MonoBehaviour:
   m_ObjectHideFlags: 0

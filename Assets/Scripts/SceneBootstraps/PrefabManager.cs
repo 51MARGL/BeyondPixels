@@ -5,17 +5,7 @@ namespace BeyondPixels.SceneBootstraps
 {
     public class PrefabManager : MonoBehaviour
     {
-        private static PrefabManager _instance;
-        public static PrefabManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = FindObjectOfType<PrefabManager>();
-
-                return _instance;
-            }
-        }
+        public static PrefabManager Instance { get; private set; }
 
         public GameObject PlayerPrefab;
         public GameObject LevelUpEffectPrefab;
@@ -30,6 +20,11 @@ namespace BeyondPixels.SceneBootstraps
         {
             public int SpawnRadius;
             public GameObject Prefab;
+        }
+
+        public void Start()
+        {
+            PrefabManager.Instance = this;
         }
     }
 }

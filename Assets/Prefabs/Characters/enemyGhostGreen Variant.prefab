@@ -60,7 +60,7 @@ PrefabInstance:
     - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackRange
-      value: 1
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
