@@ -47,7 +47,7 @@ MonoBehaviour:
   Spells:
   - Prefab: {fileID: 1323627655978938, guid: 2d3bf13eefb3bf644bcd035b85b512db, type: 3}
     BarColor: {r: 1, g: 0.12869696, b: 0, a: 1}
-    Icon: {fileID: 21300002, guid: 51567f3458543d84a809d05f5557d59d, type: 3}
+    Icon: {fileID: 21300000, guid: 921c7cc9022f34d44838f8fdd960f976, type: 3}
     Name: Fire Ring
     Description: Sets target on fire
     CastTime: 1
@@ -60,10 +60,10 @@ MonoBehaviour:
     SelfTarget: 0
     TargetRequired: 1
   - Prefab: {fileID: 1323627655978938, guid: 134c93e7cee606f408b481892c0ccf47, type: 3}
-    BarColor: {r: 0, g: 0.52242804, b: 1, a: 1}
-    Icon: {fileID: 21300002, guid: 51567f3458543d84a809d05f5557d59d, type: 3}
-    Name: Ice storm
-    Description: Throws target into ice storm
+    BarColor: {r: 1, g: 0.6018832, b: 0, a: 1}
+    Icon: {fileID: 21300000, guid: 037b89c727b7b644bb4872a5629a4ca0, type: 3}
+    Name: Fire Blast
+    Description: Fire Explosion
     CastTime: 1.5
     Duration: 0.1
     CoolDown: 20
@@ -75,7 +75,7 @@ MonoBehaviour:
     TargetRequired: 1
   - Prefab: {fileID: 1323627655978938, guid: 67bd56ce7ddf464408ca38d580ad63e2, type: 3}
     BarColor: {r: 0, g: 0.5188679, b: 0.09554865, a: 1}
-    Icon: {fileID: 21300002, guid: 51567f3458543d84a809d05f5557d59d, type: 3}
+    Icon: {fileID: 4714366232136672873, guid: 5e045e6ebb3de9a4ea63464f953b130a, type: 3}
     Name: Self Heal
     Description: Gives healing effect to spell's caster
     CastTime: 7

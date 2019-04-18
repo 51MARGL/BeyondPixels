@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6927925922833878708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6927925922833878711}
+  - component: {fileID: 6927925922833878710}
+  - component: {fileID: 6927925922833878709}
+  m_Layer: 0
+  m_Name: ItemsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6927925922833878711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6927925922833878708}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6927925922833878710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6927925922833878708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afc17de2511f66c43897cb08b3634798, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6927925922833878709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6927925922833878708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48febafd8e3bc7943a6d0e887ae3f621, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Items:
+  - Icons:
+    - {fileID: 21300000, guid: fd1afa03212cb044fa728447e43f1d7a, type: 3}
+    - {fileID: 21300000, guid: 974d3665dce03fa4b9f1fba4ec8d5470, type: 3}
+    - {fileID: 21300000, guid: d929731af6c2f324aaaa7c715e41b3c9, type: 3}
+    - {fileID: 21300000, guid: 4592952035839d440a91a9220d50599d, type: 3}
+    ItemType: 1
+    Name: Food
+    ModifierType: 1
+    ModifierValue: 15
+    GearType: 0
+  - Icons:
+    - {fileID: 21300000, guid: 5476e844c6d1faf419b1a7daac7a9062, type: 3}
+    ItemType: 2
+    Name: Health Potion
+    ModifierType: 1
+    ModifierValue: 50
+    GearType: 0
+  - Icons:
+    - {fileID: 21300000, guid: f0016a59f66e81a4aa77ac003f780c57, type: 3}
+    - {fileID: 21300000, guid: 4f8a1df4e029f5f4890990cb5a8b7ebc, type: 3}
+    - {fileID: 21300000, guid: abffe8ba564b5624093787098e148cad, type: 3}
+    - {fileID: 21300000, guid: 93cdda05e96ce9d498aadc4f9d56d089, type: 3}
+    - {fileID: 21300000, guid: 91fbb4c195aea5949a5f60200c44a0c9, type: 3}
+    ItemType: 4
+    Name: Treasure
+    ModifierType: 0
+    ModifierValue: 0
+    GearType: 0
+  - Icons:
+    - {fileID: 21300000, guid: eba945d2676a64b4d9f7e0c2d9b52ec8, type: 3}
+    ItemType: 3
+    Name: Helmet
+    ModifierType: 4
+    ModifierValue: 7
+    GearType: 1
+  - Icons:
+    - {fileID: 21300000, guid: 9252cf670a456694ca817c97b398619b, type: 3}
+    ItemType: 3
+    Name: Chest
+    ModifierType: 4
+    ModifierValue: 10
+    GearType: 2
+  - Icons:
+    - {fileID: 21300000, guid: 7307285fa28fe9546a30dee67eae4338, type: 3}
+    ItemType: 3
+    Name: Boots
+    ModifierType: 4
+    ModifierValue: 5
+    GearType: 4
+  - Icons:
+    - {fileID: 21300000, guid: a1f15b6c5e5c0e547a73c1dbd4dddf8e, type: 3}
+    ItemType: 3
+    Name: Sword
+    ModifierType: 2
+    ModifierValue: 20
+    GearType: 3
+  - Icons:
+    - {fileID: 21300000, guid: 49830698c1008a143a85757ba9592fe8, type: 3}
+    ItemType: 3
+    Name: Spell Book
+    ModifierType: 3
+    ModifierValue: 5
+    GearType: 5
