@@ -1,9 +1,11 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
@@ -23,17 +25,17 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
             public void Execute(ref InputComponent inputComponent, ref MovementComponent movementComponent)
             {
-                movementComponent.Direction = Direction;
-                inputComponent.InputDirection = Direction;
+                movementComponent.Direction = this.Direction;
+                inputComponent.InputDirection = this.Direction;
 
-                inputComponent.AttackButtonPressed = AttackPressed;
+                inputComponent.AttackButtonPressed = this.AttackPressed;
 
-                inputComponent.MouseButtonClicked = MouseClicked;
-                inputComponent.MousePosition = MousePosition;
-                inputComponent.SelectTargetButtonPressed = SelectTargetButtonPressed;
+                inputComponent.MouseButtonClicked = this.MouseClicked;
+                inputComponent.MousePosition = this.MousePosition;
+                inputComponent.SelectTargetButtonPressed = this.SelectTargetButtonPressed;
 
-                if (ActionButtonPressed > 0)
-                    inputComponent.ActionButtonPressed = ActionButtonPressed;
+                if (this.ActionButtonPressed > 0)
+                    inputComponent.ActionButtonPressed = this.ActionButtonPressed;
             }
         }
 

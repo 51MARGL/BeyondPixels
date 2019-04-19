@@ -1,11 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
+using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.SaveGame;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
@@ -16,7 +22,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
 
         protected override void OnCreateManager()
         {
-            _saveGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._saveGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -27,26 +33,38 @@ namespace BeyondPixels.ECS.Systems.SaveGame
 
         protected override void OnUpdate()
         {
-            Entities.With(_saveGroup).ForEach((Entity entity) =>
+            this.Entities.With(this._saveGroup).ForEach((Entity entity) =>
             {
                 SaveData playerData = null;
-                Entities.WithAll<PlayerComponent>().ForEach((Entity playerEntity) =>
+                this.Entities.WithAll<PlayerComponent>().ForEach((Entity playerEntity) =>
                 {
                     playerData = new SaveData
                     {
-                        LevelComponent = EntityManager.GetComponentData<LevelComponent>(playerEntity),
-                        HealthComponent = EntityManager.GetComponentData<HealthComponent>(playerEntity),
-                        XPComponent = EntityManager.GetComponentData<XPComponent>(playerEntity),
-                        HealthStatComponent = EntityManager.GetComponentData<HealthStatComponent>(playerEntity),
-                        AttackStatComponent = EntityManager.GetComponentData<AttackStatComponent>(playerEntity),
-                        DefenceStatComponent = EntityManager.GetComponentData<DefenceStatComponent>(playerEntity),
-                        MagicStatComponent = EntityManager.GetComponentData<MagicStatComponent>(playerEntity)
+                        LevelComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity),
+                        HealthComponent = this.EntityManager.GetComponentData<HealthComponent>(playerEntity),
+                        XPComponent = this.EntityManager.GetComponentData<XPComponent>(playerEntity),
+                        HealthStatComponent = this.EntityManager.GetComponentData<HealthStatComponent>(playerEntity),
+                        AttackStatComponent = this.EntityManager.GetComponentData<AttackStatComponent>(playerEntity),
+                        DefenceStatComponent = this.EntityManager.GetComponentData<DefenceStatComponent>(playerEntity),
+                        MagicStatComponent = this.EntityManager.GetComponentData<MagicStatComponent>(playerEntity)
                     };
+
+                    playerData.ItemDataList = new List<ItemData>();
+                    this.Entities.WithAll<ItemComponent, PickedUpComponent>().ForEach((Entity itemEntity, 
+                        ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
+                    {
+                        if (pickedUpComponent.Owner == playerEntity)
+                            playerData.ItemDataList.Add(new ItemData
+                            {
+                                IsEquiped = EntityManager.HasComponent<EquipedComponent>(itemEntity),
+                                ItemComponent = itemComponent
+                            });
+                    });
                 });
                 if (playerData != null)
-                    SaveGame(playerData);
+                    this.SaveGame(playerData);
 
-                PostUpdateCommands.DestroyEntity(entity);
+                this.PostUpdateCommands.DestroyEntity(entity);
             });
         }
 
@@ -55,17 +73,27 @@ namespace BeyondPixels.ECS.Systems.SaveGame
             var saveFolder = Path.Combine(Application.persistentDataPath, "SaveGame");
             var fileName = "savegame.save";
             var savePath = Path.Combine(saveFolder, fileName);
-            Directory.CreateDirectory(saveFolder);
+            var saveBckpPath = savePath + Guid.NewGuid() + ".bckp";
 
-            if (File.Exists(savePath))
-                File.Move(savePath, savePath + ".bckp");
+            try
+            {
+                Directory.CreateDirectory(saveFolder);
 
-            var binaryFormatter = new BinaryFormatter();
+                if (File.Exists(savePath))
+                    File.Move(savePath, saveBckpPath);
 
-            using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                binaryFormatter.Serialize(fileStream, playerSaveData);
+                var binaryFormatter = new BinaryFormatter();
 
-            File.Delete(savePath + ".bckp");
+                using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                    binaryFormatter.Serialize(fileStream, playerSaveData);
+
+                File.Delete(savePath + ".bckp");
+            }
+            catch (Exception)
+            {
+                if (File.Exists(saveBckpPath))
+                    File.Move(saveBckpPath, savePath);
+            }
         }
     }
 }

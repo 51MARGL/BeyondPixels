@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -21,7 +22,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                                 int index,
                                 [ReadOnly] ref LevelComponent levelComponent)
             {
-                CommandBuffer.RemoveComponent<AdjustStatsComponent>(index, entity);
+                this.CommandBuffer.RemoveComponent<AdjustStatsComponent>(index, entity);
             }
         }
 
@@ -29,16 +30,16 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new AfterStatsAdjustJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

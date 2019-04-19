@@ -2,7 +2,8 @@
 
 namespace BeyondPixels.ECS.Components.Scenes
 {
-    public class PlayerExitCutsceneComponent : MonoBehaviour {
+    public class PlayerExitCutsceneComponent : MonoBehaviour
+    {
         public GameObject ExitCaveDoor;
     }
 }

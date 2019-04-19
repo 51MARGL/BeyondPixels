@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -18,7 +19,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
                                 [ReadOnly] ref XPComponent xpComponent)
             {
                 if (xpComponent.CurrentXP >= levelComponent.NextLevelXP)
-                    CommandBuffer.AddComponent(index, entity, new LevelUpComponent());
+                    this.CommandBuffer.AddComponent(index, entity, new LevelUpComponent());
             }
         }
 
@@ -26,16 +27,16 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new LevelJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

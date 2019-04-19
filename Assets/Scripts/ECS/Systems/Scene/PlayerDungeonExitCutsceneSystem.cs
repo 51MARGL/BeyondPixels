@@ -3,8 +3,10 @@ using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
@@ -21,7 +23,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
         private bool cutsceneDone;
         protected override void OnCreateManager()
         {
-            _triggerCutsceneGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._triggerCutsceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -32,7 +34,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     typeof(DestroyComponent)
                 }
             });
-            _playerDoneCutSceneGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._playerDoneCutSceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -44,7 +46,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         protected override void OnUpdate()
         {
-            Entities.With(_triggerCutsceneGroup).ForEach((Entity triggerEntity, PlayerExitCutsceneComponent playerExitCutsceneComponent) =>
+            this.Entities.With(this._triggerCutsceneGroup).ForEach((Entity triggerEntity, PlayerExitCutsceneComponent playerExitCutsceneComponent) =>
             {
                 var player = GameObject.FindGameObjectWithTag("Player");
                 var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
@@ -56,26 +58,26 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var desiredPosition = new float2(levelExit.transform.position.x, levelExit.transform.position.y);
                 desiredPosition.y -= 1f;
 
-                if (!EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
-                    PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                if (!this.EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                    this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
 
-                var movementComponent = EntityManager.GetComponentData<MovementComponent>(playerEntity);
+                var movementComponent = this.EntityManager.GetComponentData<MovementComponent>(playerEntity);
                 if (math.abs(playerPosition.x - desiredPosition.x) > 0.05f
                     || math.abs(playerPosition.y - desiredPosition.y) > 0.05f)
                 {
                     movementComponent.Direction = desiredPosition - playerPosition;
-                    PostUpdateCommands.SetComponent(playerEntity, movementComponent);
+                    this.PostUpdateCommands.SetComponent(playerEntity, movementComponent);
                     return;
                 }
                 movementComponent.Direction = float2.zero;
-                PostUpdateCommands.SetComponent(playerEntity, movementComponent);
+                this.PostUpdateCommands.SetComponent(playerEntity, movementComponent);
 
                 if (!director.enabled)
                     director.enabled = true;
 
                 void onStop(PlayableDirector aDirector)
                 {
-                    cutsceneDone = true;
+                    this.cutsceneDone = true;
                     rigidbody.isKinematic = false;
                     director.stopped -= onStop;
                     director.enabled = false;
@@ -97,25 +99,26 @@ namespace BeyondPixels.ECS.Systems.Scenes
                         director.SetGenericBinding(playableAssetOutput.sourceObject, levelExit);
                     }
                 }
-                cutsceneDone = false;
+                this.cutsceneDone = false;
                 rigidbody.isKinematic = true;
-                PostUpdateCommands.AddComponent(playerEntity, new PlayerExitCutscenePlaying());
+                this.PostUpdateCommands.AddComponent(playerEntity, new PlayerExitCutscenePlaying());
                 director.Play();
-                PostUpdateCommands.AddComponent(triggerEntity, new DestroyComponent());
+                this.PostUpdateCommands.AddComponent(triggerEntity, new DestroyComponent());
             });
 
-            Entities.With(_playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
+            this.Entities.With(this._playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
             {
-                if (cutsceneDone)
+                if (this.cutsceneDone)
                 {
-                    PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
-                    PostUpdateCommands.RemoveComponent<PlayerExitCutscenePlaying>(playerEntity);
+                    this.PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
+                    this.PostUpdateCommands.RemoveComponent<PlayerExitCutscenePlaying>(playerEntity);
 
-                    var saveGameEntity = PostUpdateCommands.CreateEntity();
-                    PostUpdateCommands.AddComponent(saveGameEntity, new SaveGameComponent());
+                    var saveGameEntity = this.PostUpdateCommands.CreateEntity();
+                    this.PostUpdateCommands.AddComponent(saveGameEntity, new SaveGameComponent());
 
-                    var sceneLoadEntity = PostUpdateCommands.CreateEntity();
-                    PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent {
+                    var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
+                    this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
+                    {
                         SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
                     });
                 }

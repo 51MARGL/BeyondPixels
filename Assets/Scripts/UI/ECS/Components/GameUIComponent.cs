@@ -1,6 +1,9 @@
 ﻿using System;
+
 using BeyondPixels.UI.Buttons;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,7 +31,8 @@ namespace BeyondPixels.UI.ECS.Components
         }
 
         [Serializable]
-        public class SpellCastBarGroupWrapper {
+        public class SpellCastBarGroupWrapper
+        {
             public CanvasGroup SpellCastCanvasGroup;
             public Image SpellCastBar;
             public TextMeshProUGUI SpellCastTime;

@@ -2,11 +2,12 @@
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Spells;
-using BeyondPixels.SceneBootstraps;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
@@ -37,41 +38,41 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
-                var entities = chunk.GetNativeArray(EntityType);
-                var inputComponents = chunk.GetNativeArray(InputComponentType);
-                var spellCastingComponents = chunk.GetNativeArray(SpellCastingComponentType);
-                var targetComponents = chunk.GetNativeArray(TargetComponentType);
-                var magicStatComponents = chunk.GetNativeArray(MagicStatComponentType);
+                var entities = chunk.GetNativeArray(this.EntityType);
+                var inputComponents = chunk.GetNativeArray(this.InputComponentType);
+                var spellCastingComponents = chunk.GetNativeArray(this.SpellCastingComponentType);
+                var targetComponents = chunk.GetNativeArray(this.TargetComponentType);
+                var magicStatComponents = chunk.GetNativeArray(this.MagicStatComponentType);
 
-                for (int i = 0; i < chunk.Count; i++)
+                for (var i = 0; i < chunk.Count; i++)
                 {
                     if (inputComponents[i].AttackButtonPressed == 1
                         || !inputComponents[i].InputDirection.Equals(float2.zero))
                     {
-                        CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
+                        this.CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
                         return;
                     }
-                    for (int sChunkIndex = 0; sChunkIndex < ActiveSpellChunks.Length; sChunkIndex++)
+                    for (var sChunkIndex = 0; sChunkIndex < this.ActiveSpellChunks.Length; sChunkIndex++)
                     {
-                        var spellChunk = ActiveSpellChunks[sChunkIndex];
-                        var spellEntities = spellChunk.GetNativeArray(EntityType);
-                        var spellComponents = spellChunk.GetNativeArray(ActiveSpellComponentType);
-                        for (int sI = 0; sI < spellChunk.Count; sI++)
+                        var spellChunk = this.ActiveSpellChunks[sChunkIndex];
+                        var spellEntities = spellChunk.GetNativeArray(this.EntityType);
+                        var spellComponents = spellChunk.GetNativeArray(this.ActiveSpellComponentType);
+                        for (var sI = 0; sI < spellChunk.Count; sI++)
                         {
                             if (spellEntities[sI] == spellCastingComponents[i].ActiveSpell)
                             {
                                 var spellPrefab = SpellBookManagerComponent.Instance.SpellBook.Spells[spellComponents[sI].SpellIndex];
-                                if (spellPrefab.TargetRequired && !chunk.Has(TargetComponentType))
+                                if (spellPrefab.TargetRequired && !chunk.Has(this.TargetComponentType))
                                 {
-                                    CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
+                                    this.CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
                                     return;
                                 }
 
                                 var magicStatComponent = magicStatComponents[i];
-                                var castTime = math.max(1f, spellPrefab.CastTime - 
+                                var castTime = math.max(1f, spellPrefab.CastTime -
                                                             (spellPrefab.CastTime / 100f * magicStatComponent.CurrentValue));
 
-                                if (spellCastingComponents[i].StartedAt + castTime > CurrentTime)
+                                if (spellCastingComponents[i].StartedAt + castTime > this.CurrentTime)
                                     return;
 
                                 var target = Entity.Null;
@@ -83,12 +84,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                 var coolDown = math.max(1f, spellPrefab.CoolDown -
                                                             (spellPrefab.CoolDown / 100f * magicStatComponent.CurrentValue));
 
-                                CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
-                                CommandBuffer.AddComponent(chunkIndex, spellEntities[sI], new CoolDownComponent
+                                this.CommandBuffer.RemoveComponent<SpellCastingComponent>(chunkIndex, entities[i]);
+                                this.CommandBuffer.AddComponent(chunkIndex, spellEntities[sI], new CoolDownComponent
                                 {
                                     CoolDownTime = coolDown
                                 });
-                                CommandBuffer.AddComponent(chunkIndex, spellEntities[sI], new InstantiateSpellComponent
+                                this.CommandBuffer.AddComponent(chunkIndex, spellEntities[sI], new InstantiateSpellComponent
                                 {
                                     Caster = entities[i],
                                     Target = target
@@ -108,8 +109,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _playerCastingGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._playerCastingGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(InputComponent),
@@ -122,7 +123,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                      ComponentType.ReadOnly<AttackComponent>()
                 }
             });
-            _activeSpellGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._activeSpellGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     ComponentType.ReadOnly<ActiveSpellComponent>()
@@ -139,17 +140,17 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         {
             var spellCastingJobHandle = new SpellCastingJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                ActiveSpellChunks = _activeSpellGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = GetArchetypeChunkEntityType(),
-                InputComponentType = GetArchetypeChunkComponentType<InputComponent>(),
-                MagicStatComponentType = GetArchetypeChunkComponentType<MagicStatComponent>(true),
-                SpellCastingComponentType = GetArchetypeChunkComponentType<SpellCastingComponent>(true),
-                TargetComponentType = GetArchetypeChunkComponentType<TargetComponent>(true),
-                ActiveSpellComponentType = GetArchetypeChunkComponentType<ActiveSpellComponent>(true),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                ActiveSpellChunks = this._activeSpellGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = this.GetArchetypeChunkEntityType(),
+                InputComponentType = this.GetArchetypeChunkComponentType<InputComponent>(),
+                MagicStatComponentType = this.GetArchetypeChunkComponentType<MagicStatComponent>(true),
+                SpellCastingComponentType = this.GetArchetypeChunkComponentType<SpellCastingComponent>(true),
+                TargetComponentType = this.GetArchetypeChunkComponentType<TargetComponent>(true),
+                ActiveSpellComponentType = this.GetArchetypeChunkComponentType<ActiveSpellComponent>(true),
                 CurrentTime = Time.time
-            }.Schedule(_playerCastingGroup, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(spellCastingJobHandle);
+            }.Schedule(this._playerCastingGroup, inputDeps);
+            this._endFrameBarrier.AddJobHandleForProducer(spellCastingJobHandle);
             return spellCastingJobHandle;
         }
     }

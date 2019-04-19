@@ -1,7 +1,10 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+
 using Cinemachine;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Scenes
@@ -15,7 +18,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         protected override void OnCreateManager()
         {
-            _boardCameraGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._boardCameraGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -30,7 +33,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         protected override void OnUpdate()
         {
-            Entities.With(_boardCameraGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
+            this.Entities.With(this._boardCameraGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
             {
                 var mapCamTargetGroup = new GameObject("TileMapCamTargetGroup").AddComponent<CinemachineTargetGroup>();
                 var lb = new GameObject("camTarget1");
@@ -52,7 +55,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 groupCamera.Follow = mapCamTargetGroup.transform;
                 groupCamera.LookAt = mapCamTargetGroup.transform;
 
-                PostUpdateCommands.AddComponent(entity, new BoardCameraInitializedComponent());
+                this.PostUpdateCommands.AddComponent(entity, new BoardCameraInitializedComponent());
             });
         }
     }

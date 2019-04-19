@@ -1,6 +1,6 @@
 ﻿using System;
+
 using Unity.Entities;
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Components.Characters.Common
 {
@@ -9,5 +9,5 @@ namespace BeyondPixels.ECS.Components.Characters.Common
     {
         public float MaxValue;
         public float CurrentValue;
-    } 
+    }
 }

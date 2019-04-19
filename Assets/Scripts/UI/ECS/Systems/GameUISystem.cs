@@ -4,8 +4,10 @@ using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI.ECS.Components;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Systems
@@ -19,26 +21,26 @@ namespace BeyondPixels.UI.ECS.Systems
         private ComponentGroup _spellButtonEventsGroup;
         protected override void OnCreateManager()
         {
-            _playerGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(HealthComponent), typeof(PlayerComponent),
                     typeof(MagicStatComponent), typeof(LevelComponent), typeof(XPComponent)
                 }
             });
-            _playerSpellCastingGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._playerSpellCastingGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(SpellCastingComponent)
                 }
             });
-            _activeSpellGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._activeSpellGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(ActiveSpellComponent)
                 }
             });
-            _spellButtonEventsGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._spellButtonEventsGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(ActionButtonPressedComponent)
@@ -52,10 +54,10 @@ namespace BeyondPixels.UI.ECS.Systems
             var uiComponent = UIManager.Instance.GameUIComponent;
             var spellBook = SpellBookManagerComponent.Instance.SpellBook;
 
-            Entities.With(_playerGroup).ForEach((Entity playerEntity, 
-                ref HealthComponent healthComponent, 
-                ref MagicStatComponent magicStatComponent, 
-                ref LevelComponent levelComponent, 
+            this.Entities.With(this._playerGroup).ForEach((Entity playerEntity,
+                ref HealthComponent healthComponent,
+                ref MagicStatComponent magicStatComponent,
+                ref LevelComponent levelComponent,
                 ref XPComponent xpComponent) =>
             {
                 var playerUIHealthGroup = uiComponent.HealthGroup;
@@ -71,7 +73,7 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 var playerUILevelGroup = uiComponent.LevelGroup;
 
-                var currentLevel =  levelComponent.CurrentLevel;
+                var currentLevel = levelComponent.CurrentLevel;
                 var xpToNextLevel = levelComponent.NextLevelXP;
                 var currentXP = xpComponent.CurrentXP;
                 var prevLevelXP = xpToNextLevel / 2f;
@@ -83,10 +85,10 @@ namespace BeyondPixels.UI.ECS.Systems
                     = math.lerp(playerUILevelGroup.XPProgressImage.fillAmount, currentXPFill, deltaTime * 10f);
                 playerUILevelGroup.LevelText.text = currentLevel.ToString();
 
-                if (EntityManager.HasComponent<SpellCastingComponent>(playerEntity))
+                if (this.EntityManager.HasComponent<SpellCastingComponent>(playerEntity))
                 {
                     var playerUISpellBarGroup = uiComponent.SpellCastBarGroup;
-                    var spellCastingComponent = EntityManager.GetComponentData<SpellCastingComponent>(playerEntity);
+                    var spellCastingComponent = this.EntityManager.GetComponentData<SpellCastingComponent>(playerEntity);
                     var spellIndex = spellCastingComponent.SpellIndex;
                     var spell = spellBook.Spells[spellIndex];
                     var castTime = math.max(1f, spell.CastTime -
@@ -113,7 +115,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
             });
 
-            Entities.With(_activeSpellGroup).ForEach((Entity spellEntity, ref ActiveSpellComponent activeSpellComponent) =>
+            this.Entities.With(this._activeSpellGroup).ForEach((Entity spellEntity, ref ActiveSpellComponent activeSpellComponent) =>
             {
                 var playerUISpellButtonsGroup = uiComponent.SpellButtonsGroup;
                 var button = playerUISpellButtonsGroup.ActionButtons[activeSpellComponent.ActionIndex - 1];
@@ -122,9 +124,9 @@ namespace BeyondPixels.UI.ECS.Systems
                 if (button.SpellIcon.sprite != spell.Icon)
                     button.SpellIcon.sprite = spell.Icon;
 
-                if (EntityManager.HasComponent<CoolDownComponent>(spellEntity))
+                if (this.EntityManager.HasComponent<CoolDownComponent>(spellEntity))
                 {
-                    var coolDownComponent = EntityManager.GetComponentData<CoolDownComponent>(spellEntity);
+                    var coolDownComponent = this.EntityManager.GetComponentData<CoolDownComponent>(spellEntity);
                     if (coolDownComponent.CoolDownTime > 0)
                     {
                         button.CoolDownImage.enabled = true;
@@ -141,21 +143,21 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
                 if (spell.TargetRequired)
                 {
-                    if (EntityManager.HasComponent<TargetComponent>(activeSpellComponent.Owner))
+                    if (this.EntityManager.HasComponent<TargetComponent>(activeSpellComponent.Owner))
                         button.SpellIcon.color = new Color(1, 1, 1, 1);
                     else
                         button.SpellIcon.color = new Color(1, 1, 1, 0.25f);
                 }
             });
 
-            Entities.With(_spellButtonEventsGroup).ForEach((Entity eventEntity, ref ActionButtonPressedComponent eventComponent) =>
+            this.Entities.With(this._spellButtonEventsGroup).ForEach((Entity eventEntity, ref ActionButtonPressedComponent eventComponent) =>
             {
                 var actionIndex = eventComponent.ActionIndex + 1;
-                Entities.With(_playerGroup).ForEach((ref InputComponent inputComponent) =>
+                this.Entities.With(this._playerGroup).ForEach((ref InputComponent inputComponent) =>
                 {
                     inputComponent.ActionButtonPressed = actionIndex;
                 });
-                PostUpdateCommands.DestroyEntity(eventEntity);
+                this.PostUpdateCommands.DestroyEntity(eventEntity);
             });
         }
     }

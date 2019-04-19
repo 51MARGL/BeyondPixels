@@ -10,7 +10,7 @@ namespace BeyondPixels.ECS.Components.Scenes
         public void Start()
         {
             TimelinesManagerComponent.Instance = this;
-            this.Timelines = GetComponent<TimelinesComponent>();
+            this.Timelines = this.GetComponent<TimelinesComponent>();
         }
     }
 }

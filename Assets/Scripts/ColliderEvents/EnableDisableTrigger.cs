@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents

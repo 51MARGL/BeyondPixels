@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Systems.Characters.Common;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Characters.Stats
@@ -13,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 
         protected override void OnCreateManager()
         {
-            _group = GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -24,20 +25,20 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 
         protected override void OnUpdate()
         {
-            Entities.With(_group).ForEach((ref CollisionInfo collisionInfo, ref FinalDamageComponent finalDamageComponent) =>
+            this.Entities.With(this._group).ForEach((ref CollisionInfo collisionInfo, ref FinalDamageComponent finalDamageComponent) =>
             {
                 switch (finalDamageComponent.DamageType)
                 {
                     case DamageType.Weapon:
-                        var attackStatComponent = EntityManager.GetComponentData<AttackStatComponent>(collisionInfo.Sender);
-                        var defenceStatComponent = EntityManager.GetComponentData<DefenceStatComponent>(collisionInfo.Target);
+                        var attackStatComponent = this.EntityManager.GetComponentData<AttackStatComponent>(collisionInfo.Sender);
+                        var defenceStatComponent = this.EntityManager.GetComponentData<DefenceStatComponent>(collisionInfo.Target);
                         var attackModifier = finalDamageComponent.DamageAmount / 100f * attackStatComponent.CurrentValue;
                         var defenceModifier = finalDamageComponent.DamageAmount / 100f * defenceStatComponent.CurrentValue;
                         finalDamageComponent.DamageAmount += attackModifier - defenceModifier;
                         break;
                     case DamageType.Magic:
-                        var casterMagicStatComponent = EntityManager.GetComponentData<MagicStatComponent>(collisionInfo.Sender);
-                        var targetMagicStatComponent = EntityManager.GetComponentData<MagicStatComponent>(collisionInfo.Target);
+                        var casterMagicStatComponent = this.EntityManager.GetComponentData<MagicStatComponent>(collisionInfo.Sender);
+                        var targetMagicStatComponent = this.EntityManager.GetComponentData<MagicStatComponent>(collisionInfo.Target);
                         var casterMagicModifier = finalDamageComponent.DamageAmount / 100f * casterMagicStatComponent.CurrentValue;
                         var targetMagicModifier = finalDamageComponent.DamageAmount / 100f * targetMagicStatComponent.CurrentValue;
                         if (collisionInfo.Sender == collisionInfo.Target)

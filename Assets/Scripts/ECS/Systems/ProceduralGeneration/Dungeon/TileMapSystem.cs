@@ -1,10 +1,12 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+
 using BeyondPixels.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -22,8 +24,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
         protected override void OnCreateManager()
         {
-            TilesList = new NativeList<FinalTileComponent>(Allocator.Persistent);
-            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            this.TilesList = new NativeList<FinalTileComponent>(Allocator.Persistent);
+            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -34,14 +36,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                     typeof(TilemapReadyComponent)
                 }
             });
-            _tilemapGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._tilemapGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
                     typeof(DungeonTileMapComponent), typeof(Transform)
                 }
             });
-            _tilesGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -52,32 +54,32 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
         protected override void OnUpdate()
         {
-            Entities.With(_boardGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
+            this.Entities.With(this._boardGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
             {
-                SetBoardTiles(finalBoardComponent.Size, entity);
+                this.SetBoardTiles(finalBoardComponent.Size, entity);
             });
         }
 
         private void SetBoardTiles(int2 boardSize, Entity boardEntity)
         {
-            Entities.With(_tilemapGroup).ForEach((Entity entity, Transform transform, DungeonTileMapComponent tilemapComponent) =>
+            this.Entities.With(this._tilemapGroup).ForEach((Entity entity, Transform transform, DungeonTileMapComponent tilemapComponent) =>
             {
                 if (tilemapComponent.tileSpawnRoutine != null)
                     return;
 
                 TileMapSystem.TileMapDrawing = true;
-                TilesList.Clear();
-                Entities.With(_tilesGroup).ForEach((ref FinalTileComponent finalTileComponent) =>
+                this.TilesList.Clear();
+                this.Entities.With(this._tilesGroup).ForEach((ref FinalTileComponent finalTileComponent) =>
                 {
-                    TilesList.Add(finalTileComponent);
+                    this.TilesList.Add(finalTileComponent);
                 });
 
-                if (TilesList.Length > 0)
+                if (this.TilesList.Length > 0)
                     tilemapComponent.tileSpawnRoutine = tilemapComponent.StartCoroutine(
                                 this.SetTiles(entity, tilemapComponent, boardSize, transform)
                             );
 
-                PostUpdateCommands.AddComponent(boardEntity, new TilemapReadyComponent());
+                this.PostUpdateCommands.AddComponent(boardEntity, new TilemapReadyComponent());
             });
         }
 
@@ -96,7 +98,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
             yield return null;
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var yTop = centerY + i > boardSize.y - 1 ? boardSize.y - 1 : centerY + i;
                 var yBottom = centerY - i < 0 ? 0 : centerY - i;
@@ -106,7 +108,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 if (xLeft >= 0 && xRigth < boardSize.x)
                     for (int x = xLeft, iterationCounter = 0; x <= xRigth; x++, iterationCounter++)
                     {
-                        var tile = TilesList[yTop * boardSize.x + x];
+                        var tile = this.TilesList[yTop * boardSize.x + x];
                         if (tile.TileType == TileType.Floor)
                         {
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
@@ -118,7 +120,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        tile = TilesList[yBottom * boardSize.x + x];
+                        tile = this.TilesList[yBottom * boardSize.x + x];
                         if (tile.TileType == TileType.Floor)
                         {
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
@@ -134,7 +136,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 if (yBottom >= 0 && yTop < boardSize.y)
                     for (int y = yBottom, iterationCounter = 0; y <= yTop; y++, iterationCounter++)
                     {
-                        var tile = TilesList[y * boardSize.x + xLeft];
+                        var tile = this.TilesList[y * boardSize.x + xLeft];
                         if (tile.TileType == TileType.Floor)
                         {
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
@@ -146,7 +148,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
 
-                        tile = TilesList[y * boardSize.x + xRigth];
+                        tile = this.TilesList[y * boardSize.x + xRigth];
                         if (tile.TileType == TileType.Floor)
                         {
                             tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
@@ -162,9 +164,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             }
 
             if (boardSize.y % 2 == 0)
-                for (int x = 0; x < boardSize.x; x++)
+                for (var x = 0; x < boardSize.x; x++)
                 {
-                    var tile = TilesList[0 * boardSize.x + x];
+                    var tile = this.TilesList[0 * boardSize.x + x];
                     if (tile.TileType == TileType.Floor)
                     {
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
@@ -178,9 +180,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 }
 
             if (boardSize.x % 2 == 0)
-                for (int y = 0; y < boardSize.y; y++)
+                for (var y = 0; y < boardSize.y; y++)
                 {
-                    var tile = TilesList[y * boardSize.x];
+                    var tile = this.TilesList[y * boardSize.x];
                     if (tile.TileType == TileType.Floor)
                     {
                         tilemapComponent.TilemapBase.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.GroundTile);
@@ -195,9 +197,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             yield return null;
 
             //hide skybox
-            for (int x = -tilemapComponent.OuterWallWidth; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)
+            for (var x = -tilemapComponent.OuterWallWidth; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)
             {
-                for (int y = boardSize.y; y < boardSize.y + tilemapComponent.OuterWallWidth; y++)
+                for (var y = boardSize.y; y < boardSize.y + tilemapComponent.OuterWallWidth; y++)
                 {
                     tilemapComponent.TilemapWalls.SetTile(new Vector3Int(x, boardSize.y - 1 - y, 0), tilemapComponent.WallTile);
                     tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(x, boardSize.y - 1 - y, 0), tilemapComponent.WallTileTop);
@@ -208,9 +210,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
                 yield return null;
             }
-            for (int y = 0; y < boardSize.y; y++)
+            for (var y = 0; y < boardSize.y; y++)
             {
-                for (int x = boardSize.x; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)
+                for (var x = boardSize.x; x < boardSize.x + tilemapComponent.OuterWallWidth; x++)
                 {
                     tilemapComponent.TilemapWalls.SetTile(new Vector3Int(boardSize.x - 1 - x, y, 0), tilemapComponent.WallTile);
                     tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(boardSize.x - 1 - x, y, 0), tilemapComponent.WallTileTop);
@@ -222,7 +224,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 yield return null;
             }
 
-            TilesList.Clear();
+            this.TilesList.Clear();
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
             TileMapSystem.TileMapDrawing = false;
@@ -230,7 +232,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
         protected override void OnDestroyManager()
         {
-            TilesList.Dispose();
+            this.TilesList.Dispose();
         }
     }
 }

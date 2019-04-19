@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -12,13 +14,13 @@ namespace BeyondPixels.ColliderEvents
                 && !this.transform.parent.gameObject.CompareTag(collider.transform.parent.tag))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
                 var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                     return;
 
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), 
-                                                             typeof(WeaponCollisionComponent), 
+                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
+                                                             typeof(WeaponCollisionComponent),
                                                              typeof(DamageComponent));
 
                 entityManager.SetComponentData(eventEntity,

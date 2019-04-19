@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -24,13 +25,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute(int index)
             {
-                if (TreeArray[index].IsNull == 1 || TreeArray[index].IsLeaf == 0)
+                if (this.TreeArray[index].IsNull == 1 || this.TreeArray[index].IsLeaf == 0)
                     return;
 
-                var random = new Random((uint)(RandomSeed + index));
-                var node = TreeArray[index];
-                var roomX = math.clamp(node.RectBounds.x + random.NextInt(0, node.RectBounds.w / 3), 2, Board.Size.x - 2);
-                var roomY = math.clamp(node.RectBounds.y + random.NextInt(0, node.RectBounds.z / 3), 2, Board.Size.y - 2);
+                var random = new Random((uint)(this.RandomSeed + index));
+                var node = this.TreeArray[index];
+                var roomX = math.clamp(node.RectBounds.x + random.NextInt(0, node.RectBounds.w / 3), 2, this.Board.Size.x - 2);
+                var roomY = math.clamp(node.RectBounds.y + random.NextInt(0, node.RectBounds.z / 3), 2, this.Board.Size.y - 2);
                 var roomWidth = node.RectBounds.w - (roomX - node.RectBounds.x) - 2;
                 var roomHeight = node.RectBounds.z - (roomY - node.RectBounds.y) - 2;
                 roomWidth -= random.NextInt(0, roomWidth);
@@ -42,7 +43,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     Y = roomY,
                     Size = new int2(roomWidth, roomHeight)
                 };
-                TreeArray[index] = node;
+                this.TreeArray[index] = node;
             }
         }
 
@@ -62,17 +63,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute(int index)
             {
-                var startIndex = (int)math.pow(2, Level - 1) - 1;
-                if (TreeArray[startIndex + index].IsNull == 1
-                    || TreeArray[startIndex + index + 1].IsNull == 1
+                var startIndex = (int)math.pow(2, this.Level - 1) - 1;
+                if (this.TreeArray[startIndex + index].IsNull == 1
+                    || this.TreeArray[startIndex + index + 1].IsNull == 1
                     || startIndex + index % 2 == 0)
                     return;
 
-                var random = new Random((uint)(RandomSeed + index));
-                var leftRoom = GetRoom(startIndex + index);
-                var rightRoom = GetRoom(startIndex + index + 1);
+                var random = new Random((uint)(this.RandomSeed + index));
+                var leftRoom = this.GetRoom(startIndex + index);
+                var rightRoom = this.GetRoom(startIndex + index + 1);
 
-                Corridors.Enqueue(new CorridorComponent
+                this.Corridors.Enqueue(new CorridorComponent
                 {
                     Start = new int2(random.NextInt(leftRoom.X + 1, leftRoom.X + leftRoom.Size.x),
                                      random.NextInt(leftRoom.Y + 1, leftRoom.Y + leftRoom.Size.y)),
@@ -83,16 +84,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public RoomComponent GetRoom(int index)
             {
-                var node = TreeArray[index];
+                var node = this.TreeArray[index];
                 if (node.IsLeaf == 1)
                     return node.Room;
 
                 var room = new RoomComponent();
-                if (TreeArray[2 * index + 1].IsNull == 0)
-                    return GetRoom(2 * index + 1);
+                if (this.TreeArray[2 * index + 1].IsNull == 0)
+                    return this.GetRoom(2 * index + 1);
 
-                if (TreeArray[2 * index + 2].IsNull == 0)
-                    return GetRoom(2 * index + 2);
+                if (this.TreeArray[2 * index + 2].IsNull == 0)
+                    return this.GetRoom(2 * index + 2);
 
                 return room;
             }
@@ -107,10 +108,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute()
             {
-                int index = 0;
-                while (CorridorsQueue.Count > 0)
-                    if (CorridorsQueue.TryDequeue(out var corridor))
-                        CorridorsArray[index++] = corridor;
+                var index = 0;
+                while (this.CorridorsQueue.Count > 0)
+                    if (this.CorridorsQueue.TryDequeue(out var corridor))
+                        this.CorridorsArray[index++] = corridor;
             }
         }
 
@@ -129,8 +130,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute(int index)
             {
-                var tileA = Corridors[index].Start;
-                var tileB = Corridors[index].End;
+                var tileA = this.Corridors[index].Start;
+                var tileB = this.Corridors[index].End;
 
                 var dx = tileB.x - tileA.x;
                 var dy = tileB.y - tileA.y;
@@ -138,45 +139,45 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 if (index % 2 == 0)
                 {
                     if (dx < 0)
-                        ConnectHorizontal(tileB.x, tileA.x, tileB.y);
+                        this.ConnectHorizontal(tileB.x, tileA.x, tileB.y);
                     else
-                        ConnectHorizontal(tileA.x, tileB.x, tileA.y);
+                        this.ConnectHorizontal(tileA.x, tileB.x, tileA.y);
 
                     if (dy < 0)
-                        ConnectVertical(tileB.y, tileA.y, tileB.x);
+                        this.ConnectVertical(tileB.y, tileA.y, tileB.x);
                     else
-                        ConnectVertical(tileA.y, tileB.y, tileA.x);
+                        this.ConnectVertical(tileA.y, tileB.y, tileA.x);
                 }
                 else
                 {
                     if (dy < 0)
-                        ConnectVertical(tileB.y, tileA.y, tileB.x);
+                        this.ConnectVertical(tileB.y, tileA.y, tileB.x);
                     else
-                        ConnectVertical(tileA.y, tileB.y, tileA.x);
+                        this.ConnectVertical(tileA.y, tileB.y, tileA.x);
 
                     if (dx < 0)
-                        ConnectHorizontal(tileB.x, tileA.x, tileB.y);
+                        this.ConnectHorizontal(tileB.x, tileA.x, tileB.y);
                     else
-                        ConnectHorizontal(tileA.x, tileB.x, tileA.y);
+                        this.ConnectHorizontal(tileA.x, tileB.x, tileA.y);
                 }
             }
 
             private void ConnectHorizontal(int x1, int x2, int y)
             {
                 var dx = x2 - x1;
-                for (int x = 0; x <= dx; x++)
+                for (var x = 0; x <= dx; x++)
                 {
-                    Tiles[y * TileStride + x1 + x] = TileType.Floor;
-                    Tiles[(y - 1) * TileStride + x1 + x] = TileType.Floor;
+                    this.Tiles[y * this.TileStride + x1 + x] = TileType.Floor;
+                    this.Tiles[(y - 1) * this.TileStride + x1 + x] = TileType.Floor;
                 }
             }
             private void ConnectVertical(int y1, int y2, int x)
             {
                 var dy = y2 - y1;
-                for (int y = 0; y <= dy; y++)
+                for (var y = 0; y <= dy; y++)
                 {
-                    Tiles[(y1 + y) * TileStride + x] = TileType.Floor;
-                    Tiles[(y1 + y) * TileStride + x - 1] = TileType.Floor;
+                    this.Tiles[(y1 + y) * this.TileStride + x] = TileType.Floor;
+                    this.Tiles[(y1 + y) * this.TileStride + x - 1] = TileType.Floor;
                 }
             }
         }
@@ -195,20 +196,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute(int index)
             {
-                if (TreeArray[index].IsNull == 1 || TreeArray[index].IsLeaf == 0)
+                if (this.TreeArray[index].IsNull == 1 || this.TreeArray[index].IsLeaf == 0)
                     return;
 
-                var currentRoom = TreeArray[index].Room;
-                for (int j = 0; j < currentRoom.Size.x; j++)
+                var currentRoom = this.TreeArray[index].Room;
+                for (var j = 0; j < currentRoom.Size.x; j++)
                 {
-                    int xCoord = currentRoom.X + j;
+                    var xCoord = currentRoom.X + j;
 
                     if (currentRoom.X == 0 || currentRoom.Y == 0)
                         return;
-                    for (int k = 0; k < currentRoom.Size.y; k++)
+                    for (var k = 0; k < currentRoom.Size.y; k++)
                     {
-                        int yCoord = currentRoom.Y + k;
-                        Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
+                        var yCoord = currentRoom.Y + k;
+                        this.Tiles[(yCoord * this.TileStride) + xCoord] = TileType.Floor;
                     }
                 }
             }
@@ -223,7 +224,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute()
             {
-                RemoveThinWalls(Board, Tiles, Board.Size.x);
+                this.RemoveThinWalls(this.Board, this.Tiles, this.Board.Size.x);
             }
 
             private void RemoveThinWalls(BoardComponent board, NativeArray<TileType> tiles, int tilesStride)
@@ -267,13 +268,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute(int index)
             {
-                if (IsBoardValid())
-                    for (int x = 0; x < TileStride; x++)
+                if (this.IsBoardValid())
+                    for (var x = 0; x < this.TileStride; x++)
                     {
-                        var entity = CommandBuffer.CreateEntity(index);
-                        CommandBuffer.AddComponent(index, entity, new FinalTileComponent
+                        var entity = this.CommandBuffer.CreateEntity(index);
+                        this.CommandBuffer.AddComponent(index, entity, new FinalTileComponent
                         {
-                            TileType = Tiles[(index * TileStride) + x],
+                            TileType = this.Tiles[(index * this.TileStride) + x],
                             Position = new int2(x, index)
                         });
                     }
@@ -282,8 +283,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             private bool IsBoardValid()
             {
                 var freeTilesCount = 0;
-                for (int i = 0; i < Tiles.Length; i++)
-                    if (Tiles[i] == TileType.Floor)
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i] == TileType.Floor)
                         freeTilesCount++;
 
                 if (freeTilesCount < 50)
@@ -311,35 +312,35 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void Execute()
             {
-                if (IsBoardValid())
+                if (this.IsBoardValid())
                 {
-                    CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
-                    var finalBoardComponent = CommandBuffer.CreateEntity();
-                    CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
+                    var finalBoardComponent = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
                     {
-                        Size = BoardComponent.Size
+                        Size = this.BoardComponent.Size
                     });
                 }
                 else
                 {
-                    var random = new Random((uint)RandomSeed);
+                    var random = new Random((uint)this.RandomSeed);
 
                     var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 150));
-                    var board = CommandBuffer.CreateEntity();
-                    CommandBuffer.AddComponent(board, new BoardComponent
+                    var board = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
                         Size = randomSize,
-                        MinRoomSize = BoardComponent.MinRoomSize
+                        MinRoomSize = this.BoardComponent.MinRoomSize
                     });
-                    CommandBuffer.DestroyEntity(BoardEntity);
+                    this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }
             }
 
             private bool IsBoardValid()
             {
                 var freeTilesCount = 0;
-                for (int i = 0; i < Tiles.Length; i++)
-                    if (Tiles[i] == TileType.Floor)
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i] == TileType.Floor)
                         freeTilesCount++;
 
                 if (freeTilesCount < 50)
@@ -369,10 +370,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         private ComponentGroup _boardGroup;
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
-            CurrentPhase = 0;
-            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
+            this.CurrentPhase = 0;
+            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -387,25 +388,25 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var boardChunks = _boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
+            var boardChunks = this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (var chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
             {
                 var chunk = boardChunks[chunkIndex];
-                var boardEntities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
-                var boards = chunk.GetNativeArray(GetArchetypeChunkComponentType<BoardComponent>());
-                for (int i = 0; i < chunk.Count; i++)
+                var boardEntities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
+                var boards = chunk.GetNativeArray(this.GetArchetypeChunkComponentType<BoardComponent>());
+                for (var i = 0; i < chunk.Count; i++)
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
                     var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-                    if (CurrentPhase == 0)
+                    if (this.CurrentPhase == 0)
                     {
-                        Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                        for (int j = 0; j < Tiles.Length; j++)
-                            Tiles[j] = TileType.Wall;
+                        this.Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        for (var j = 0; j < this.Tiles.Length; j++)
+                            this.Tiles[j] = TileType.Wall;
 
                         var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
-                        TreeArray = bspTree.ToNativeArray();
+                        this.TreeArray = bspTree.ToNativeArray();
 
                         var createRoomsJobHandle = new CreateRoomsJob
                         {
@@ -413,11 +414,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             RandomSeed = random.NextInt(),
                             Board = board,
                             MinRoomSize = board.MinRoomSize
-                        }.Schedule(TreeArray.Length, 1, inputDeps);
+                        }.Schedule(this.TreeArray.Length, 1, inputDeps);
 
                         var lastLevelJobHandle = createRoomsJobHandle;
-                        var concurrentQueue = CorridorsQueue.ToConcurrent();
-                        for (int level = bspTree.Height; level > 0; level--)
+                        var concurrentQueue = this.CorridorsQueue.ToConcurrent();
+                        for (var level = bspTree.Height; level > 0; level--)
                         {
                             lastLevelJobHandle = new FindCorridorsForLevelJob
                             {
@@ -429,9 +430,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         }
                         inputDeps = lastLevelJobHandle;
                     }
-                    else if (CurrentPhase == 1)
+                    else if (this.CurrentPhase == 1)
                     {
-                        var corridorsArray = new NativeArray<CorridorComponent>(CorridorsQueue.Count, Allocator.TempJob);
+                        var corridorsArray = new NativeArray<CorridorComponent>(this.CorridorsQueue.Count, Allocator.TempJob);
 
                         var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
                         {
@@ -451,7 +452,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             TreeArray = TreeArray,
                             Tiles = Tiles,
                             TileStride = board.Size.x
-                        }.Schedule(TreeArray.Length, 1, inputDeps);
+                        }.Schedule(this.TreeArray.Length, 1, inputDeps);
 
                         var removeThinWallsJobHandle = new RemoveThinWallsJob
                         {
@@ -461,30 +462,30 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
                         var instantiateTilesJobHandle = new InstantiateTilesJob
                         {
-                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                             Tiles = Tiles,
                             TileStride = board.Size.x
                         }.Schedule(board.Size.y, 1, removeThinWallsJobHandle);
 
                         inputDeps = new TagBoardDoneJob
                         {
-                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer(),
+                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
                             BoardEntity = boardEntity,
                             BoardComponent = board,
                             TreeArray = TreeArray,
                             Tiles = Tiles,
                             RandomSeed = random.NextInt()
                         }.Schedule(instantiateTilesJobHandle);
-                        _endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                        this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
                     }
-                    else if (CurrentPhase == 2)
+                    else if (this.CurrentPhase == 2)
                     {
-                        CorridorsQueue.Clear();
+                        this.CorridorsQueue.Clear();
                     }
                 }
             }
 
-            CurrentPhase = (CurrentPhase + 1) % 3;
+            this.CurrentPhase = (this.CurrentPhase + 1) % 3;
             var cleanUpJobHandle = new CleanUpJob
             {
                 Chunks = boardChunks
@@ -494,7 +495,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
         protected override void OnDestroyManager()
         {
-            CorridorsQueue.Dispose();
+            this.CorridorsQueue.Dispose();
         }
     }
 }

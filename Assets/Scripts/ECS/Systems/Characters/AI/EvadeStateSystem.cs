@@ -1,7 +1,9 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnCreateManager()
         {
-            _evadeGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._evadeGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -30,7 +32,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnUpdate()
         {
-            Entities.With(_evadeGroup).ForEach((Entity entity,
+            this.Entities.With(this._evadeGroup).ForEach((Entity entity,
                                                 NavMeshAgent navMeshAgent,
                                                 ref MovementComponent movementComponent,
                                                 ref PositionComponent positionComponent) =>
@@ -49,8 +51,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 {
                     movementComponent.Direction = float2.zero;
 
-                    PostUpdateCommands.RemoveComponent(entity, typeof(EvadeStateComponent));
-                    PostUpdateCommands.AddComponent(entity,
+                    this.PostUpdateCommands.RemoveComponent(entity, typeof(EvadeStateComponent));
+                    this.PostUpdateCommands.AddComponent(entity,
                         new IdleStateComponent
                         {
                             StartedAt = Time.time

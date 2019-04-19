@@ -1,6 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -24,7 +24,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                     healthStatComponent.CurrentValue = properValue;
                     healthComponent.MaxValue = healthStatComponent.CurrentValue;
                     healthComponent.CurrentValue = healthStatComponent.CurrentValue;
-                }                
+                }
             }
         }
 

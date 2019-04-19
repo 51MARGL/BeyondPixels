@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -35,19 +36,19 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute(int index)
             {
-                var batch = Data[index];
-                var random = new Random((uint)(RandomSeed * (index + 1)));
+                var batch = this.Data[index];
+                var random = new Random((uint)(this.RandomSeed * (index + 1)));
 
-                Rooms[batch.FirstRoomIndex] =
-                    CreateRoom(Board, Corridors[batch.FirstCorridorIndex], ref random);
-                Corridors[3 + batch.FirstRoomIndex] =
-                    CreateCorridor(Rooms[batch.FirstRoomIndex], Board, false, ref random);
+                this.Rooms[batch.FirstRoomIndex] =
+                    CreateRoom(this.Board, this.Corridors[batch.FirstCorridorIndex], ref random);
+                this.Corridors[3 + batch.FirstRoomIndex] =
+                    CreateCorridor(this.Rooms[batch.FirstRoomIndex], this.Board, false, ref random);
 
                 for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
                 {
-                    Rooms[i] = CreateRoom(Board, Corridors[j - 1], ref random);
-                    if (j < Corridors.Length)
-                        Corridors[j] = CreateCorridor(Rooms[i], Board, false, ref random);
+                    this.Rooms[i] = CreateRoom(this.Board, this.Corridors[j - 1], ref random);
+                    if (j < this.Corridors.Length)
+                        this.Corridors[j] = CreateCorridor(this.Rooms[i], this.Board, false, ref random);
                 }
             }
         }
@@ -68,17 +69,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute(int index)
             {
-                var currentRoom = Roms[index];
-                for (int j = 0; j < currentRoom.Size.x; j++)
+                var currentRoom = this.Roms[index];
+                for (var j = 0; j < currentRoom.Size.x; j++)
                 {
-                    int xCoord = currentRoom.X + j;
+                    var xCoord = currentRoom.X + j;
 
                     if (currentRoom.X == 0 || currentRoom.Y == 0)
                         return;
-                    for (int k = 0; k < currentRoom.Size.y; k++)
+                    for (var k = 0; k < currentRoom.Size.y; k++)
                     {
-                        int yCoord = currentRoom.Y + k;
-                        Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
+                        var yCoord = currentRoom.Y + k;
+                        this.Tiles[(yCoord * this.TileStride) + xCoord] = TileType.Floor;
                     }
                 }
             }
@@ -100,12 +101,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute(int index)
             {
-                var currentCorridor = Corridors[index];
+                var currentCorridor = this.Corridors[index];
 
-                for (int j = 0; j < currentCorridor.Length; j++)
+                for (var j = 0; j < currentCorridor.Length; j++)
                 {
-                    int xCoord = currentCorridor.StartX;
-                    int yCoord = currentCorridor.StartY;
+                    var xCoord = currentCorridor.StartX;
+                    var yCoord = currentCorridor.StartY;
 
                     switch (currentCorridor.Direction)
                     {
@@ -123,12 +124,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                             break;
                     }
 
-                    Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
+                    this.Tiles[(yCoord * this.TileStride) + xCoord] = TileType.Floor;
 
                     if (currentCorridor.Direction == Direction.Up || currentCorridor.Direction == Direction.Down)
-                        Tiles[(yCoord * TileStride) + xCoord - 1] = TileType.Floor;
+                        this.Tiles[(yCoord * this.TileStride) + xCoord - 1] = TileType.Floor;
                     else
-                        Tiles[((yCoord - 1) * TileStride) + xCoord] = TileType.Floor;
+                        this.Tiles[((yCoord - 1) * this.TileStride) + xCoord] = TileType.Floor;
                 }
             }
         }
@@ -142,20 +143,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute()
             {
-                var tilesStride = Board.Size.x;
-                for (int x = 0; x < Board.Size.x; x++)
+                var tilesStride = this.Board.Size.x;
+                for (var x = 0; x < this.Board.Size.x; x++)
                 {
-                    Tiles[x] = TileType.Wall;
-                    Tiles[tilesStride + x] = TileType.Wall;
-                    Tiles[((Board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
-                    Tiles[((Board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
+                    this.Tiles[x] = TileType.Wall;
+                    this.Tiles[tilesStride + x] = TileType.Wall;
+                    this.Tiles[((this.Board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
+                    this.Tiles[((this.Board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
                 }
-                for (int y = 0; y < Board.Size.y; y++)
+                for (var y = 0; y < this.Board.Size.y; y++)
                 {
-                    Tiles[y * tilesStride] = TileType.Wall;
-                    Tiles[y * tilesStride + 1] = TileType.Wall;
-                    Tiles[(y * tilesStride) + Board.Size.x - 1] = TileType.Wall;
-                    Tiles[(y * tilesStride) + Board.Size.x - 2] = TileType.Wall;
+                    this.Tiles[y * tilesStride] = TileType.Wall;
+                    this.Tiles[y * tilesStride + 1] = TileType.Wall;
+                    this.Tiles[(y * tilesStride) + this.Board.Size.x - 1] = TileType.Wall;
+                    this.Tiles[(y * tilesStride) + this.Board.Size.x - 2] = TileType.Wall;
                 }
             }
         }
@@ -169,7 +170,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute()
             {
-                RemoveThinWalls(Board, Tiles, Board.Size.x);
+                this.RemoveThinWalls(this.Board, this.Tiles, this.Board.Size.x);
             }
 
             private void RemoveThinWalls(BoardComponent board, NativeArray<TileType> tiles, int tilesStride)
@@ -213,13 +214,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute(int index)
             {
-                if (IsBoardValid())
-                    for (int x = 0; x < TileStride; x++)
+                if (this.IsBoardValid())
+                    for (var x = 0; x < this.TileStride; x++)
                     {
-                        var entity = CommandBuffer.CreateEntity(index);
-                        CommandBuffer.AddComponent(index, entity, new FinalTileComponent
+                        var entity = this.CommandBuffer.CreateEntity(index);
+                        this.CommandBuffer.AddComponent(index, entity, new FinalTileComponent
                         {
-                            TileType = Tiles[(index * TileStride) + x],
+                            TileType = this.Tiles[(index * this.TileStride) + x],
                             Position = new int2(x, index)
                         });
                     }
@@ -227,8 +228,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             private bool IsBoardValid()
             {
                 var freeTilesCount = 0;
-                for (int i = 0; i < Tiles.Length; i++)
-                    if (Tiles[i] == TileType.Floor)
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i] == TileType.Floor)
                         freeTilesCount++;
 
                 if (freeTilesCount < 50)
@@ -252,39 +253,39 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute()
             {
-                if (IsBoardValid())
+                if (this.IsBoardValid())
                 {
-                    CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
-                    var finalBoardComponent = CommandBuffer.CreateEntity();
-                    CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
+                    var finalBoardComponent = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
                     {
-                        Size = BoardComponent.Size
+                        Size = this.BoardComponent.Size
                     });
                 }
                 else
                 {
-                    var random = new Random((uint)RandomSeed);
+                    var random = new Random((uint)this.RandomSeed);
 
                     var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 150));
                     var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(10, 20);
-                    var board = CommandBuffer.CreateEntity();
-                    CommandBuffer.AddComponent(board, new BoardComponent
+                    var board = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
                         Size = randomSize,
                         RoomCount = roomCount,
-                        MaxRoomSize = BoardComponent.MaxRoomSize,
-                        MaxCorridorLength = BoardComponent.MaxCorridorLength,
-                        MinCorridorLength = BoardComponent.MinCorridorLength
+                        MaxRoomSize = this.BoardComponent.MaxRoomSize,
+                        MaxCorridorLength = this.BoardComponent.MaxCorridorLength,
+                        MinCorridorLength = this.BoardComponent.MinCorridorLength
                     });
-                    CommandBuffer.DestroyEntity(BoardEntity);
+                    this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }
             }
 
             private bool IsBoardValid()
             {
                 var freeTilesCount = 0;
-                for (int i = 0; i < Tiles.Length; i++)
-                    if (Tiles[i] == TileType.Floor)
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i] == TileType.Floor)
                         freeTilesCount++;
 
                 if (freeTilesCount < 50)
@@ -316,8 +317,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         private ComponentGroup _boardGroup;
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -332,13 +333,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var boardChunks = _boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
+            var boardChunks = this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (var chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
             {
                 var chunk = boardChunks[chunkIndex];
-                var boardEntities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
-                var boards = chunk.GetNativeArray(GetArchetypeChunkComponentType<BoardComponent>());
-                for (int i = 0; i < chunk.Count; i++)
+                var boardEntities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
+                var boards = chunk.GetNativeArray(this.GetArchetypeChunkComponentType<BoardComponent>());
+                for (var i = 0; i < chunk.Count; i++)
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
@@ -349,7 +350,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     var rooms = new NativeArray<RoomComponent>(roomCount, Allocator.TempJob);
                     var corridors = new NativeArray<CorridorComponent>(roomCount + 2, Allocator.TempJob);
 
-                    for (int j = 0; j < tiles.Length; j++)
+                    for (var j = 0; j < tiles.Length; j++)
                         tiles[j] = TileType.Wall;
 
                     // setup fist room and corridors to all 4 directions
@@ -406,20 +407,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
                     var instantiateTilesJobHandle = new InstantiateTilesJob
                     {
-                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                        CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                         Tiles = tiles,
                         TileStride = board.Size.x
                     }.Schedule(board.Size.y, 1, closeBordersJobHandle);
 
                     inputDeps = new TagBoardDoneJob
                     {
-                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer(),
+                        CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
                         BoardEntity = boardEntity,
                         Tiles = tiles,
                         BoardComponent = board,
                         RandomSeed = random.NextInt()
                     }.Schedule(instantiateTilesJobHandle);
-                    _endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                    this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
                 }
             }
             var cleanUpJobHandle = new CleanUpJob
@@ -514,7 +515,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             if (!first && direction == oppositeDirection)
             {
-                int directionInt = (int)direction;
+                var directionInt = (int)direction;
                 directionInt++;
                 directionInt = directionInt % 4;
                 direction = (Direction)directionInt;
@@ -525,7 +526,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             var corridorX = 0;
             var corridorY = 0;
 
-            int maxLength = board.MaxCorridorLength;
+            var maxLength = board.MaxCorridorLength;
 
             switch (direction)
             {

@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Scenes;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -13,8 +15,8 @@ namespace BeyondPixels.ColliderEvents
         {
             if (collider.gameObject.CompareTag("UseTrigger"))
             {
-                Canvas.enabled = true;
-                IsInside = true;
+                this.Canvas.enabled = true;
+                this.IsInside = true;
             }
         }
 
@@ -22,14 +24,14 @@ namespace BeyondPixels.ColliderEvents
         {
             if (collider.gameObject.CompareTag("UseTrigger"))
             {
-                Canvas.enabled = false;
-                IsInside = false;
+                this.Canvas.enabled = false;
+                this.IsInside = false;
             }
 
         }
         public void Update()
         {
-            if (IsInside && Input.GetKeyDown(KeyCode.E))
+            if (this.IsInside && Input.GetKeyDown(KeyCode.E))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
 
@@ -40,8 +42,8 @@ namespace BeyondPixels.ColliderEvents
                 component.ExitCaveDoor = this.transform.GetChild(0).gameObject;
                 gameObject.AddComponent<GameObjectEntity>();
 
-                Canvas.enabled = false;
-                IsInside = false;
+                this.Canvas.enabled = false;
+                this.IsInside = false;
             }
         }
     }

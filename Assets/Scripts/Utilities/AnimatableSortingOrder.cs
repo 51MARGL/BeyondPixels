@@ -4,18 +4,18 @@ namespace BeyondPixels.Utilities
 {
     public class AnimatableSortingOrder : MonoBehaviour
     {
-        private SpriteRenderer sr;                
-        public float sortingLayer = 0.0f;        
+        private SpriteRenderer sr;
+        public float sortingLayer = 0.0f;
 
         private void Start()
         {
-            sr = GetComponent<SpriteRenderer>();
+            this.sr = this.GetComponent<SpriteRenderer>();
         }
 
         private void Update()
         {
-            int layer = (int)sortingLayer;        
-            sr.sortingOrder = layer;            
+            var layer = (int)this.sortingLayer;
+            this.sr.sortingOrder = layer;
         }
     }
 }

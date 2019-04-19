@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+
+using UnityEngine;
 
 [AddComponentMenu("Utilities/HUDFPS")]
 public class HUDFPS : MonoBehaviour
@@ -27,53 +28,53 @@ public class HUDFPS : MonoBehaviour
     private string sFPS = ""; // The fps formatted into a string.
     private GUIStyle style; // The style the text will be displayed at, based en defaultSkin.label.
 
-    void Start()
+    private void Start()
     {
-        StartCoroutine(FPS());
+        this.StartCoroutine(this.FPS());
     }
 
-    void Update()
+    private void Update()
     {
-        accum += Time.timeScale / Time.deltaTime;
-        ++frames;
+        this.accum += Time.timeScale / Time.deltaTime;
+        ++this.frames;
     }
 
-    IEnumerator FPS()
+    private IEnumerator FPS()
     {
         // Infinite loop executed every "frenquency" secondes.
         while (true)
         {
             // Update the FPS
-            float fps = accum / frames;
-            sFPS = fps.ToString("f" + Mathf.Clamp(nbDecimal, 0, 10));
+            var fps = this.accum / this.frames;
+            this.sFPS = fps.ToString("f" + Mathf.Clamp(this.nbDecimal, 0, 10));
 
             //Update the color
-            color = (fps >= 30) ? Color.green : ((fps > 10) ? Color.red : Color.yellow);
+            this.color = (fps >= 30) ? Color.green : ((fps > 10) ? Color.red : Color.yellow);
 
-            accum = 0.0F;
-            frames = 0;
+            this.accum = 0.0F;
+            this.frames = 0;
 
-            yield return new WaitForSeconds(frequency);
+            yield return new WaitForSeconds(this.frequency);
         }
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
         // Copy the default label skin, change the color and the alignement
-        if (style == null)
+        if (this.style == null)
         {
-            style = new GUIStyle(GUI.skin.label);
-            style.normal.textColor = Color.white;
-            style.alignment = TextAnchor.MiddleCenter;
+            this.style = new GUIStyle(GUI.skin.label);
+            this.style.normal.textColor = Color.white;
+            this.style.alignment = TextAnchor.MiddleCenter;
         }
 
-        GUI.color = updateColor ? color : Color.white;
-        startRect = GUI.Window(0, startRect, DoMyWindow, "");
+        GUI.color = this.updateColor ? this.color : Color.white;
+        this.startRect = GUI.Window(0, this.startRect, this.DoMyWindow, "");
     }
 
-    void DoMyWindow(int windowID)
+    private void DoMyWindow(int windowID)
     {
-        GUI.Label(new Rect(0, 0, startRect.width, startRect.height), sFPS + " FPS", style);
-        if (allowDrag) GUI.DragWindow(new Rect(0, 0, Screen.width, Screen.height));
+        GUI.Label(new Rect(0, 0, this.startRect.width, this.startRect.height), this.sFPS + " FPS", this.style);
+        if (this.allowDrag) GUI.DragWindow(new Rect(0, 0, Screen.width, Screen.height));
     }
 }

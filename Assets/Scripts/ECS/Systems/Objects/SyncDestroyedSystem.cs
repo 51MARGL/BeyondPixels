@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Objects
@@ -10,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnCreateManager()
         {
-            _syncGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._syncGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(SyncDestroyedComponent)
@@ -20,17 +22,17 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnUpdate()
         {
-            if (_syncGroup.CalculateLength() > 0)
+            if (this._syncGroup.CalculateLength() > 0)
             {
                 var gameObjects = Object.FindObjectsOfType<GameObjectEntity>();
-                Entities.With(_syncGroup).ForEach((Entity entity, ref SyncDestroyedComponent syncComponent) =>
+                this.Entities.With(this._syncGroup).ForEach((Entity entity, ref SyncDestroyedComponent syncComponent) =>
                 {
                     foreach (var gameObject in gameObjects)
                         if (syncComponent.EntityID == gameObject.Entity.Index
-                            && !EntityManager.Exists(gameObject.Entity))
+                            && !this.EntityManager.Exists(gameObject.Entity))
                         {
                             Object.Destroy(gameObject.gameObject);
-                            PostUpdateCommands.DestroyEntity(entity);
+                            this.PostUpdateCommands.DestroyEntity(entity);
                         }
                 });
             }

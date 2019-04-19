@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Items;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;

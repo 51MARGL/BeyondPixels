@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -27,12 +28,12 @@ namespace BeyondPixels.ECS.Systems.Common
             {
                 CharacterType targetType = 0;
                 CharacterType casterType = 0;
-                for (int c = 0; c < Chunks.Length; c++)
+                for (var c = 0; c < this.Chunks.Length; c++)
                 {
-                    var chunk = Chunks[c];
-                    var entities = chunk.GetNativeArray(EntityType);
-                    var characterComponents = chunk.GetNativeArray(CharacterComponentType);
-                    for (int i = 0; i < chunk.Count; i++)
+                    var chunk = this.Chunks[c];
+                    var entities = chunk.GetNativeArray(this.EntityType);
+                    var characterComponents = chunk.GetNativeArray(this.CharacterComponentType);
+                    for (var i = 0; i < chunk.Count; i++)
                     {
                         if (entities[i] == collisionInfo.Target)
                             targetType = characterComponents[i].CharacterType;
@@ -45,7 +46,7 @@ namespace BeyondPixels.ECS.Systems.Common
                     || (targetType != casterType
                     && spellCollisionComponent.Target == collisionInfo.Sender))
                 {
-                    CommandBuffer.DestroyEntity(index, entity);
+                    this.CommandBuffer.DestroyEntity(index, entity);
                     return;
                 }
 
@@ -53,9 +54,9 @@ namespace BeyondPixels.ECS.Systems.Common
                 switch (collisionInfo.EventType)
                 {
                     case EventType.TriggerEnter:
-                        newEntity = CommandBuffer.CreateEntity(index);
-                        CommandBuffer.AddComponent(index, newEntity, collisionInfo);
-                        CommandBuffer.AddComponent(index, newEntity,
+                        newEntity = this.CommandBuffer.CreateEntity(index);
+                        this.CommandBuffer.AddComponent(index, newEntity, collisionInfo);
+                        this.CommandBuffer.AddComponent(index, newEntity,
                                 new FinalDamageComponent
                                 {
                                     DamageType = damageComponent.DamageType,
@@ -63,9 +64,9 @@ namespace BeyondPixels.ECS.Systems.Common
                                 });
                         break;
                     case EventType.TriggerStay:
-                        newEntity = CommandBuffer.CreateEntity(index);
-                        CommandBuffer.AddComponent(index, newEntity, collisionInfo);
-                        CommandBuffer.AddComponent(index, newEntity,
+                        newEntity = this.CommandBuffer.CreateEntity(index);
+                        this.CommandBuffer.AddComponent(index, newEntity, collisionInfo);
+                        this.CommandBuffer.AddComponent(index, newEntity,
                                 new FinalDamageComponent
                                 {
                                     DamageType = damageComponent.DamageType,
@@ -74,28 +75,28 @@ namespace BeyondPixels.ECS.Systems.Common
                         break;
                 }
 
-                CommandBuffer.DestroyEntity(index, entity);
+                this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private ComponentGroup _group;
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _group = GetComponentGroup(typeof(CharacterComponent), typeof(PositionComponent));
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._group = this.GetComponentGroup(typeof(CharacterComponent), typeof(PositionComponent));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var chunks = _group.CreateArchetypeChunkArray(Allocator.TempJob);
+            var chunks = this._group.CreateArchetypeChunkArray(Allocator.TempJob);
             var handle = new ApplyDamageJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 Chunks = chunks,
-                EntityType = GetArchetypeChunkEntityType(),
-                CharacterComponentType = GetArchetypeChunkComponentType<CharacterComponent>()
+                EntityType = this.GetArchetypeChunkEntityType(),
+                CharacterComponentType = this.GetArchetypeChunkComponentType<CharacterComponent>()
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

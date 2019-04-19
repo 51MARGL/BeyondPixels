@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.Utilities
@@ -24,5 +25,5 @@ namespace BeyondPixels.Utilities
 
     [DisableAutoCreation]
     public class FixedUpdateSystemGroup : ComponentSystemGroup { }
-    
+
 }

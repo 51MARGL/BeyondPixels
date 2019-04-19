@@ -1,7 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Objects;
-using BeyondPixels.Utilities;
+﻿using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -18,8 +16,8 @@ namespace BeyondPixels.ECS.Systems.Objects
                                 int index,
                                 [ReadOnly] ref EntityEnableComponent entityEnableComponent)
             {
-                CommandBuffer.RemoveComponent<Disabled>(index, entityEnableComponent.Target);
-                CommandBuffer.DestroyEntity(index, entity);
+                this.CommandBuffer.RemoveComponent<Disabled>(index, entityEnableComponent.Target);
+                this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
         private struct DisableJob : IJobProcessComponentDataWithEntity<EntityDisableComponent>
@@ -30,8 +28,8 @@ namespace BeyondPixels.ECS.Systems.Objects
                                 int index,
                                 [ReadOnly] ref EntityDisableComponent entityDisableComponent)
             {
-                CommandBuffer.AddComponent(index, entityDisableComponent.Target, new Disabled());
-                CommandBuffer.DestroyEntity(index, entity);
+                this.CommandBuffer.AddComponent(index, entityDisableComponent.Target, new Disabled());
+                this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
 
@@ -39,20 +37,20 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inpuDeps)
         {
             var enableJobHanlde = new EnableJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent()
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inpuDeps);
             var disableJobHanlde = new DisableJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent()
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, enableJobHanlde);
-            _endFrameBarrier.AddJobHandleForProducer(disableJobHanlde);
+            this._endFrameBarrier.AddJobHandleForProducer(disableJobHanlde);
             return disableJobHanlde;
         }
     }

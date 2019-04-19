@@ -2,7 +2,8 @@
 
 namespace BeyondPixels.ECS.Components.Objects
 {
-    public struct SyncDestroyedComponent : IComponentData {
+    public struct SyncDestroyedComponent : IComponentData
+    {
         public int EntityID;
     }
 }

@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -26,33 +27,33 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                 [ReadOnly] ref CollisionInfo collisionInfo,
                                 [ReadOnly] ref AggroRangeCollisionComponent aggroRangeCollisionComponent)
             {
-                for (int c = 0; c < TargetChunks.Length; c++)
+                for (var c = 0; c < this.TargetChunks.Length; c++)
                 {
-                    var chunk = TargetChunks[c];
-                    var entities = chunk.GetNativeArray(EntityType);
-                    for (int i = 0; i < chunk.Count; i++)
+                    var chunk = this.TargetChunks[c];
+                    var entities = chunk.GetNativeArray(this.EntityType);
+                    for (var i = 0; i < chunk.Count; i++)
                         if (entities[i] == collisionInfo.Sender)
                         {
                             switch (collisionInfo.EventType)
                             {
                                 case EventType.TriggerEnter:
-                                    if (!chunk.Has(FollowStateComponentType))
-                                        CommandBuffer.AddComponent(index, collisionInfo.Sender,
+                                    if (!chunk.Has(this.FollowStateComponentType))
+                                        this.CommandBuffer.AddComponent(index, collisionInfo.Sender,
                                             new FollowStateComponent
                                             {
                                                 Target = collisionInfo.Target
                                             });
                                     break;
                                 case EventType.TriggerExit:
-                                    if (chunk.Has(FollowStateComponentType))
-                                        CommandBuffer.RemoveComponent<FollowStateComponent>(index, collisionInfo.Sender);
+                                    if (chunk.Has(this.FollowStateComponentType))
+                                        this.CommandBuffer.RemoveComponent<FollowStateComponent>(index, collisionInfo.Sender);
                                     break;
                             }
-                            CommandBuffer.DestroyEntity(index, entity);
+                            this.CommandBuffer.DestroyEntity(index, entity);
                             return;
                         }
                 }
-                CommandBuffer.DestroyEntity(index, entity);
+                this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
 
@@ -62,8 +63,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _targetGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._targetGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -80,12 +81,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
         {
             var handle = new AggroEventJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                TargetChunks = _targetGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = GetArchetypeChunkEntityType(),
-                FollowStateComponentType = GetArchetypeChunkComponentType<FollowStateComponent>()
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                TargetChunks = this._targetGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = this.GetArchetypeChunkEntityType(),
+                FollowStateComponentType = this.GetArchetypeChunkComponentType<FollowStateComponent>()
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

@@ -2,8 +2,10 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.Utilities;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -15,7 +17,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            _group = GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(MovementComponent), typeof(Transform)
@@ -28,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnUpdate()
         {
-            Entities.With(_group).ForEach((Animator animatorComponent, ref MovementComponent movementComponent) =>
+            this.Entities.With(this._group).ForEach((Animator animatorComponent, ref MovementComponent movementComponent) =>
             {
                 if (!movementComponent.Direction.Equals(float2.zero))
                 {

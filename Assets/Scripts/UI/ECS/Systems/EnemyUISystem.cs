@@ -1,8 +1,10 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.UI.ECS.Components;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Systems.UI
@@ -14,13 +16,13 @@ namespace BeyondPixels.UI.ECS.Systems.UI
         private ComponentGroup _enemyGroup;
         protected override void OnCreateManager()
         {
-            _playerGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(TargetComponent), typeof(PlayerComponent)
                 }
             });
-            _enemyGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._enemyGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(EnemyUIComponent), typeof(SpriteRenderer), typeof(HealthComponent)
@@ -31,7 +33,7 @@ namespace BeyondPixels.UI.ECS.Systems.UI
         protected override void OnUpdate()
         {
             var deltaTime = Time.deltaTime;
-            Entities.With(_enemyGroup).ForEach(
+            this.Entities.With(this._enemyGroup).ForEach(
                 (Entity entity,
                  ref HealthComponent healthComponent,
                  SpriteRenderer spriteRenderer,
@@ -42,7 +44,7 @@ namespace BeyondPixels.UI.ECS.Systems.UI
 
                 // if object is vissible by main camera
                 if (GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(Camera.main),
-                                                    spriteRenderer.bounds)) 
+                                                    spriteRenderer.bounds))
                 {
                     if (!enemyUIComponent.Canvas.enabled)
                         enemyUIComponent.Canvas.enabled = true;
@@ -74,7 +76,7 @@ namespace BeyondPixels.UI.ECS.Systems.UI
 
                     //Targetting image
                     enemyUIComponent.TargettingCircle.SetActive(false);
-                    Entities.With(_playerGroup).ForEach((Entity playerEntity, ref TargetComponent targetComponent) =>
+                    this.Entities.With(this._playerGroup).ForEach((Entity playerEntity, ref TargetComponent targetComponent) =>
                     {
                         if (targetComponent.Target == entity)
                             enemyUIComponent.TargettingCircle.SetActive(true);

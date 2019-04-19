@@ -1,11 +1,11 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.Utilities;
-using Unity.Collections;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
-using UnityEngine.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
@@ -16,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            _group = GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -29,11 +29,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnUpdate()
         {
-            Entities.With(_group).ForEach((Entity entity, ref MovementComponent movementComponent, Rigidbody2D rigidbody, Transform transform) =>
+            this.Entities.With(this._group).ForEach((Entity entity, ref MovementComponent movementComponent, Rigidbody2D rigidbody, Transform transform) =>
             {
                 var velocity = new float2();
 
-                if (!EntityManager.HasComponent<AttackComponent>(entity) 
+                if (!this.EntityManager.HasComponent<AttackComponent>(entity)
                     && !movementComponent.Direction.Equals(float2.zero))
                 {
                     velocity = math.normalize(movementComponent.Direction) *

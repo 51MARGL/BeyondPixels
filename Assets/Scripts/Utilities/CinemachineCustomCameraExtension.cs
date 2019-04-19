@@ -1,4 +1,5 @@
 ﻿using Cinemachine;
+
 using UnityEngine;
 
 namespace BeyondPixels.Utilities
@@ -20,12 +21,12 @@ namespace BeyondPixels.Utilities
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
         {
-            if (enabled && stage == CinemachineCore.Stage.Body)
+            if (this.enabled && stage == CinemachineCore.Stage.Body)
             {
                 var pos = state.RawPosition;
                 var rot = state.RawOrientation;
                 pos = new Vector3(pos.x, pos.y, this.m_ZPosition);
-                rot = Quaternion.Euler(m_XRotation, 0, 0);
+                rot = Quaternion.Euler(this.m_XRotation, 0, 0);
                 state.RawPosition = pos;
                 state.RawOrientation = rot;
             }

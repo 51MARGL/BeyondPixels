@@ -1,9 +1,10 @@
 ﻿using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
-using Unity.Burst;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Spells
@@ -22,9 +23,9 @@ namespace BeyondPixels.ECS.Systems.Spells
                                 [ReadOnly] ref SpellComponent spellComponent)
             {
                 if (durationComponent.Duration < 0)
-                    CommandBuffer.AddComponent(index, entity, new DestroyComponent());
+                    this.CommandBuffer.AddComponent(index, entity, new DestroyComponent());
                 else
-                    durationComponent.Duration -= DeltaTime;
+                    durationComponent.Duration -= this.DeltaTime;
             }
         }
 
@@ -32,17 +33,17 @@ namespace BeyondPixels.ECS.Systems.Spells
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new DurationJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 DeltaTime = Time.deltaTime
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

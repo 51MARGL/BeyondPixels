@@ -1,5 +1,7 @@
 ﻿using System;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +11,7 @@ namespace BeyondPixels.UI.ECS.Components
     {
         public LevelGroupWrapper LevelGroup;
         public StatsGroupWrapper StatsGroup;
+        public InventoryGroupWrapper InventoryGroup;
 
         [Serializable]
         public class LevelGroupWrapper
@@ -24,6 +27,14 @@ namespace BeyondPixels.UI.ECS.Components
             public AttackStatWrapper AttackStat;
             public DefenceStatWrapper DefenceStat;
             public MagicStatWrapper MagicStat;
+        }
+
+        [Serializable]
+        public class InventoryGroupWrapper
+        {
+            public GameObject Grid;
+            public GameObject ItemButtonPrefab;
+            public int ColumnCount;
         }
 
         [Serializable]

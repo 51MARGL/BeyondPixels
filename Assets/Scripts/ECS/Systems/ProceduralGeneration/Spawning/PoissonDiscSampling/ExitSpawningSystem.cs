@@ -2,10 +2,12 @@
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.SceneBootstraps;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
@@ -25,10 +27,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             public void Execute(Entity boardEntity, int index, ref FinalBoardComponent finalBoardComponent)
             {
-                var poissonDiscEntity = CommandBuffer.CreateEntity(index);
+                var poissonDiscEntity = this.CommandBuffer.CreateEntity(index);
                 var boardSize = finalBoardComponent.Size;
                 var radius = 30;
-                CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
+                this.CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
                     GridSize = boardSize,
                     SamplesLimit = 50,
@@ -36,32 +38,32 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     Radius = radius
                 });
 
-                var cellList = GetCells(boardSize, radius);
+                var cellList = this.GetCells(boardSize, radius);
                 while (cellList.Length == 0)
                 {
                     radius -= 5;
-                    cellList = GetCells(boardSize, radius);
+                    cellList = this.GetCells(boardSize, radius);
                 }
 
-                for (int i = 0; i < cellList.Length; i++)
+                for (var i = 0; i < cellList.Length; i++)
                 {
-                    var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, cellList[i]);
+                    var entity = this.CommandBuffer.CreateEntity(index);
+                    this.CommandBuffer.AddComponent(index, entity, cellList[i]);
                 }
-                CommandBuffer.AddComponent(index, boardEntity, new ExitSpawnStartedComponent());
+                this.CommandBuffer.AddComponent(index, boardEntity, new ExitSpawnStartedComponent());
             }
 
             private NativeList<PoissonCellComponent> GetCells(int2 boardSize, int radius)
             {
                 var cellList = new NativeList<PoissonCellComponent>(Allocator.Temp);
-                for (int y = 0; y < boardSize.y; y++)
-                    for (int x = 0; x < boardSize.x; x++)
+                for (var y = 0; y < boardSize.y; y++)
+                    for (var x = 0; x < boardSize.x; x++)
                     {
-                        int validationIndex = GetValidationIndex(y * boardSize.x + x, boardSize, radius);
+                        var validationIndex = this.GetValidationIndex(y * boardSize.x + x, boardSize, radius);
                         cellList.Add(new PoissonCellComponent
                         {
                             SampleIndex = validationIndex,
-                            Position = Tiles[y * boardSize.x + x].Position,
+                            Position = this.Tiles[y * boardSize.x + x].Position,
                             RequestID = SystemRequestID
                         });
                     }
@@ -71,17 +73,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             private int GetValidationIndex(int tileIndex, int2 boardSize, int radius)
             {
-                var tile = Tiles[tileIndex];
+                var tile = this.Tiles[tileIndex];
                 if (tile.TileType == TileType.Wall
-                    && math.distance(PlayerPosition, tile.Position) >= radius
+                    && math.distance(this.PlayerPosition, tile.Position) >= radius
                     && tile.Position.x > 2 && tile.Position.x < boardSize.x - 2
                     && tile.Position.y > 2 && tile.Position.y < boardSize.y - 2
-                    && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor
-                    && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
-                    && Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
-                    && Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
-                    && Tiles[(tile.Position.y) * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
-                    && Tiles[(tile.Position.y) * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall)
+                    && this.Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor
+                    && this.Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
+                    && this.Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
+                    && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
+                    && this.Tiles[(tile.Position.y) * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
+                    && this.Tiles[(tile.Position.y) * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall)
                     return -1;
 
                 return -2;
@@ -94,7 +96,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             public void Execute(Entity entity, int index, [ReadOnly] ref FinalBoardComponent finalBoardComponent)
             {
-                CommandBuffer.AddComponent(index, entity, new ExitSpawnedComponent());
+                this.CommandBuffer.AddComponent(index, entity, new ExitSpawnedComponent());
             }
         }
 
@@ -105,7 +107,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             public void Execute(Entity entity, int index, [ReadOnly] ref SampleComponent sampleComponent)
             {
                 if (sampleComponent.RequestID == SystemRequestID)
-                    CommandBuffer.DestroyEntity(index, entity);
+                    this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
 
@@ -117,15 +119,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _tilesGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
                     typeof(FinalTileComponent)
                 }
             });
-            _boardSpawnInitGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._boardSpawnInitGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -137,7 +139,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     typeof(ExitSpawnStartedComponent)
                 }
             });
-            _boardSpawnReadyGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._boardSpawnReadyGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -148,7 +150,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     typeof(ExitSpawnedComponent)
                 }
             });
-            _samplesGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._samplesGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -159,35 +161,35 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            if (_boardSpawnInitGroup.CalculateLength() > 0)
-                return SetupValidationGrid(inputDeps);
+            if (this._boardSpawnInitGroup.CalculateLength() > 0)
+                return this.SetupValidationGrid(inputDeps);
 
-            if (_boardSpawnReadyGroup.CalculateLength() > 0
+            if (this._boardSpawnReadyGroup.CalculateLength() > 0
                 && PlayerSpawningSystem.PlayerInstantiated)
             {
-                if (_samplesGroup.CalculateLength() > 0)
+                if (this._samplesGroup.CalculateLength() > 0)
                 {
-                    var samplesArray = _samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
+                    var samplesArray = this._samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
                     var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
-                    for (int i = 0; i < samplesArray.Length; i++)
+                    for (var i = 0; i < samplesArray.Length; i++)
                         if (samplesArray[i].RequestID == SystemRequestID)
                             samplesList.Add(samplesArray[i]);
 
                     var tagBoardDoneJobHandle = new TagBoardDoneJob
                     {
-                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                        CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                     }.Schedule(this, inputDeps);
                     var cleanSamplesJobHandle = new CleanSamplesJob
                     {
-                        CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                        CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                     }.Schedule(this, inputDeps);
 
                     inputDeps = JobHandle.CombineDependencies(tagBoardDoneJobHandle, cleanSamplesJobHandle);
-                    _endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                    this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
 
                     inputDeps.Complete();
-                    for (int i = 0; i < samplesList.Length; i++)
-                        InstantiateExit(samplesList[i].Position);
+                    for (var i = 0; i < samplesList.Length; i++)
+                        this.InstantiateExit(samplesList[i].Position);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -202,11 +204,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             var playerPosition = new float2(playerPos.x, playerPos.y);
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                Tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                Tiles = this._tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
                 PlayerPosition = playerPosition
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
+            this._endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
             return initializeValidationGridJobHandle;
         }
 

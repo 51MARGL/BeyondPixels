@@ -1,9 +1,10 @@
 ﻿using System;
+
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
-using BeyondPixels.ECS.Components.Objects;
+using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
@@ -11,10 +12,13 @@ using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
+
 using Cinemachine;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
@@ -27,14 +31,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 
         protected override void OnCreateManager()
         {
-            _tilesGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
                     typeof(FinalTileComponent)
                 }
             });
-            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -46,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                     typeof(PlayerSpawnedComponent)
                 }
             });
-            _boardReadyGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._boardReadyGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -66,14 +70,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 
         protected override void OnUpdate()
         {
-            Entities.With(_boardGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
+            this.Entities.With(this._boardGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
             {
                 PlayerInstantiated = false;
                 PlayerPosition = float3.zero;
 
                 var boardSize = finalBoardComponent.Size;
                 var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-                var tiles = _tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob);
+                var tiles = this._tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob);
                 var bottom = random.NextBool();
                 var left = random.NextBool();
                 var startX = 3;
@@ -103,8 +107,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                     xCond = (int current, int end) => current > end;
                 }
 
-                for (int y = startY; yCond(y, endY); y += yStep)
-                    for (int x = startX; xCond(x, endX); x += xStep)
+                for (var y = startY; yCond(y, endY); y += yStep)
+                    for (var x = startX; xCond(x, endX); x += xStep)
                         if (tiles[y * boardSize.x + x].TileType == TileType.Floor
                             && tiles[(y + 1) * boardSize.x + x].TileType == TileType.Wall
                             && tiles[(y + 1) * boardSize.x + (x + 1)].TileType == TileType.Wall
@@ -115,14 +119,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                             PlayerPosition = new float3(x + 0.5f, y + 1.75f, 0);
 
                 if (!PlayerPosition.Equals(float3.zero))
-                    PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
+                    this.PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
                 tiles.Dispose();
             });
-            if (_boardReadyGroup.CalculateLength() > 0 && !PlayerInstantiated && !TileMapSystem.TileMapDrawing)
+            if (this._boardReadyGroup.CalculateLength() > 0 && !PlayerInstantiated && !TileMapSystem.TileMapDrawing)
             {
-                SpawnPlayer(PlayerPosition);
-                var loadGameEntity = PostUpdateCommands.CreateEntity();
-                PostUpdateCommands.AddComponent(loadGameEntity, new LoadGameComponent());
+                this.SpawnPlayer(PlayerPosition);
+                var loadGameEntity = this.PostUpdateCommands.CreateEntity();
+                this.PostUpdateCommands.AddComponent(loadGameEntity, new LoadGameComponent());
                 PlayerInstantiated = true;
             }
         }
@@ -134,52 +138,52 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                                             position, Quaternion.identity);
             var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
             var playerInitializeComponent = player.GetComponent<PlayerInitializeComponent>();
-            PostUpdateCommands.AddComponent(playerEntity, new PlayerComponent());
-            PostUpdateCommands.AddComponent(playerEntity, new InputComponent());
+            this.PostUpdateCommands.AddComponent(playerEntity, new PlayerComponent());
+            this.PostUpdateCommands.AddComponent(playerEntity, new InputComponent());
 
-            PostUpdateCommands.AddComponent(playerEntity, new CharacterComponent
+            this.PostUpdateCommands.AddComponent(playerEntity, new CharacterComponent
             {
                 CharacterType = CharacterType.Player
             });
-            PostUpdateCommands.AddComponent(playerEntity, new MovementComponent
+            this.PostUpdateCommands.AddComponent(playerEntity, new MovementComponent
             {
                 Direction = float2.zero,
                 Speed = playerInitializeComponent.MovementSpeed
             });
-            PostUpdateCommands.AddComponent(playerEntity, new WeaponComponent
+            this.PostUpdateCommands.AddComponent(playerEntity, new WeaponComponent
             {
                 DamageValue = playerInitializeComponent.WeaponDamage
             });
-            PostUpdateCommands.AddComponent(playerEntity, new PositionComponent
+            this.PostUpdateCommands.AddComponent(playerEntity, new PositionComponent
             {
                 InitialPosition = new float2(player.transform.position.x, player.transform.position.y)
             });
             GameObject.Destroy(playerInitializeComponent);
-            PostUpdateCommands.RemoveComponent<PlayerInitializeComponent>(playerEntity);
+            this.PostUpdateCommands.RemoveComponent<PlayerInitializeComponent>(playerEntity);
 
             #region statsInit
             var statsInitializeComponent = player.GetComponent<StatsInitializeComponent>();
-            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.LevelComponent);
-            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.HealthStatComponent);
-            PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
+            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.LevelComponent);
+            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.HealthStatComponent);
+            this.PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
             {
                 MaxValue = statsInitializeComponent.HealthStatComponent.CurrentValue,
                 CurrentValue = statsInitializeComponent.HealthStatComponent.CurrentValue
             });
-            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.AttackStatComponent);
-            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.DefenceStatComponent);
-            PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.MagicStatComponent);
-            PostUpdateCommands.AddComponent(playerEntity, new XPComponent());
-            PostUpdateCommands.AddComponent(playerEntity, new AdjustStatsComponent());
+            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.AttackStatComponent);
+            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.DefenceStatComponent);
+            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.MagicStatComponent);
+            this.PostUpdateCommands.AddComponent(playerEntity, new XPComponent());
+            this.PostUpdateCommands.AddComponent(playerEntity, new AdjustStatsComponent());
             GameObject.Destroy(statsInitializeComponent);
             #endregion
             #endregion
 
             #region spellInit
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
-                var spellEntity = PostUpdateCommands.CreateEntity();
-                PostUpdateCommands.AddComponent(spellEntity, new ActiveSpellComponent
+                var spellEntity = this.PostUpdateCommands.CreateEntity();
+                this.PostUpdateCommands.AddComponent(spellEntity, new ActiveSpellComponent
                 {
                     Owner = playerEntity,
                     ActionIndex = i + 1,
@@ -188,6 +192,131 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             }
             #endregion
 
+
+            #region items
+            var weaponEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(weaponEntity, new ItemComponent
+            {
+                StoreIndex = 6,
+                IconIndex = 0,
+                Level = 2
+            });
+            this.PostUpdateCommands.AddComponent(weaponEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+            this.PostUpdateCommands.AddComponent(weaponEntity, new EquipedComponent());
+
+            var spellBookEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(spellBookEntity, new ItemComponent
+            {
+                StoreIndex = 7,
+                IconIndex = 0,
+                Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(spellBookEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var helmetEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(helmetEntity, new ItemComponent
+            {
+                StoreIndex = 3,
+                IconIndex = 0,
+                Level = 2
+            });
+            this.PostUpdateCommands.AddComponent(helmetEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var chestEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(chestEntity, new ItemComponent
+            {
+                StoreIndex = 4,
+                IconIndex = 0,
+                Level = 2
+            });
+            this.PostUpdateCommands.AddComponent(chestEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var bootsEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(bootsEntity, new ItemComponent
+            {
+                StoreIndex = 5,
+                IconIndex = 0,
+                Level = 2
+            });
+            this.PostUpdateCommands.AddComponent(bootsEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var foodEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(foodEntity, new ItemComponent
+            {
+                StoreIndex = 0,
+                IconIndex = 2,
+                Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(foodEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var foodEntity2 = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(foodEntity2, new ItemComponent
+            {
+                StoreIndex = 0,
+                IconIndex = 0,
+                Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(foodEntity2, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var foodEntity3 = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(foodEntity3, new ItemComponent
+            {
+                StoreIndex = 0,
+                IconIndex = 0,
+                Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(foodEntity3, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var potionEntity = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(potionEntity, new ItemComponent
+            {
+                StoreIndex = 1,
+                IconIndex = 0,
+                Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(potionEntity, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            var potionEntity2 = this.PostUpdateCommands.CreateEntity();
+            this.PostUpdateCommands.AddComponent(potionEntity2, new ItemComponent
+            {
+                StoreIndex = 1,
+                IconIndex = 0,
+                Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(potionEntity2, new PickedUpComponent
+            {
+                Owner = playerEntity
+            });
+
+            #endregion  
+
             #region camera
             var camera = GameObject.Find("PlayerVCamera").GetComponent<CinemachineVirtualCamera>();
             camera.Follow = player.transform;
@@ -195,7 +324,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             #endregion
 
 
-            PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+            this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
         }
     }
 }

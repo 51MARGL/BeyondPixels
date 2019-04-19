@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
+
 using Unity.Collections;
 using Unity.Entities;
 
@@ -15,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
         protected override void OnCreateManager()
         {
-            _boardGroup = GetComponentGroup(
+            this._boardGroup = this.GetComponentGroup(
                 ComponentType.ReadOnly(typeof(FinalBoardComponent)),
                 ComponentType.ReadOnly(typeof(TilemapReadyComponent)),
                 ComponentType.ReadOnly(typeof(EnemiesSpawnedComponent)),
@@ -23,37 +24,37 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 ComponentType.ReadOnly(typeof(PlayerSpawnedComponent)),
                 ComponentType.ReadOnly(typeof(ExitSpawnedComponent))
             );
-            _tileGroup = GetComponentGroup(
+            this._tileGroup = this.GetComponentGroup(
                ComponentType.ReadOnly(typeof(FinalTileComponent)));
-            _tilemapGroup = GetComponentGroup(
+            this._tilemapGroup = this.GetComponentGroup(
                ComponentType.ReadOnly(typeof(DungeonTileMapComponent)));
         }
 
         protected override void OnUpdate()
         {
-            if (_boardGroup.CalculateLength() == 0)
+            if (this._boardGroup.CalculateLength() == 0)
                 return;
 
-            DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
-            DeleteAllEntities(this._tileGroup.CreateArchetypeChunkArray(Allocator.TempJob));
+            this.DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
+            this.DeleteAllEntities(this._tileGroup.CreateArchetypeChunkArray(Allocator.TempJob));
 
-            Entities.With(_tilemapGroup).ForEach((Entity entity) =>
+            this.Entities.With(this._tilemapGroup).ForEach((Entity entity) =>
             {
-                PostUpdateCommands.AddComponent(entity, new Disabled());
+                this.PostUpdateCommands.AddComponent(entity, new Disabled());
             });
         }
 
         private void DeleteAllEntities(NativeArray<ArchetypeChunk> chunks)
         {
-            var entityType = GetArchetypeChunkEntityType();
+            var entityType = this.GetArchetypeChunkEntityType();
 
-            for (int chunkIndex = 0; chunkIndex < chunks.Length; chunkIndex++)
+            for (var chunkIndex = 0; chunkIndex < chunks.Length; chunkIndex++)
             {
                 var chunk = chunks[chunkIndex];
                 var entities = chunk.GetNativeArray(entityType);
 
-                for (int i = 0; i < chunk.Count; i++)
-                    PostUpdateCommands.DestroyEntity(entities[i]);
+                for (var i = 0; i < chunk.Count; i++)
+                    this.PostUpdateCommands.DestroyEntity(entities[i]);
             }
 
             chunks.Dispose();

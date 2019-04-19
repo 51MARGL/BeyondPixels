@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP;
+
 using Unity.Collections;
 using Unity.Mathematics;
 
@@ -23,10 +24,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         public NativeArray<NodeComponent> ToNativeArray()
         {
             var nodesArray = new NativeArray<NodeComponent>((int)math.pow(2, this.Height) - 1, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            for (int i = 0; i < nodesArray.Length; i++)
+            for (var i = 0; i < nodesArray.Length; i++)
                 nodesArray[i] = new NodeComponent { IsNull = 1 };
 
-            MapToArray(this.Root, nodesArray, 0);
+            this.MapToArray(this.Root, nodesArray, 0);
             return nodesArray;
         }
 
@@ -37,9 +38,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             array[index] = node.NodeComponent;
             if (node.LeftChild != null)
-                MapToArray(node.LeftChild, array, 2 * index + 1);
+                this.MapToArray(node.LeftChild, array, 2 * index + 1);
             if (node.RightChild != null)
-                MapToArray(node.RightChild, array, 2 * index + 2);
+                this.MapToArray(node.RightChild, array, 2 * index + 2);
         }
 
         public class BSPNode
@@ -51,7 +52,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public bool IsLeaf
             {
-                get => LeftChild == null && RightChild == null;
+                get => this.LeftChild == null && this.RightChild == null;
             }
 
             public BSPNode(NodeComponent nodeComponent)

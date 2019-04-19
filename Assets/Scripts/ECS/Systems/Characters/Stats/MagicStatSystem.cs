@@ -1,5 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.Characters.Stats;
+﻿using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;

@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -29,16 +30,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                var random = new Random((uint)(RandomSeed * (index + 1)));
-                for (int x = 0; x < TileStride; x++)
-                    if (random.NextInt(0, 100) > RandomFillPercent)
-                        Tiles[index * TileStride + x] = new TileComponent
+                var random = new Random((uint)(this.RandomSeed * (index + 1)));
+                for (var x = 0; x < this.TileStride; x++)
+                    if (random.NextInt(0, 100) > this.RandomFillPercent)
+                        this.Tiles[index * this.TileStride + x] = new TileComponent
                         {
                             Position = new int2(x, index),
                             CurrentGenState = TileType.Floor
                         };
                     else
-                        Tiles[index * TileStride + x] = new TileComponent
+                        this.Tiles[index * this.TileStride + x] = new TileComponent
                         {
                             Position = new int2(x, index),
                             CurrentGenState = TileType.Wall
@@ -57,14 +58,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                var currentTile = Tiles[index];
+                var currentTile = this.Tiles[index];
 
                 currentTile.NextGenState =
-                    GetDeadNeighborsCount(currentTile.Position.x, currentTile.Position.y) > 4
+                    this.GetDeadNeighborsCount(currentTile.Position.x, currentTile.Position.y) > 4
                         ? TileType.Wall
                         : TileType.Floor;
 
-                Tiles[index] = currentTile;
+                this.Tiles[index] = currentTile;
             }
 
             public int GetDeadNeighborsCount(int gridX, int gridY)
@@ -98,9 +99,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                var currentTile = Tiles[index];
+                var currentTile = this.Tiles[index];
                 currentTile.CurrentGenState = currentTile.NextGenState;
-                Tiles[index] = currentTile;
+                this.Tiles[index] = currentTile;
             }
         }
 
@@ -119,18 +120,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                var flags = new NativeArray<int>(Tiles.Length, Allocator.Temp);
+                var flags = new NativeArray<int>(this.Tiles.Length, Allocator.Temp);
                 var roomTilesIndex = 0;
-                for (int y = 0; y < Board.Size.y; y++)
-                    for (int x = 0; x < Board.Size.x; x++)
+                for (var y = 0; y < this.Board.Size.y; y++)
+                    for (var x = 0; x < this.Board.Size.x; x++)
                     {
-                        var currentTile = Tiles[y * Board.Size.x + x];
-                        if (flags[y * Board.Size.x + x] == 0
+                        var currentTile = this.Tiles[y * this.Board.Size.x + x];
+                        if (flags[y * this.Board.Size.x + x] == 0
                             && currentTile.CurrentGenState == TileType.Floor)
                         {
-                            var tileCount = AddRoomTiles(currentTile, flags, roomTilesIndex, Board.Size.x);
+                            var tileCount = this.AddRoomTiles(currentTile, flags, roomTilesIndex, this.Board.Size.x);
 
-                            Rooms.Add(new RoomComponent
+                            this.Rooms.Add(new RoomComponent
                             {
                                 StartTileIndex = roomTilesIndex,
                                 TileCount = tileCount
@@ -161,10 +162,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                             if (currIndex >= 0 && currIndex < this.Tiles.Length
                                 && (y == tile.Position.y || x == tile.Position.x)
-                                && flags[currIndex] == 0 && Tiles[currIndex].CurrentGenState == TileType.Floor)
+                                && flags[currIndex] == 0 && this.Tiles[currIndex].CurrentGenState == TileType.Floor)
                             {
                                 flags[currIndex] = 1;
-                                queue.Enqueue(Tiles[currIndex]);
+                                queue.Enqueue(this.Tiles[currIndex]);
                             }
                         }
                 }
@@ -184,21 +185,21 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                var widthStep = Board.Size.x / math.clamp(Board.Size.x / 50, 1, Board.Size.x);
-                var heightStep = Board.Size.y / math.clamp(Board.Size.y / 50, 1, Board.Size.y);
+                var widthStep = this.Board.Size.x / math.clamp(this.Board.Size.x / 50, 1, this.Board.Size.x);
+                var heightStep = this.Board.Size.y / math.clamp(this.Board.Size.y / 50, 1, this.Board.Size.y);
                 var currentIndex = 0;
-                for (int y = 0; y < Board.Size.y; y += heightStep)
+                for (var y = 0; y < this.Board.Size.y; y += heightStep)
                 {
-                    for (int x = 0; x < Board.Size.x; x += widthStep)
-                        for (int i = currentIndex; i < Rooms.Length; i++)
-                            if (RoomTiles[Rooms[i].StartTileIndex].Position.x >= x
-                                && RoomTiles[Rooms[i].StartTileIndex].Position.x <= x + widthStep
-                                && RoomTiles[Rooms[i].StartTileIndex].Position.y >= y
-                                && RoomTiles[Rooms[i].StartTileIndex].Position.y <= y + heightStep)
+                    for (var x = 0; x < this.Board.Size.x; x += widthStep)
+                        for (var i = currentIndex; i < this.Rooms.Length; i++)
+                            if (this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x >= x
+                                && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x <= x + widthStep
+                                && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y >= y
+                                && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y <= y + heightStep)
                             {
-                                var tmp = Rooms[currentIndex];
-                                Rooms[currentIndex++] = Rooms[i];
-                                Rooms[i] = tmp;
+                                var tmp = this.Rooms[currentIndex];
+                                this.Rooms[currentIndex++] = this.Rooms[i];
+                                this.Rooms[i] = tmp;
                             }
                 }
             }
@@ -224,12 +225,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                MarkClosestRoomsConnections(ConnectedRoomsTable, index * RoomsChunkSize, RoomsChunkSize);
+                this.MarkClosestRoomsConnections(this.ConnectedRoomsTable, index * this.RoomsChunkSize, this.RoomsChunkSize);
             }
 
             private void MarkClosestRoomsConnections(NativeArray<int> connectedRoomsTable, int roomsStartIndex, int roomsChunkSize)
             {
-                for (int i = roomsStartIndex; i < roomsStartIndex + roomsChunkSize && i < Rooms.Length; i++)
+                for (var i = roomsStartIndex; i < roomsStartIndex + roomsChunkSize && i < this.Rooms.Length; i++)
                 {
                     var bestDistance = (float)int.MaxValue;
                     var bestTileA = new TileComponent();
@@ -237,17 +238,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     var bestRoomAIndex = 0;
                     var bestRoomBIndex = 0;
 
-                    for (int j = roomsStartIndex; j < roomsStartIndex + roomsChunkSize && j < Rooms.Length; j++)
+                    for (var j = roomsStartIndex; j < roomsStartIndex + roomsChunkSize && j < this.Rooms.Length; j++)
                     {
-                        if (connectedRoomsTable[i * Rooms.Length + j] == 1)
+                        if (connectedRoomsTable[i * this.Rooms.Length + j] == 1)
                             continue;
 
-                        for (int tileIndexA = 0; tileIndexA < Rooms[i].TileCount; tileIndexA++)
+                        for (var tileIndexA = 0; tileIndexA < this.Rooms[i].TileCount; tileIndexA++)
                         {
-                            for (int tileIndexB = 0; tileIndexB < Rooms[j].TileCount; tileIndexB++)
+                            for (var tileIndexB = 0; tileIndexB < this.Rooms[j].TileCount; tileIndexB++)
                             {
-                                var tileA = this.RoomTiles[Rooms[i].StartTileIndex + tileIndexA];
-                                var tileB = this.RoomTiles[Rooms[j].StartTileIndex + tileIndexB];
+                                var tileA = this.RoomTiles[this.Rooms[i].StartTileIndex + tileIndexA];
+                                var tileB = this.RoomTiles[this.Rooms[j].StartTileIndex + tileIndexB];
                                 var distance = math.distance(tileA.Position, tileB.Position);
 
                                 if (distance < bestDistance)
@@ -262,7 +263,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
                     }
 
-                    MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB, roomsStartIndex, roomsChunkSize);
+                    this.MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB, roomsStartIndex, roomsChunkSize);
                 }
             }
 
@@ -270,21 +271,21 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var connectedTableCopy = new NativeArray<int>(connectedRoomsTable.Length, Allocator.Temp);
                 connectedRoomsTable.CopyTo(connectedTableCopy);
-                for (int i = 0; i < roomsStartIndex + roomsChunkSize && i < Rooms.Length; i++)
+                for (var i = 0; i < roomsStartIndex + roomsChunkSize && i < this.Rooms.Length; i++)
                 {
-                    if (connectedTableCopy[bestRoomAIndex * Rooms.Length + i] == 1)
-                        for (int j = 0; j < roomsStartIndex + roomsChunkSize && j < Rooms.Length; j++)
-                            if (connectedTableCopy[bestRoomBIndex * Rooms.Length + j] == 1)
+                    if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + i] == 1)
+                        for (var j = 0; j < roomsStartIndex + roomsChunkSize && j < this.Rooms.Length; j++)
+                            if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + j] == 1)
                             {
-                                connectedRoomsTable[i * Rooms.Length + j] = 1;
-                                connectedRoomsTable[j * Rooms.Length + i] = 1;
+                                connectedRoomsTable[i * this.Rooms.Length + j] = 1;
+                                connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
-                    if (connectedTableCopy[bestRoomBIndex * Rooms.Length + i] == 1)
-                        for (int j = 0; j < Rooms.Length; j++)
-                            if (connectedTableCopy[bestRoomAIndex * Rooms.Length + j] == 1)
+                    if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + i] == 1)
+                        for (var j = 0; j < this.Rooms.Length; j++)
+                            if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + j] == 1)
                             {
-                                connectedRoomsTable[i * Rooms.Length + j] = 1;
-                                connectedRoomsTable[j * Rooms.Length + i] = 1;
+                                connectedRoomsTable[i * this.Rooms.Length + j] = 1;
+                                connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
                 }
 
@@ -314,7 +315,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                MarkNotAccessibleRoomsConnections(ConnectedRoomsTable);
+                this.MarkNotAccessibleRoomsConnections(this.ConnectedRoomsTable);
             }
 
             private void MarkNotAccessibleRoomsConnections(NativeArray<int> connectedRoomsTable)
@@ -339,30 +340,30 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     connectedRoomList.Clear();
                     connectedRoomIndexList.Clear();
 
-                    for (int i = 0; i < Rooms.Length; i++)
+                    for (var i = 0; i < this.Rooms.Length; i++)
                     {
                         if (connectedRoomsTable[i] == 1)
                         {
-                            connectedRoomList.Add(Rooms[i]);
+                            connectedRoomList.Add(this.Rooms[i]);
                             connectedRoomIndexList.Add(i);
                         }
                         else
                         {
-                            disconnectedRoomList.Add(Rooms[i]);
+                            disconnectedRoomList.Add(this.Rooms[i]);
                             disconnectedRoomIndexList.Add(i);
                         }
                     }
 
-                    for (int i = 0; i < disconnectedRoomList.Length; i++)
+                    for (var i = 0; i < disconnectedRoomList.Length; i++)
                     {
-                        for (int j = 0; j < connectedRoomList.Length; j++)
+                        for (var j = 0; j < connectedRoomList.Length; j++)
                         {
-                            if (connectedRoomsTable[disconnectedRoomIndexList[i] * Rooms.Length + connectedRoomIndexList[j]] == 1)
+                            if (connectedRoomsTable[disconnectedRoomIndexList[i] * this.Rooms.Length + connectedRoomIndexList[j]] == 1)
                                 continue;
 
-                            for (int tileIndexA = 0; tileIndexA < disconnectedRoomList[i].TileCount; tileIndexA++)
+                            for (var tileIndexA = 0; tileIndexA < disconnectedRoomList[i].TileCount; tileIndexA++)
                             {
-                                for (int tileIndexB = 0; tileIndexB < connectedRoomList[j].TileCount; tileIndexB++)
+                                for (var tileIndexB = 0; tileIndexB < connectedRoomList[j].TileCount; tileIndexB++)
                                 {
                                     var tileA = this.RoomTiles[disconnectedRoomList[i].StartTileIndex + tileIndexA];
                                     var tileB = this.RoomTiles[connectedRoomList[j].StartTileIndex + tileIndexB];
@@ -382,7 +383,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
                     }
                     if (possibleConFound)
-                        MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB);
+                        this.MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB);
                 }
             }
 
@@ -390,21 +391,21 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var connectedTableCopy = new NativeArray<int>(connectedRoomsTable.Length, Allocator.Temp);
                 connectedRoomsTable.CopyTo(connectedTableCopy);
-                for (int i = 0; i < Rooms.Length; i++)
+                for (var i = 0; i < this.Rooms.Length; i++)
                 {
-                    if (connectedTableCopy[bestRoomAIndex * Rooms.Length + i] == 1)
-                        for (int j = 0; j < Rooms.Length; j++)
-                            if (connectedTableCopy[bestRoomBIndex * Rooms.Length + j] == 1)
+                    if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + i] == 1)
+                        for (var j = 0; j < this.Rooms.Length; j++)
+                            if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + j] == 1)
                             {
-                                connectedRoomsTable[i * Rooms.Length + j] = 1;
-                                connectedRoomsTable[j * Rooms.Length + i] = 1;
+                                connectedRoomsTable[i * this.Rooms.Length + j] = 1;
+                                connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
-                    if (connectedTableCopy[bestRoomBIndex * Rooms.Length + i] == 1)
-                        for (int j = 0; j < Rooms.Length; j++)
-                            if (connectedTableCopy[bestRoomAIndex * Rooms.Length + j] == 1)
+                    if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + i] == 1)
+                        for (var j = 0; j < this.Rooms.Length; j++)
+                            if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + j] == 1)
                             {
-                                connectedRoomsTable[i * Rooms.Length + j] = 1;
-                                connectedRoomsTable[j * Rooms.Length + i] = 1;
+                                connectedRoomsTable[i * this.Rooms.Length + j] = 1;
+                                connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
                 }
 
@@ -425,10 +426,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                int index = 0;
-                while (CorridorsQueue.Count > 0)
-                    if (CorridorsQueue.TryDequeue(out var corridor))
-                        CorridorsArray[index++] = corridor;
+                var index = 0;
+                while (this.CorridorsQueue.Count > 0)
+                    if (this.CorridorsQueue.TryDequeue(out var corridor))
+                        this.CorridorsArray[index++] = corridor;
             }
         }
 
@@ -450,11 +451,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                var tileA = Corridors[index].Start;
-                var tileB = Corridors[index].End;
-                var line = GetLine(tileA, tileB);
-                for (int i = 0; i < line.Length; i++)
-                    ClearPass(line[i], PassageRadius);
+                var tileA = this.Corridors[index].Start;
+                var tileB = this.Corridors[index].End;
+                var line = this.GetLine(tileA, tileB);
+                for (var i = 0; i < line.Length; i++)
+                    this.ClearPass(line[i], this.PassageRadius);
 
             }
 
@@ -535,42 +536,42 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             public void Execute()
             {
                 TileComponent currentTile;
-                var tilesStride = Board.Size.x;
-                for (int x = 0; x < Board.Size.x; x++)
+                var tilesStride = this.Board.Size.x;
+                for (var x = 0; x < this.Board.Size.x; x++)
                 {
-                    currentTile = Tiles[x];
+                    currentTile = this.Tiles[x];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[x] = currentTile;
+                    this.Tiles[x] = currentTile;
 
-                    currentTile = Tiles[tilesStride + x];
+                    currentTile = this.Tiles[tilesStride + x];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[tilesStride + x] = currentTile;
+                    this.Tiles[tilesStride + x] = currentTile;
 
-                    currentTile = Tiles[((Board.Size.y - 1) * tilesStride) + x];
+                    currentTile = this.Tiles[((this.Board.Size.y - 1) * tilesStride) + x];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[((Board.Size.y - 1) * tilesStride) + x] = currentTile;
+                    this.Tiles[((this.Board.Size.y - 1) * tilesStride) + x] = currentTile;
 
-                    currentTile = Tiles[((Board.Size.y - 2) * tilesStride) + x];
+                    currentTile = this.Tiles[((this.Board.Size.y - 2) * tilesStride) + x];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[((Board.Size.y - 2) * tilesStride) + x] = currentTile;
+                    this.Tiles[((this.Board.Size.y - 2) * tilesStride) + x] = currentTile;
                 }
-                for (int y = 0; y < Board.Size.y; y++)
+                for (var y = 0; y < this.Board.Size.y; y++)
                 {
-                    currentTile = Tiles[y * tilesStride];
+                    currentTile = this.Tiles[y * tilesStride];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[y * tilesStride] = currentTile;
+                    this.Tiles[y * tilesStride] = currentTile;
 
-                    currentTile = Tiles[y * tilesStride + 1];
+                    currentTile = this.Tiles[y * tilesStride + 1];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[y * tilesStride + 1] = currentTile;
+                    this.Tiles[y * tilesStride + 1] = currentTile;
 
-                    currentTile = Tiles[(y * tilesStride) + Board.Size.x - 1];
+                    currentTile = this.Tiles[(y * tilesStride) + this.Board.Size.x - 1];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[(y * tilesStride) + Board.Size.x - 1] = currentTile;
+                    this.Tiles[(y * tilesStride) + this.Board.Size.x - 1] = currentTile;
 
-                    currentTile = Tiles[(y * tilesStride) + Board.Size.x - 2];
+                    currentTile = this.Tiles[(y * tilesStride) + this.Board.Size.x - 2];
                     currentTile.CurrentGenState = TileType.Wall;
-                    Tiles[(y * tilesStride) + Board.Size.x - 2] = currentTile;
+                    this.Tiles[(y * tilesStride) + this.Board.Size.x - 2] = currentTile;
                 }
             }
         }
@@ -584,7 +585,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                RemoveThinWalls(Board, Tiles, Board.Size.x);
+                this.RemoveThinWalls(this.Board, this.Tiles, this.Board.Size.x);
             }
 
             private void RemoveThinWalls(BoardComponent board, NativeArray<TileComponent> tiles, int tilesStride)
@@ -632,13 +633,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                if (IsBoardValid())
-                    for (int x = 0; x < TileStride; x++)
+                if (this.IsBoardValid())
+                    for (var x = 0; x < this.TileStride; x++)
                     {
-                        var entity = CommandBuffer.CreateEntity(index);
-                        CommandBuffer.AddComponent(index, entity, new FinalTileComponent
+                        var entity = this.CommandBuffer.CreateEntity(index);
+                        this.CommandBuffer.AddComponent(index, entity, new FinalTileComponent
                         {
-                            TileType = Tiles[(index * TileStride) + x].CurrentGenState,
+                            TileType = this.Tiles[(index * this.TileStride) + x].CurrentGenState,
                             Position = new int2(x, index)
                         });
                     }
@@ -647,8 +648,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             private bool IsBoardValid()
             {
                 var freeTilesCount = 0;
-                for (int i = 0; i < Tiles.Length; i++)
-                    if (Tiles[i].CurrentGenState == TileType.Floor)
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i].CurrentGenState == TileType.Floor)
                         freeTilesCount++;
 
                 if (freeTilesCount < 50)
@@ -672,37 +673,37 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute()
             {
-                if (IsBoardValid())
+                if (this.IsBoardValid())
                 {
-                    CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
-                    var finalBoardComponent = CommandBuffer.CreateEntity();
-                    CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
+                    var finalBoardComponent = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
                     {
-                        Size = BoardComponent.Size
+                        Size = this.BoardComponent.Size
                     });
                 }
                 else
                 {
-                    var random = new Random((uint)RandomSeed);
+                    var random = new Random((uint)this.RandomSeed);
 
                     var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 150));
                     var randomFillPercent = random.NextInt(60, 75);
-                    var board = CommandBuffer.CreateEntity();
-                    CommandBuffer.AddComponent(board, new BoardComponent
+                    var board = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
                         Size = randomSize,
                         RandomFillPercent = random.NextInt(60, 75),
-                        PassRadius = BoardComponent.PassRadius
+                        PassRadius = this.BoardComponent.PassRadius
                     });
-                    CommandBuffer.DestroyEntity(BoardEntity);
+                    this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }
             }
 
             private bool IsBoardValid()
             {
                 var freeTilesCount = 0;
-                for (int i = 0; i < Tiles.Length; i++)
-                    if (Tiles[i].CurrentGenState == TileType.Floor)
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i].CurrentGenState == TileType.Floor)
                         freeTilesCount++;
 
                 if (freeTilesCount < 50)
@@ -733,11 +734,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         private ComponentGroup _boardGroup;
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            RoomList = new NativeList<RoomComponent>(Allocator.Persistent);
-            CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
-            CurrentPhase = 0;
-            _boardGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this.RoomList = new NativeList<RoomComponent>(Allocator.Persistent);
+            this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
+            this.CurrentPhase = 0;
+            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -752,23 +753,23 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var boardChunks = _boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
+            var boardChunks = this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (var chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
             {
                 var chunk = boardChunks[chunkIndex];
-                var boardEntities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
-                var boards = chunk.GetNativeArray(GetArchetypeChunkComponentType<BoardComponent>());
-                for (int i = 0; i < chunk.Count; i++)
+                var boardEntities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
+                var boards = chunk.GetNativeArray(this.GetArchetypeChunkComponentType<BoardComponent>());
+                for (var i = 0; i < chunk.Count; i++)
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
                     var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-                    if (CurrentPhase == 0)
+                    if (this.CurrentPhase == 0)
                     {
-                        Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                        RoomTiles = new NativeArray<TileComponent>(Tiles.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                        RoomList.Clear();
-                        CorridorsQueue.Clear();
+                        this.Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        this.RoomTiles = new NativeArray<TileComponent>(this.Tiles.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        this.RoomList.Clear();
+                        this.CorridorsQueue.Clear();
 
                         var randomFillBoardJobHandle = new RandomFillBoardJob
                         {
@@ -779,18 +780,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }.Schedule(board.Size.y, 1, inputDeps);
 
                         var lastGenerationJobHandle = randomFillBoardJobHandle;
-                        for (int geneation = 0; geneation < 5; geneation++)
+                        for (var geneation = 0; geneation < 5; geneation++)
                         {
                             var calculateNextGenerationJobHandle = new CalculateNextGenerationJob
                             {
                                 Tiles = Tiles,
                                 TileStride = board.Size.x
-                            }.Schedule(Tiles.Length, 1, lastGenerationJobHandle);
+                            }.Schedule(this.Tiles.Length, 1, lastGenerationJobHandle);
 
                             lastGenerationJobHandle = new ProcessNextGenerationJob
                             {
                                 Tiles = Tiles
-                            }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
+                            }.Schedule(this.Tiles.Length, 32, calculateNextGenerationJobHandle);
                         }
 
                         var closeBordersJobHandle = new CloseBordersJob
@@ -807,14 +808,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             Rooms = RoomList
                         }.Schedule(closeBordersJobHandle);
                     }
-                    else if (CurrentPhase == 1)
+                    else if (this.CurrentPhase == 1)
                     {
-                        var roomCount = RoomList.Length;
+                        var roomCount = this.RoomList.Length;
                         var roomsChunkSize = 10;
-                        var concurrentQueue = CorridorsQueue.ToConcurrent();
+                        var concurrentQueue = this.CorridorsQueue.ToConcurrent();
                         var connectedRoomsTable = new NativeArray<int>(roomCount * roomCount, Allocator.TempJob);
 
-                        for (int roomIndex = 0; roomIndex < roomCount; roomIndex++)
+                        for (var roomIndex = 0; roomIndex < roomCount; roomIndex++)
                             connectedRoomsTable[roomIndex * roomCount + roomIndex] = 1;
 
                         var RearangeRoomsJobhandle = new RearangeRoomsJob
@@ -841,9 +842,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             Corridors = concurrentQueue
                         }.Schedule(findClosestRoomsConnectionsJobHandle);
                     }
-                    else if (CurrentPhase == 2)
+                    else if (this.CurrentPhase == 2)
                     {
-                        var corridorsArray = new NativeArray<CorridorComponent>(CorridorsQueue.Count, Allocator.TempJob);
+                        var corridorsArray = new NativeArray<CorridorComponent>(this.CorridorsQueue.Count, Allocator.TempJob);
 
                         var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
                         {
@@ -863,12 +864,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         {
                             Tiles = Tiles,
                             TileStride = board.Size.x
-                        }.Schedule(Tiles.Length, 1, createCorridorsJobHandle);
+                        }.Schedule(this.Tiles.Length, 1, createCorridorsJobHandle);
 
                         var lastGenerationJobHandle = new ProcessNextGenerationJob
                         {
                             Tiles = Tiles,
-                        }.Schedule(Tiles.Length, 32, calculateNextGenerationJobHandle);
+                        }.Schedule(this.Tiles.Length, 32, calculateNextGenerationJobHandle);
 
                         var removeThinWallsJobHandle = new RemoveThinWallsJob
                         {
@@ -884,7 +885,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                         var instantiateTilesJobHandle = new InstantiateTilesJob
                         {
-                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                             Tiles = Tiles,
                             TileStride = board.Size.x,
                             RoomTiles = RoomTiles
@@ -892,22 +893,22 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                         inputDeps = new TagBoardDoneJob
                         {
-                            CommandBuffer = _endFrameBarrier.CreateCommandBuffer(),
+                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
                             BoardEntity = boardEntity,
                             BoardComponent = board,
                             Tiles = Tiles,
                             RandomSeed = random.NextInt()
                         }.Schedule(instantiateTilesJobHandle);
-                        _endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                        this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
                     }
-                    else if (CurrentPhase == 3)
+                    else if (this.CurrentPhase == 3)
                     {
-                        RoomList.Clear();
-                        CorridorsQueue.Clear();
+                        this.RoomList.Clear();
+                        this.CorridorsQueue.Clear();
                     }
                 }
             }
-            CurrentPhase = (CurrentPhase + 1) % 4;
+            this.CurrentPhase = (this.CurrentPhase + 1) % 4;
 
             var cleanUpJobHandle = new CleanUpJob
             {
@@ -918,8 +919,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
         protected override void OnDestroyManager()
         {
-            RoomList.Dispose();
-            CorridorsQueue.Dispose();
+            this.RoomList.Dispose();
+            this.CorridorsQueue.Dispose();
         }
     }
 }

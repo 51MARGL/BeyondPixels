@@ -1,6 +1,8 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.Utilities;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
@@ -15,7 +17,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override void OnCreateManager()
         {
-            _addedGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._addedGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(SpellCastingComponent)
@@ -24,7 +26,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     typeof(SpellStateComponent)
                 }
             });
-            _removedGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._removedGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(SpellStateComponent)
@@ -37,19 +39,19 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override void OnUpdate()
         {
-            Entities.With(_addedGroup).ForEach((Entity entity, Animator animatorComponent) =>
+            this.Entities.With(this._addedGroup).ForEach((Entity entity, Animator animatorComponent) =>
             {
                 animatorComponent.ActivateLayer("CastSpellLayer");
                 animatorComponent.SetBool("spellCasting", true);
 
-                PostUpdateCommands.AddComponent(entity, new SpellStateComponent());
+                this.PostUpdateCommands.AddComponent(entity, new SpellStateComponent());
             });
-            Entities.With(_removedGroup).ForEach((Entity entity, Animator animatorComponent) =>
+            this.Entities.With(this._removedGroup).ForEach((Entity entity, Animator animatorComponent) =>
             {
                 animatorComponent.ActivateLayer("CastSpellLayer");
                 animatorComponent.SetBool("spellCasting", false);
 
-                PostUpdateCommands.RemoveComponent<SpellStateComponent>(entity);
+                this.PostUpdateCommands.RemoveComponent<SpellStateComponent>(entity);
             });
         }
     }

@@ -1,5 +1,7 @@
 ﻿using System;
+
 using BeyondPixels.ECS.Components.Characters.Common;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Components.Spells

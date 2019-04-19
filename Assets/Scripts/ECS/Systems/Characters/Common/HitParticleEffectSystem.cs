@@ -1,9 +1,11 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.SceneBootstraps;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -16,14 +18,14 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            _damageGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._damageGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
                     typeof(CollisionInfo), typeof(FinalDamageComponent)
                 }
             });
-            _characterGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._characterGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -33,24 +35,24 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         }
         protected override void OnUpdate()
         {
-            if (_damageGroup.CalculateLength() == 0)
+            if (this._damageGroup.CalculateLength() == 0)
                 return;
 
-            var positions = new NativeArray<float2>(_damageGroup.CalculateLength(), Allocator.TempJob);
+            var positions = new NativeArray<float2>(this._damageGroup.CalculateLength(), Allocator.TempJob);
 
             var k = 0;
-            Entities.With(_damageGroup).ForEach((Entity damageEntity, ref FinalDamageComponent damageComponent, ref CollisionInfo collisionInfo) =>
+            this.Entities.With(this._damageGroup).ForEach((Entity damageEntity, ref FinalDamageComponent damageComponent, ref CollisionInfo collisionInfo) =>
             {
                 var eventTarget = collisionInfo.Target;
                 var damageValue = damageComponent.DamageAmount;
-                Entities.With(_characterGroup).ForEach((Entity characterEntity, ref PositionComponent positionComponent) =>
+                this.Entities.With(this._characterGroup).ForEach((Entity characterEntity, ref PositionComponent positionComponent) =>
                 {
                     if (eventTarget == characterEntity && damageValue > 0)
                         positions[k++] = positionComponent.CurrentPosition;
                 });
             });
 
-            for (int i = 0; i < k; i++)
+            for (var i = 0; i < k; i++)
             {
                 GameObject.Instantiate(PrefabManager.Instance.BloodSplashPrefab,
                                        new float3(positions[i].x, positions[i].y, -1),

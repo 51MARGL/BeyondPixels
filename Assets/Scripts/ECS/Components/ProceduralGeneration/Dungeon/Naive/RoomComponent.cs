@@ -1,14 +1,13 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
 {
     public struct RoomComponent : IComponentData
     {
-        public int X;                  
+        public int X;
         public int Y;
-        public int2 Size;            
+        public int2 Size;
         public Direction EnteringCorridor;
     }
 }

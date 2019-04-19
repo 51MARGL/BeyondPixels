@@ -4,7 +4,9 @@ using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.SceneBootstraps;
+
 using Unity.Entities;
+
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -21,7 +23,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
         private bool cutsceneDone;
         protected override void OnCreateManager()
         {
-            _boardCameraGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._boardCameraGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -32,7 +34,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     typeof(PlayerEnterCutsceneTriggeredComponent)
                 }
             });
-            _playerDoneCutSceneGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._playerDoneCutSceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -44,7 +46,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         protected override void OnUpdate()
         {
-            Entities.With(_boardCameraGroup).ForEach((Entity boardEntity, ref FinalBoardComponent finalBoardComponent) =>
+            this.Entities.With(this._boardCameraGroup).ForEach((Entity boardEntity, ref FinalBoardComponent finalBoardComponent) =>
             {
                 var player = GameObject.FindGameObjectWithTag("Player");
                 var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
@@ -56,7 +58,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
                 void onStop(PlayableDirector aDirector)
                 {
-                    cutsceneDone = true;
+                    this.cutsceneDone = true;
                     rigidbody.isKinematic = false;
                     director.stopped -= onStop;
                     director.enabled = false;
@@ -78,21 +80,21 @@ namespace BeyondPixels.ECS.Systems.Scenes
                         director.SetGenericBinding(playableAssetOutput.sourceObject, levelEnter);
                     }
                 }
-                cutsceneDone = false;
+                this.cutsceneDone = false;
                 rigidbody.isKinematic = true;
-                if (!EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
-                    PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
-                PostUpdateCommands.AddComponent(playerEntity, new PlayerEnterCutscenePlaying());
+                if (!this.EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                    this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                this.PostUpdateCommands.AddComponent(playerEntity, new PlayerEnterCutscenePlaying());
                 director.Play();
-                PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());
+                this.PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());
             });
 
-            Entities.With(_playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
+            this.Entities.With(this._playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>
             {
-                if (cutsceneDone)
+                if (this.cutsceneDone)
                 {
-                    PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
-                    PostUpdateCommands.RemoveComponent<PlayerEnterCutscenePlaying>(playerEntity);
+                    this.PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
+                    this.PostUpdateCommands.RemoveComponent<PlayerEnterCutscenePlaying>(playerEntity);
                 }
             });
         }

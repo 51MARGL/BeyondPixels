@@ -1,5 +1,6 @@
 ﻿using Unity.Collections;
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.Utilities
@@ -8,11 +9,11 @@ namespace BeyondPixels.Utilities
     {
         private void OnApplicationQuit()
         {
-            StopAllCoroutines();
+            this.StopAllCoroutines();
 
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
             var entityArray = entityManager.GetAllEntities(Allocator.TempJob);
-            for (int i = 0; i < entityArray.Length; i++)
+            for (var i = 0; i < entityArray.Length; i++)
                 entityManager.DestroyEntity(entityArray[i]);
             entityArray.Dispose();
 

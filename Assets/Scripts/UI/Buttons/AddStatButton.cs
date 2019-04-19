@@ -1,12 +1,10 @@
-﻿using System;
-using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Player;
+﻿using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.UI.ECS.Components;
-using TMPro;
+
 using Unity.Entities;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace BeyondPixels.UI.Buttons
 {

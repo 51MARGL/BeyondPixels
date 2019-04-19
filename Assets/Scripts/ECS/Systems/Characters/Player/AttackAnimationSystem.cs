@@ -1,7 +1,9 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.Utilities;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
@@ -13,7 +15,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override void OnCreateManager()
         {
-            _group = GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(CharacterComponent), typeof(AttackComponent)
@@ -22,12 +24,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         }
         protected override void OnUpdate()
         {
-            Entities.With(_group).ForEach((Entity entity, Animator animatorComponent, ref AttackComponent attackComponent) =>
+            this.Entities.With(this._group).ForEach((Entity entity, Animator animatorComponent, ref AttackComponent attackComponent) =>
             {
                 animatorComponent.ActivateLayer("AttackLayer");
 
-                string attackTriggerName = "Attack" + (attackComponent.CurrentComboIndex + 1);
-                int attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
+                var attackTriggerName = "Attack" + (attackComponent.CurrentComboIndex + 1);
+                var attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
                 if (!animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsName(attackTriggerName))
                     animatorComponent.SetTrigger(attackTriggerName);
 
@@ -35,7 +37,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 {
                     foreach (var comboName in new[] { "Attack1", "Attack2" })
                         animatorComponent.ResetTrigger(comboName);
-                    PostUpdateCommands.RemoveComponent<AttackComponent>(entity);
+                    this.PostUpdateCommands.RemoveComponent<AttackComponent>(entity);
                 }
 
             });

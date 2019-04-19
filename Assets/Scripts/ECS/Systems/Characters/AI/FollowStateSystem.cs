@@ -2,8 +2,10 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,7 +18,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnCreateManager()
         {
-            _followGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._followGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -28,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     typeof(AttackStateComponent)
                 }
             });
-            _targetGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._targetGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -43,16 +45,16 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnUpdate()
         {
-            Entities.With(_followGroup).ForEach((Entity entity,
+            this.Entities.With(this._followGroup).ForEach((Entity entity,
                                                 NavMeshAgent navMeshAgent,
                                                 ref MovementComponent movementComponent,
                                                 ref FollowStateComponent followStateComponent,
                                                 ref WeaponComponent weaponComponent,
                                                 ref PositionComponent positionComponent) =>
             {
-                if (_targetGroup.CalculateLength() == 0)
+                if (this._targetGroup.CalculateLength() == 0)
                 {
-                    PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
+                    this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
                     return;
                 }
 
@@ -61,7 +63,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 var currentPosition = positionComponent.CurrentPosition;
                 var mvmComponent = movementComponent;
 
-                Entities.With(_targetGroup).ForEach((Entity playerEntity, ref PositionComponent playerPositionComponent) =>
+                this.Entities.With(this._targetGroup).ForEach((Entity playerEntity, ref PositionComponent playerPositionComponent) =>
                 {
                     if (playerEntity == flwStateComponent.Target)
                     {
@@ -84,7 +86,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                             && currentTime - flwStateComponent.LastTimeAttacked > wpnComponent.CoolDown)
                         {
                             flwStateComponent.LastTimeAttacked = currentTime;
-                            PostUpdateCommands.AddComponent(entity,
+                            this.PostUpdateCommands.AddComponent(entity,
                                 new AttackStateComponent
                                 {
                                     StartedAt = currentTime,

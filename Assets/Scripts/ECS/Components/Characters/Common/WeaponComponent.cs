@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.Entities;
+﻿using Unity.Entities;
 
 namespace BeyondPixels.ECS.Components.Characters.Common
 {
@@ -8,5 +7,5 @@ namespace BeyondPixels.ECS.Components.Characters.Common
         public int DamageValue;
         public float AttackRange;
         public float CoolDown;
-    } 
+    }
 }

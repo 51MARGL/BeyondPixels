@@ -1,10 +1,11 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
-using Unity.Burst;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
@@ -22,19 +23,19 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                 [ReadOnly] ref IdleStateComponent idleStateComponent,
                                 [ReadOnly] ref PositionComponent positionComponent)
             {
-                var random = new System.Random((int)CurrentTime + index);
-                if (CurrentTime - idleStateComponent.StartedAt < random.Next(10, 50) / 10f)
+                var random = new System.Random((int)this.CurrentTime + index);
+                if (this.CurrentTime - idleStateComponent.StartedAt < random.Next(10, 50) / 10f)
                     return;
 
-                CommandBuffer.RemoveComponent(index, entity, typeof(IdleStateComponent));
+                this.CommandBuffer.RemoveComponent(index, entity, typeof(IdleStateComponent));
                 if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) < 1)
-                    CommandBuffer.AddComponent(index, entity,
+                    this.CommandBuffer.AddComponent(index, entity,
                         new InspectStateComponent
                         {
                             StartedAt = CurrentTime
                         });
                 else
-                    CommandBuffer.AddComponent(index, entity,
+                    this.CommandBuffer.AddComponent(index, entity,
                         new EvadeStateComponent
                         {
                             StartedAt = CurrentTime
@@ -46,17 +47,17 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new IdleStateJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 CurrentTime = Time.time
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

@@ -1,9 +1,11 @@
 ﻿using System;
-using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Player;
+
 using BeyondPixels.UI.ECS.Components;
+
 using TMPro;
+
 using Unity.Entities;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,17 +23,17 @@ namespace BeyondPixels.UI.Buttons
         {
             get
             {
-                if (_spellIcon == null)
-                    _spellIcon = GetComponent<Image>();
+                if (this._spellIcon == null)
+                    this._spellIcon = this.GetComponent<Image>();
 
-                return _spellIcon;
+                return this._spellIcon;
             }
-            set => _spellIcon = value;
+            set => this._spellIcon = value;
         }
 
         private void Start()
         {
-            SpellIcon = GetComponent<Image>();
+            this.SpellIcon = this.GetComponent<Image>();
         }
 
         public void OnPointerClick(PointerEventData eventData)

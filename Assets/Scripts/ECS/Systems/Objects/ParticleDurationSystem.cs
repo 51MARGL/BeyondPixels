@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Objects
@@ -11,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnCreateManager()
         {
-            _particlesGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._particlesGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -25,10 +27,10 @@ namespace BeyondPixels.ECS.Systems.Objects
         }
         protected override void OnUpdate()
         {
-            Entities.With(_particlesGroup).ForEach((Entity entity, ParticleSystem particleSystem) =>
+            this.Entities.With(this._particlesGroup).ForEach((Entity entity, ParticleSystem particleSystem) =>
             {
                 if (particleSystem != null && !particleSystem.IsAlive())
-                    PostUpdateCommands.AddComponent(entity, new DestroyComponent());
+                    this.PostUpdateCommands.AddComponent(entity, new DestroyComponent());
             });
         }
     }

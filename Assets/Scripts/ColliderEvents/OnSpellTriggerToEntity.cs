@@ -1,7 +1,8 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Spells;
+
 using Unity.Entities;
-using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -15,7 +16,7 @@ namespace BeyondPixels.ColliderEvents
             if (collider.gameObject.CompareTag("Hitbox"))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var spellEntity = GetComponent<GameObjectEntity>().Entity;
+                var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(spellEntity))
                     return;
 
@@ -40,7 +41,7 @@ namespace BeyondPixels.ColliderEvents
                         {
                             Target = targetComponent.Target,
                         });
-                totalTime = 0;
+                this.totalTime = 0;
             }
         }
 
@@ -48,11 +49,11 @@ namespace BeyondPixels.ColliderEvents
         {
             if (collider.gameObject.CompareTag("Hitbox"))
             {
-                totalTime += Time.deltaTime;
-                if (totalTime > 1f)
+                this.totalTime += Time.deltaTime;
+                if (this.totalTime > 1f)
                 {
                     var entityManager = World.Active.GetExistingManager<EntityManager>();
-                    var spellEntity = GetComponent<GameObjectEntity>().Entity;
+                    var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                     if (!entityManager.Exists(spellEntity))
                         return;
 
@@ -76,7 +77,7 @@ namespace BeyondPixels.ColliderEvents
                             {
                                 Target = targetComponent.Target,
                             });
-                    totalTime = 0;
+                    this.totalTime = 0;
                 }
             }
         }

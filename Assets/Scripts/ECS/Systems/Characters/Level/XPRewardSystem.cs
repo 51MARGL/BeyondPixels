@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -26,16 +27,16 @@ namespace BeyondPixels.ECS.Systems.Level
                                 [ReadOnly] ref XPRewardComponent xpRewardComponent,
                                 [ReadOnly] ref LevelComponent levelComponent)
             {
-                for (int c = 0; c < Chunks.Length; c++)
+                for (var c = 0; c < this.Chunks.Length; c++)
                 {
-                    var chunk = Chunks[c];
-                    var entities = chunk.GetNativeArray(EntityType);
-                    var xpComponentComponents = chunk.GetNativeArray(XPComponentType);
-                    for (int i = 0; i < chunk.Count; i++)
+                    var chunk = this.Chunks[c];
+                    var entities = chunk.GetNativeArray(this.EntityType);
+                    var xpComponentComponents = chunk.GetNativeArray(this.XPComponentType);
+                    for (var i = 0; i < chunk.Count; i++)
                     {
                         var xpComponentComponent = xpComponentComponents[i];
                         xpComponentComponent.CurrentXP += xpRewardComponent.XPAmount * levelComponent.CurrentLevel;
-                        CommandBuffer.SetComponent(index, entities[i], xpComponentComponent);
+                        this.CommandBuffer.SetComponent(index, entities[i], xpComponentComponent);
                     }
                 }
             }
@@ -45,8 +46,8 @@ namespace BeyondPixels.ECS.Systems.Level
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _healthGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._healthGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -60,12 +61,12 @@ namespace BeyondPixels.ECS.Systems.Level
         {
             var destroyJobHandle = new XPRewardSystemJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                Chunks = _healthGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = GetArchetypeChunkEntityType(),
-                XPComponentType = GetArchetypeChunkComponentType<XPComponent>()
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                Chunks = this._healthGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = this.GetArchetypeChunkEntityType(),
+                XPComponentType = this.GetArchetypeChunkComponentType<XPComponent>()
             }.Schedule(this, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(destroyJobHandle);
+            this._endFrameBarrier.AddJobHandleForProducer(destroyJobHandle);
             return destroyJobHandle;
         }
     }

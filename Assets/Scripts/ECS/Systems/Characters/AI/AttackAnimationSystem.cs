@@ -1,6 +1,8 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.Utilities;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
@@ -14,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnCreateManager()
         {
-            _attackStartGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._attackStartGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -25,7 +27,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     typeof(AttackStateInitialComponent)
                 }
             });
-            _attackingGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._attackingGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
@@ -36,18 +38,20 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnUpdate()
         {
-            Entities.With(_attackStartGroup).ForEach((Entity entity, Animator animatorComponent) => {
+            this.Entities.With(this._attackStartGroup).ForEach((Entity entity, Animator animatorComponent) =>
+            {
                 animatorComponent.ActivateLayer("AttackLayer");
                 animatorComponent.SetTrigger("Attack");
 
-                PostUpdateCommands.AddComponent(entity, new AttackStateInitialComponent());
+                this.PostUpdateCommands.AddComponent(entity, new AttackStateInitialComponent());
             });
-            Entities.With(_attackingGroup).ForEach((Entity entity, Animator animatorComponent) => {
-                int attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
+            this.Entities.With(this._attackingGroup).ForEach((Entity entity, Animator animatorComponent) =>
+            {
+                var attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
                 if (animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsTag("Finish"))
                 {
-                    PostUpdateCommands.RemoveComponent<AttackStateComponent>(entity);
-                    PostUpdateCommands.RemoveComponent<AttackStateInitialComponent>(entity);
+                    this.PostUpdateCommands.RemoveComponent<AttackStateComponent>(entity);
+                    this.PostUpdateCommands.RemoveComponent<AttackStateInitialComponent>(entity);
                 }
             });
         }

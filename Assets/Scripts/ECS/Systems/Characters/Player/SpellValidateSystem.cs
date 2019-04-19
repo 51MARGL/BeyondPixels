@@ -1,10 +1,11 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Spells;
-using BeyondPixels.SceneBootstraps;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
@@ -31,34 +32,34 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
             {
-                var entities = chunk.GetNativeArray(EntityType);
-                var inputComponents = chunk.GetNativeArray(InputComponentType);
-                for (int i = 0; i < chunk.Count; i++)
+                var entities = chunk.GetNativeArray(this.EntityType);
+                var inputComponents = chunk.GetNativeArray(this.InputComponentType);
+                for (var i = 0; i < chunk.Count; i++)
                 {
-                    for (int sChunkIndex = 0; sChunkIndex < ActiveSpellChunks.Length; sChunkIndex++)
+                    for (var sChunkIndex = 0; sChunkIndex < this.ActiveSpellChunks.Length; sChunkIndex++)
                     {
                         if (inputComponents[i].ActionButtonPressed == 0)
                             return;
 
                         var inputComponent = inputComponents[i];
-                        var spellChunk = ActiveSpellChunks[sChunkIndex];
-                        var spellEntities = spellChunk.GetNativeArray(EntityType);
-                        var spellComponents = spellChunk.GetNativeArray(ActiveSpellComponentType);
+                        var spellChunk = this.ActiveSpellChunks[sChunkIndex];
+                        var spellEntities = spellChunk.GetNativeArray(this.EntityType);
+                        var spellComponents = spellChunk.GetNativeArray(this.ActiveSpellComponentType);
 
-                        for (int sI = 0; sI < spellChunk.Count; sI++)
+                        for (var sI = 0; sI < spellChunk.Count; sI++)
                         {
                             if (spellComponents[sI].Owner == entities[i]
                                 && inputComponent.ActionButtonPressed == spellComponents[sI].ActionIndex)
                             {
                                 var spellPrefab = SpellBookManagerComponent.Instance.SpellBook.Spells[spellComponents[sI].SpellIndex];
-                                if (spellPrefab.TargetRequired && !chunk.Has(TargetComponentType))
+                                if (spellPrefab.TargetRequired && !chunk.Has(this.TargetComponentType))
                                 {
                                     inputComponent.ActionButtonPressed = 0;
                                     inputComponents[i] = inputComponent;
                                     return;
                                 }
 
-                                CommandBuffer.AddComponent(chunkIndex, entities[i], new SpellCastingComponent
+                                this.CommandBuffer.AddComponent(chunkIndex, entities[i], new SpellCastingComponent
                                 {
                                     SpellIndex = spellComponents[sI].SpellIndex,
                                     ActiveSpell = spellEntities[sI],
@@ -83,8 +84,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override void OnCreateManager()
         {
-            _endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            _playerCastGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._playerCastGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     typeof(InputComponent), ComponentType.ReadOnly<CharacterComponent>()
@@ -95,7 +96,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                      ComponentType.ReadOnly<SpellCastingComponent>()
                 }
             });
-            _activeSpellGroup = GetComponentGroup(new EntityArchetypeQuery
+            this._activeSpellGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[] {
                     ComponentType.ReadOnly<ActiveSpellComponent>()
@@ -112,15 +113,15 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         {
             var validateSpellJobHandle = new SpellValidateJob
             {
-                CommandBuffer = _endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                ActiveSpellChunks = _activeSpellGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = GetArchetypeChunkEntityType(),
-                InputComponentType = GetArchetypeChunkComponentType<InputComponent>(),
-                TargetComponentType = GetArchetypeChunkComponentType<TargetComponent>(true),
-                ActiveSpellComponentType = GetArchetypeChunkComponentType<ActiveSpellComponent>(true),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                ActiveSpellChunks = this._activeSpellGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = this.GetArchetypeChunkEntityType(),
+                InputComponentType = this.GetArchetypeChunkComponentType<InputComponent>(),
+                TargetComponentType = this.GetArchetypeChunkComponentType<TargetComponent>(true),
+                ActiveSpellComponentType = this.GetArchetypeChunkComponentType<ActiveSpellComponent>(true),
                 CurrentTime = Time.time
-            }.Schedule(_playerCastGroup, inputDeps);
-            _endFrameBarrier.AddJobHandleForProducer(validateSpellJobHandle);
+            }.Schedule(this._playerCastGroup, inputDeps);
+            this._endFrameBarrier.AddJobHandleForProducer(validateSpellJobHandle);
             return validateSpellJobHandle;
         }
     }

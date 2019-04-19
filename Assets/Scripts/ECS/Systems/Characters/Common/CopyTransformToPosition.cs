@@ -1,8 +1,10 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
+
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -16,9 +18,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
             public void Execute(int index, TransformAccess transform)
             {
-                var position = PositionComponents[index];
+                var position = this.PositionComponents[index];
                 position.CurrentPosition = new float2(transform.position.x, transform.position.y);
-                PositionComponents[index] = position;
+                this.PositionComponents[index] = position;
             }
         }
 
@@ -26,16 +28,16 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            _transformGroup = GetComponentGroup(typeof(PositionComponent), typeof(UnityEngine.Transform));
+            this._transformGroup = this.GetComponentGroup(typeof(PositionComponent), typeof(UnityEngine.Transform));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var transformArray = _transformGroup.GetTransformAccessArray();
+            var transformArray = this._transformGroup.GetTransformAccessArray();
             return new CopyTransformToPositionJob
             {
                 //no other method for now
-                PositionComponents = _transformGroup.GetComponentDataArray<PositionComponent>()
+                PositionComponents = this._transformGroup.GetComponentDataArray<PositionComponent>()
             }.Schedule(transformArray, inputDeps);
         }
     }

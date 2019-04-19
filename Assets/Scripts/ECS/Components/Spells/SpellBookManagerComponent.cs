@@ -10,7 +10,7 @@ namespace BeyondPixels.ECS.Components.Spells
         public void Start()
         {
             SpellBookManagerComponent.Instance = this;
-            this.SpellBook = GetComponent<SpellBookComponent>();
+            this.SpellBook = this.GetComponent<SpellBookComponent>();
         }
     }
 }

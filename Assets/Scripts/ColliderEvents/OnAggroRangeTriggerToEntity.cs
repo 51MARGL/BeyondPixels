@@ -1,5 +1,6 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ColliderEvents
@@ -13,9 +14,9 @@ namespace BeyondPixels.ColliderEvents
             if (collider.gameObject.CompareTag("Player"))
             {
                 var wallLayer = LayerMask.GetMask("World");
-                var distance = math.distance(transform.position, collider.transform.position);
-                var hits = Physics2D.RaycastAll(transform.position,
-                                                collider.transform.position - transform.position,
+                var distance = math.distance(this.transform.position, collider.transform.position);
+                var hits = Physics2D.RaycastAll(this.transform.position,
+                                                collider.transform.position - this.transform.position,
                                                 distance, wallLayer);
 
                 foreach (var hit in hits)
@@ -25,7 +26,7 @@ namespace BeyondPixels.ColliderEvents
                 }
 
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
                 var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                     return;
@@ -40,7 +41,7 @@ namespace BeyondPixels.ColliderEvents
                     EventType = EventType.TriggerEnter
                 });
 
-                hasTarget = true;
+                this.hasTarget = true;
             }
         }
 
@@ -49,7 +50,7 @@ namespace BeyondPixels.ColliderEvents
             if (collider.gameObject.CompareTag("Player"))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
                 var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                     return;
@@ -63,21 +64,21 @@ namespace BeyondPixels.ColliderEvents
                     EventType = EventType.TriggerExit
                 });
 
-                hasTarget = false;
+                this.hasTarget = false;
             }
         }
 
         private void OnTriggerStay2D(Collider2D collider)
         {
-            if (hasTarget)
+            if (this.hasTarget)
                 return;
 
             if (collider.gameObject.CompareTag("Player"))
             {
                 var wallLayer = LayerMask.GetMask("World");
-                var distance = math.distance(transform.position, collider.transform.position);
-                var hits = Physics2D.RaycastAll(transform.position,
-                                                collider.transform.position - transform.position, 
+                var distance = math.distance(this.transform.position, collider.transform.position);
+                var hits = Physics2D.RaycastAll(this.transform.position,
+                                                collider.transform.position - this.transform.position,
                                                 distance, wallLayer);
 
                 foreach (var hit in hits)
@@ -87,7 +88,7 @@ namespace BeyondPixels.ColliderEvents
                 }
 
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = GetComponentInParent<GameObjectEntity>().Entity;
+                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
                 var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                     return;
@@ -102,7 +103,7 @@ namespace BeyondPixels.ColliderEvents
                     EventType = EventType.TriggerEnter
                 });
 
-                hasTarget = true;
+                this.hasTarget = true;
             }
         }
     }
