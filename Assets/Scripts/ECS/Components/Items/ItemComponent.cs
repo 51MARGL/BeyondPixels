@@ -9,6 +9,6 @@ namespace BeyondPixels.ECS.Components.Items
     {
         public int StoreIndex;
         public int IconIndex;
-        public int Level;
+        public int Level;        
     }
 }

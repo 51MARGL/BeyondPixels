@@ -133,6 +133,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 
         private void SpawnPlayer(float3 position)
         {
+            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+
             #region PlayerEntityArchetype
             var player = GameObject.Instantiate(PrefabManager.Instance.PlayerPrefab,
                                             position, Quaternion.identity);
@@ -144,6 +146,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             this.PostUpdateCommands.AddComponent(playerEntity, new CharacterComponent
             {
                 CharacterType = CharacterType.Player
+            });
+            this.PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
+            {
+                MaxValue = playerInitializeComponent.BaseHealth,
+                CurrentValue = playerInitializeComponent.BaseHealth,
+                BaseValue = playerInitializeComponent.BaseHealth
             });
             this.PostUpdateCommands.AddComponent(playerEntity, new MovementComponent
             {
@@ -165,11 +173,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             var statsInitializeComponent = player.GetComponent<StatsInitializeComponent>();
             this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.LevelComponent);
             this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.HealthStatComponent);
-            this.PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
-            {
-                MaxValue = statsInitializeComponent.HealthStatComponent.CurrentValue,
-                CurrentValue = statsInitializeComponent.HealthStatComponent.CurrentValue
-            });
+            
             this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.AttackStatComponent);
             this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.DefenceStatComponent);
             this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.MagicStatComponent);
@@ -201,11 +205,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 IconIndex = 0,
                 Level = 2
             });
+            this.PostUpdateCommands.AddComponent(weaponEntity, new AttackStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
+            });
+            this.PostUpdateCommands.AddComponent(weaponEntity, new MagicStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
+            });
             this.PostUpdateCommands.AddComponent(weaponEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
-            this.PostUpdateCommands.AddComponent(weaponEntity, new EquipedComponent());
 
             var spellBookEntity = this.PostUpdateCommands.CreateEntity();
             this.PostUpdateCommands.AddComponent(spellBookEntity, new ItemComponent
@@ -213,6 +224,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 StoreIndex = 7,
                 IconIndex = 0,
                 Level = 1
+            });
+            this.PostUpdateCommands.AddComponent(spellBookEntity, new MagicStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
             });
             this.PostUpdateCommands.AddComponent(spellBookEntity, new PickedUpComponent
             {
@@ -226,6 +241,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 IconIndex = 0,
                 Level = 2
             });
+            this.PostUpdateCommands.AddComponent(helmetEntity, new DefenceStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
+            });
             this.PostUpdateCommands.AddComponent(helmetEntity, new PickedUpComponent
             {
                 Owner = playerEntity
@@ -238,6 +257,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 IconIndex = 0,
                 Level = 2
             });
+            this.PostUpdateCommands.AddComponent(chestEntity, new DefenceStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
+            });
+            this.PostUpdateCommands.AddComponent(chestEntity, new AttackStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
+            });
             this.PostUpdateCommands.AddComponent(chestEntity, new PickedUpComponent
             {
                 Owner = playerEntity
@@ -249,6 +276,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 StoreIndex = 5,
                 IconIndex = 0,
                 Level = 2
+            });
+            this.PostUpdateCommands.AddComponent(bootsEntity, new DefenceStatModifierComponent
+            {
+                Value = random.NextInt(1, 6)
             });
             this.PostUpdateCommands.AddComponent(bootsEntity, new PickedUpComponent
             {

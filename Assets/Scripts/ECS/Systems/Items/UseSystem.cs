@@ -40,7 +40,17 @@ namespace BeyondPixels.ECS.Systems.Items
                         if (this.EntityManager.HasComponent<EquipedComponent>(entity))
                             this.PostUpdateCommands.RemoveComponent<EquipedComponent>(entity);
                         else
+                        {
+                            this.Entities.WithAll<ItemComponent, PickedUpComponent, EquipedComponent>().ForEach((Entity equipedEntity, ref PickedUpComponent pickedUpEquipedComponent, ref ItemComponent equipedItemComponent) => {
+                                if (ownerEntity == pickedUpEquipedComponent.Owner)
+                                {
+                                    var equipedItem = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[equipedItemComponent.StoreIndex];
+                                    if (equipedItem.ItemType == ItemType.Gear && equipedItem.GearType == item.GearType)
+                                        PostUpdateCommands.RemoveComponent<EquipedComponent>(equipedEntity);
+                                }
+                            });
                             this.PostUpdateCommands.AddComponent(entity, new EquipedComponent());
+                        }
                         break;
                 }
 

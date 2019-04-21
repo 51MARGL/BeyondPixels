@@ -64,14 +64,16 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 4592952035839d440a91a9220d50599d, type: 3}
     ItemType: 1
     Name: Food
-    ModifierType: 1
+    Description: Heals up to {value}% of health
+    Costs: 10
     ModifierValue: 15
     GearType: 0
   - Icons:
     - {fileID: 21300000, guid: 5476e844c6d1faf419b1a7daac7a9062, type: 3}
     ItemType: 2
     Name: Health Potion
-    ModifierType: 1
+    Description: Heals up to {value}% of health
+    Costs: 50
     ModifierValue: 50
     GearType: 0
   - Icons:
@@ -82,41 +84,47 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 91fbb4c195aea5949a5f60200c44a0c9, type: 3}
     ItemType: 4
     Name: Treasure
-    ModifierType: 0
+    Description: High value item. Sell to earn some coins
+    Costs: 100
     ModifierValue: 0
     GearType: 0
   - Icons:
     - {fileID: 21300000, guid: eba945d2676a64b4d9f7e0c2d9b52ec8, type: 3}
     ItemType: 3
     Name: Helmet
-    ModifierType: 4
+    Description: Increases your armor
+    Costs: 15
     ModifierValue: 7
     GearType: 1
   - Icons:
     - {fileID: 21300000, guid: 9252cf670a456694ca817c97b398619b, type: 3}
     ItemType: 3
     Name: Chest
-    ModifierType: 4
+    Description: Increases your armor
+    Costs: 20
     ModifierValue: 10
     GearType: 2
   - Icons:
     - {fileID: 21300000, guid: 7307285fa28fe9546a30dee67eae4338, type: 3}
     ItemType: 3
     Name: Boots
-    ModifierType: 4
+    Description: Increases your armor
+    Costs: 15
     ModifierValue: 5
-    GearType: 4
+    GearType: 3
   - Icons:
     - {fileID: 21300000, guid: a1f15b6c5e5c0e547a73c1dbd4dddf8e, type: 3}
     ItemType: 3
     Name: Sword
-    ModifierType: 2
-    ModifierValue: 20
-    GearType: 3
+    Description: Increases your weapon damage
+    Costs: 20
+    ModifierValue: 10
+    GearType: 4
   - Icons:
     - {fileID: 21300000, guid: 49830698c1008a143a85757ba9592fe8, type: 3}
     ItemType: 3
     Name: Spell Book
-    ModifierType: 3
+    Description: Increases your magic damage
+    Costs: 20
     ModifierValue: 5
     GearType: 5

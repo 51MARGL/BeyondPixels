@@ -32,8 +32,9 @@ namespace BeyondPixels.ECS.Systems.Objects
                             && !this.EntityManager.Exists(gameObject.Entity))
                         {
                             Object.Destroy(gameObject.gameObject);
-                            this.PostUpdateCommands.DestroyEntity(entity);
                         }
+
+                    this.PostUpdateCommands.DestroyEntity(entity);
                 });
             }
         }

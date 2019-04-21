@@ -9,5 +9,6 @@ namespace BeyondPixels.ECS.Components.Characters.Common
     {
         public float MaxValue;
         public float CurrentValue;
+        public float BaseValue;
     }
 }

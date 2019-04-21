@@ -7,14 +7,14 @@ using Unity.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
-    public class AddStatSystem : JobComponentSystem
+    public class AddStatPointSystem : JobComponentSystem
     {
-        private struct AddStatJob : IJobProcessComponentDataWithEntity<AddStatComponent, LevelComponent, HealthStatComponent, AttackStatComponent, DefenceStatComponent, MagicStatComponent>
+        private struct AddStatPointJob : IJobProcessComponentDataWithEntity<AddStatPointComponent, LevelComponent, HealthStatComponent, AttackStatComponent, DefenceStatComponent, MagicStatComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
             public void Execute(Entity entity, int index,
-                                [ReadOnly] ref AddStatComponent addStatComponent,
+                                [ReadOnly] ref AddStatPointComponent addStatComponent,
                                 ref LevelComponent levelComponent,
                                 ref HealthStatComponent healthStatComponent,
                                 ref AttackStatComponent attackStatComponent,
@@ -41,7 +41,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                     levelComponent.SkillPoints--;
                     this.CommandBuffer.AddComponent(index, entity, new AdjustStatsComponent());
                 }
-                this.CommandBuffer.RemoveComponent<AddStatComponent>(index, entity);
+                this.CommandBuffer.RemoveComponent<AddStatPointComponent>(index, entity);
             }
         }
 
@@ -54,7 +54,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var handle = new AddStatJob
+            var handle = new AddStatPointJob
             {
                 CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
             }.Schedule(this, inputDeps);

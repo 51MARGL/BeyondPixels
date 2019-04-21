@@ -6,5 +6,6 @@ namespace BeyondPixels.ECS.Components.Characters.Player
     {
         public int MovementSpeed;
         public int WeaponDamage;
+        public int BaseHealth;
     }
 }

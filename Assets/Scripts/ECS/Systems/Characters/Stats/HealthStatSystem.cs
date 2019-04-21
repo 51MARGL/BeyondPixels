@@ -4,6 +4,7 @@ using BeyondPixels.ECS.Components.Characters.Stats;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
@@ -22,8 +23,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                 if (healthStatComponent.CurrentValue != properValue)
                 {
                     healthStatComponent.CurrentValue = properValue;
-                    healthComponent.MaxValue = healthStatComponent.CurrentValue;
-                    healthComponent.CurrentValue = healthStatComponent.CurrentValue;
+                    healthComponent.MaxValue = healthComponent.BaseValue 
+                        + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
+                    healthComponent.CurrentValue = healthComponent.BaseValue
+                        + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
                 }
             }
         }

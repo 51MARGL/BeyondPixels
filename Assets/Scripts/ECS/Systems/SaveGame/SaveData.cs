@@ -26,6 +26,10 @@ namespace BeyondPixels.ECS.Systems.SaveGame
     {
         public bool IsEquiped;
         public ItemComponent ItemComponent;
+        public AttackStatModifierComponent AttackModifier;
+        public DefenceStatModifierComponent DefenceModifier;
+        public HealthStatModifierComponent HealthModifier;
+        public MagicStatModifierComponent MagicModifier;
     }
 
 }

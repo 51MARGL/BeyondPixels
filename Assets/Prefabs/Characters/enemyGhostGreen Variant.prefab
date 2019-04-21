@@ -60,12 +60,17 @@ PrefabInstance:
     - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackRange
-      value: 0.7
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: BaseHealth
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: HealthStatComponent.CurrentValue
-      value: 20
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
@@ -85,7 +90,7 @@ PrefabInstance:
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: HealthStatComponent.BaseValue
-      value: 20
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
@@ -120,7 +125,7 @@ PrefabInstance:
     - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: HealthStatComponent.PerPointValue
-      value: 8
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 309658852677841198, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}

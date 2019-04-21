@@ -232,6 +232,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 CharacterType = CharacterType.Enemy
             });
+            commandBuffer.AddComponent(enemyEntity, new HealthComponent
+            {
+                MaxValue = enemyInitializeComponent.BaseHealth,
+                CurrentValue = enemyInitializeComponent.BaseHealth,
+                BaseValue = enemyInitializeComponent.BaseHealth
+            });
             commandBuffer.AddComponent(enemyEntity, new MovementComponent
             {
                 Direction = float2.zero,
@@ -271,11 +277,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             commandBuffer.AddComponent(enemyEntity, lvlComponent);
             commandBuffer.AddComponent(enemyEntity, healthStatComponent);
-            commandBuffer.AddComponent(enemyEntity, new HealthComponent
-            {
-                MaxValue = healthStatComponent.CurrentValue,
-                CurrentValue = healthStatComponent.CurrentValue
-            });
             commandBuffer.AddComponent(enemyEntity, attackStatComponent);
             commandBuffer.AddComponent(enemyEntity, defenceStatComponent);
             commandBuffer.AddComponent(enemyEntity, magicStatComponent);

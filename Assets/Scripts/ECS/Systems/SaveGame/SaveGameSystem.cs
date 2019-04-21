@@ -57,7 +57,19 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                             playerData.ItemDataList.Add(new ItemData
                             {
                                 IsEquiped = EntityManager.HasComponent<EquipedComponent>(itemEntity),
-                                ItemComponent = itemComponent
+                                ItemComponent = itemComponent,
+                                AttackModifier =  EntityManager.HasComponent<AttackStatModifierComponent>(itemEntity) ?
+                                                  EntityManager.GetComponentData<AttackStatModifierComponent>(itemEntity) :
+                                                  new AttackStatModifierComponent(),
+                                DefenceModifier = EntityManager.HasComponent<DefenceStatModifierComponent>(itemEntity) ?
+                                                  EntityManager.GetComponentData<DefenceStatModifierComponent>(itemEntity) :
+                                                  new DefenceStatModifierComponent(),
+                                HealthModifier =  EntityManager.HasComponent<HealthStatModifierComponent>(itemEntity) ?
+                                                  EntityManager.GetComponentData<HealthStatModifierComponent>(itemEntity) :
+                                                  new HealthStatModifierComponent(),
+                                MagicModifier =   EntityManager.HasComponent<MagicStatModifierComponent>(itemEntity) ?
+                                                  EntityManager.GetComponentData<MagicStatModifierComponent>(itemEntity) :
+                                                  new MagicStatModifierComponent(),
                             });
                     });
                 });
@@ -87,7 +99,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                 using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                     binaryFormatter.Serialize(fileStream, playerSaveData);
 
-                File.Delete(savePath + ".bckp");
+                File.Delete(saveBckpPath);
             }
             catch (Exception)
             {

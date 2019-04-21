@@ -5269,6 +5269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MovementSpeed: 4
   WeaponDamage: 10
+  BaseHealth: 100
 --- !u!114 &4444492588875631888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5286,9 +5287,9 @@ MonoBehaviour:
     NextLevelXP: 25
     SkillPoints: 0
   HealthStatComponent:
-    CurrentValue: 100
-    BaseValue: 100
-    PerPointValue: 10
+    CurrentValue: 1
+    BaseValue: 1
+    PerPointValue: 1
     PointsSpent: 1
   AttackStatComponent:
     CurrentValue: 1

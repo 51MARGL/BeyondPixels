@@ -1,5 +1,5 @@
 ﻿using System;
-
+using BeyondPixels.UI.Buttons;
 using TMPro;
 
 using UnityEngine;
@@ -11,6 +11,7 @@ namespace BeyondPixels.UI.ECS.Components
     {
         public LevelGroupWrapper LevelGroup;
         public StatsGroupWrapper StatsGroup;
+        public EquipedGearGroupWrapper GearGroup;
         public InventoryGroupWrapper InventoryGroup;
 
         [Serializable]
@@ -27,6 +28,12 @@ namespace BeyondPixels.UI.ECS.Components
             public AttackStatWrapper AttackStat;
             public DefenceStatWrapper DefenceStat;
             public MagicStatWrapper MagicStat;
+        }
+
+        [Serializable]
+        public class EquipedGearGroupWrapper
+        {
+            public EquipedGearButton[] GearSlots;
         }
 
         [Serializable]

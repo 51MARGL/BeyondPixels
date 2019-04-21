@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using BeyondPixels.ECS.Components.Characters.Player;
@@ -54,6 +55,15 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                                 this.PostUpdateCommands.AddComponent(itemEntity, pickedUpComponent);
                                 if (playerData.ItemDataList[i].IsEquiped)
                                     this.PostUpdateCommands.AddComponent(itemEntity, new EquipedComponent());
+
+                                if (playerData.ItemDataList[i].AttackModifier.Value > 0)
+                                    this.PostUpdateCommands.AddComponent(itemEntity, playerData.ItemDataList[i].AttackModifier);
+                                if (playerData.ItemDataList[i].DefenceModifier.Value > 0)
+                                    this.PostUpdateCommands.AddComponent(itemEntity, playerData.ItemDataList[i].DefenceModifier);
+                                if (playerData.ItemDataList[i].HealthModifier.Value > 0)
+                                    this.PostUpdateCommands.AddComponent(itemEntity, playerData.ItemDataList[i].HealthModifier);
+                                if (playerData.ItemDataList[i].MagicModifier.Value > 0)
+                                    this.PostUpdateCommands.AddComponent(itemEntity, playerData.ItemDataList[i].MagicModifier);
                             }
                     });
                 this.PostUpdateCommands.DestroyEntity(entity);
@@ -70,10 +80,14 @@ namespace BeyondPixels.ECS.Systems.SaveGame
             if (!File.Exists(savePath))
                 return playerData;
 
-            var binaryFormatter = new BinaryFormatter();
+            try
+            {
+                var binaryFormatter = new BinaryFormatter();
 
-            using (var fileStream = new FileStream(savePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                playerData = (SaveData)binaryFormatter.Deserialize(fileStream);
+                using (var fileStream = new FileStream(savePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    playerData = (SaveData)binaryFormatter.Deserialize(fileStream);
+            }
+            catch (Exception) { }
 
             return playerData;
         }

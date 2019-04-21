@@ -40,8 +40,6 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                             if (entities[i] == collisionInfo.Target)
                             {
                                 var damageAmount = damageComponent.DamageAmount;
-                                if (collisionInfo.Sender != collisionInfo.Target)
-                                    damageAmount = math.max(0, damageAmount);
 
                                 var healthComponent = healthComponents[i];
 

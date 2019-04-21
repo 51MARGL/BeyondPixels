@@ -247,7 +247,7 @@ GameObject:
   - component: {fileID: 5268932538454564547}
   - component: {fileID: 6732561597648421803}
   - component: {fileID: 683025745205968225}
-  - component: {fileID: 5529365950163505134}
+  - component: {fileID: 528543721607576814}
   m_Layer: 5
   m_Name: InventoryItemButton
   m_TagString: Untagged
@@ -359,7 +359,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &5529365950163505134
+--- !u!114 &528543721607576814
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -368,7 +368,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5586936468767687569}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c24d433e330b7747891d02076df23e9, type: 3}
+  m_Script: {fileID: 11500000, guid: 26b9b82e941d69d4d8305b2ca40a6b1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ItemIcon: {fileID: 1208308903080745073}

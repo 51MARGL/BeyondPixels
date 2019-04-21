@@ -4,6 +4,7 @@ using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Systems.Characters.Common;
 
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
@@ -34,7 +35,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                         var defenceStatComponent = this.EntityManager.GetComponentData<DefenceStatComponent>(collisionInfo.Target);
                         var attackModifier = finalDamageComponent.DamageAmount / 100f * attackStatComponent.CurrentValue;
                         var defenceModifier = finalDamageComponent.DamageAmount / 100f * defenceStatComponent.CurrentValue;
-                        finalDamageComponent.DamageAmount += attackModifier - defenceModifier;
+                        finalDamageComponent.DamageAmount += math.max(0, attackModifier - defenceModifier);
                         break;
                     case DamageType.Magic:
                         var casterMagicStatComponent = this.EntityManager.GetComponentData<MagicStatComponent>(collisionInfo.Sender);
@@ -44,7 +45,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                         if (collisionInfo.Sender == collisionInfo.Target)
                             finalDamageComponent.DamageAmount += casterMagicModifier;
                         else
-                            finalDamageComponent.DamageAmount += casterMagicModifier - targetMagicModifier;
+                            finalDamageComponent.DamageAmount += math.max(0, casterMagicModifier - targetMagicModifier);
                         break;
                 }
             });

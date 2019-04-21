@@ -6,6 +6,7 @@ namespace BeyondPixels.ECS.Components.Characters.AI
     {
         public int MovementSpeed;
         public int WeaponDamage;
+        public int BaseHealth;
         public float AttackCoolDown;
         public float AttackRange;
     }

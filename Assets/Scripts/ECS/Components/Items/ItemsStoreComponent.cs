@@ -14,12 +14,13 @@ namespace BeyondPixels.ECS.Components.Items
             public Sprite[] Icons;
             public ItemType ItemType;
             public string Name;
-            public ModifierType ModifierType;
+            public string Description;
+            public int Costs;
             public int ModifierValue;
             public GearType GearType;
         }
-
     }
+
     public enum ItemType
     {
         Food = 1,
@@ -40,8 +41,8 @@ namespace BeyondPixels.ECS.Components.Items
     {
         Helmet = 1,
         Chest = 2,
-        Weapon = 3,
-        Boots = 4,
+        Boots = 3,
+        Weapon = 4,
         Magic = 5
     }
 }

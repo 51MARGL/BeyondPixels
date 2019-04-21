@@ -2,7 +2,7 @@
 
 namespace BeyondPixels.ECS.Components.Characters.Stats
 {
-    public struct AddStatComponent : IComponentData
+    public struct AddStatPointComponent : IComponentData
     {
         public StatTarget StatTarget;
     }

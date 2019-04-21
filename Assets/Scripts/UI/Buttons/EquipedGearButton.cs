@@ -3,7 +3,6 @@ using System.Text;
 
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.UI.ECS.Components;
-using TMPro;
 using Unity.Entities;
 
 using UnityEngine;
@@ -12,23 +11,22 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class InventoryItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class EquipedGearButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public Image ItemIcon;
         public Entity ItemEntity;
-        public TextMeshProUGUI Amount;
+        public GearType GearType;
+        public bool HasItem;
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left
-                || eventData.button == PointerEventData.InputButton.Right)
+            if (eventData.button == PointerEventData.InputButton.Left && this.HasItem)
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
                 var eventEntity = entityManager.CreateEntity();
                 entityManager.AddComponentData(eventEntity, new InventoryItemButtonPressedComponent
                 {
-                    ItemEntity = ItemEntity,
-                    MouseButton = (int)eventData.button
+                    ItemEntity = ItemEntity
                 });
 
                 UIManager.Instance.HideTooltip();
@@ -40,7 +38,7 @@ namespace BeyondPixels.UI.Buttons
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
             var itemComponent = entityManager.GetComponentData<ItemComponent>(ItemEntity);
             var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
-            var header = item.Name;            
+            var header = item.Name;
             var sb = new StringBuilder();
             sb.Append($"Cost: {item.Costs * itemComponent.Level}");
             sb.Append(Environment.NewLine);
@@ -71,20 +69,9 @@ namespace BeyondPixels.UI.Buttons
                 sb.Append(Environment.NewLine);
             }
             sb.Append(Environment.NewLine);
-            sb.Append(item.Description.Replace("{value}", item.ModifierValue.ToString()));
+            sb.Append(item.Description);
 
-            var btnDesc = string.Empty;
-            switch (item.ItemType)
-            {
-                case ItemType.Food:
-                case ItemType.Potion:
-                    btnDesc = "LMB: Use    RMB: Destroy";
-                    break;
-                case ItemType.Gear:
-                    btnDesc = "LMB: Equip    RMB: Destroy";
-                    break;
-            }
-            UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), btnDesc);
+            UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), "LMB: Unequip", true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
