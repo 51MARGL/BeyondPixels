@@ -67,7 +67,7 @@ namespace BeyondPixels.ECS.Systems.Items
             });
             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
             {
-                Value = random.NextInt(1, 6)
+                Value = random.NextInt(1, 3)
             });
 
             if (random.NextInt(0, 100) > 50)
@@ -77,7 +77,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -86,24 +86,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -112,7 +112,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -121,24 +121,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -147,7 +147,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
 
                     if (random.NextInt(0, 100) > 75)
@@ -157,24 +157,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -203,7 +203,7 @@ namespace BeyondPixels.ECS.Systems.Items
             });
             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent 
             {
-                Value = random.NextInt(1, 6)
+                Value = random.NextInt(1, 3)
             });
 
             if (random.NextInt(0, 100) > 50)
@@ -213,7 +213,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -222,24 +222,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -248,7 +248,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -257,24 +257,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -283,7 +283,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
 
                     if (random.NextInt(0, 100) > 75)
@@ -293,24 +293,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -339,7 +339,7 @@ namespace BeyondPixels.ECS.Systems.Items
             });
             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
             {
-                Value = random.NextInt(1, 6)
+                Value = random.NextInt(1, 3)
             });
 
             if (random.NextInt(0, 100) > 50)
@@ -349,7 +349,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -358,24 +358,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -384,7 +384,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -393,24 +393,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -419,7 +419,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
 
                     if (random.NextInt(0, 100) > 75)
@@ -429,24 +429,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -475,7 +475,7 @@ namespace BeyondPixels.ECS.Systems.Items
             });
             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
             {
-                Value = random.NextInt(1, 6)
+                Value = random.NextInt(1, 3)
             });
 
             if (random.NextInt(0, 100) > 50)
@@ -485,7 +485,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -494,24 +494,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -520,7 +520,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -529,24 +529,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -555,7 +555,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
 
                     if (random.NextInt(0, 100) > 75)
@@ -565,24 +565,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -611,7 +611,7 @@ namespace BeyondPixels.ECS.Systems.Items
             });
             entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
             {
-                Value = random.NextInt(1, 6)
+                Value = random.NextInt(1, 3)
             });
 
             if (random.NextInt(0, 100) > 50)
@@ -621,7 +621,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -630,24 +630,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -656,7 +656,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
                     if (random.NextInt(0, 100) > 75)
                     {
@@ -665,24 +665,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }
@@ -691,7 +691,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
                     {
-                        Value = random.NextInt(1, 4)
+                        Value = 1
                     });
 
                     if (random.NextInt(0, 100) > 75)
@@ -701,24 +701,24 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                         else if (randomStat == 1)
                         {
                             entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
                             {
-                                Value = random.NextInt(1, 4)
+                                Value = 1
                             });
                             if (random.NextInt(0, 100) > 90)
                                 entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
                                 {
-                                    Value = random.NextInt(1, 4)
+                                    Value = 1
                                 });
                         }
                     }

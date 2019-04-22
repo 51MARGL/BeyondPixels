@@ -114,8 +114,7 @@ namespace BeyondPixels.UI.ECS.Systems
                                         defenceStatComponent, magicStatComponent, addPointButtonAlpha);
 
 
-                    var gearGroup = infoMenuComponent.GearGroup;
-                    this.SetUpEquipedGearButtons(gearGroup, this._equipedItemsGroup);
+                    this.SetUpEquipedGearButtons(infoMenuComponent.GearGroup, this._equipedItemsGroup, playerEntity);
 
                     var inventoryGroup = infoMenuComponent.InventoryGroup;
                     var itemCount = this._inventoryItemsGroup.CalculateLength();
@@ -163,7 +162,7 @@ namespace BeyondPixels.UI.ECS.Systems
             statsGroup.MagicStat.AddButton.GetComponent<CanvasGroup>().alpha = addPointButtonAlpha;
         }
 
-        private void SetUpEquipedGearButtons(EquipedGearGroupWrapper gearGroup, ComponentGroup itemsGroup)
+        private void SetUpEquipedGearButtons(EquipedGearGroupWrapper gearGroup, ComponentGroup itemsGroup, Entity owner)
         {
             for (var i = 0; i < gearGroup.GearSlots.Length; i++)
             {
@@ -171,8 +170,11 @@ namespace BeyondPixels.UI.ECS.Systems
                 gearGroup.GearSlots[i].HasItem = false;
             }
 
-            this.Entities.With(itemsGroup).ForEach((Entity itemEntity, ref ItemComponent itemComponent) =>
+            this.Entities.With(itemsGroup).ForEach((Entity itemEntity, ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
             {
+                if (pickedUpComponent.Owner != owner)
+                    return;
+
                 var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
                 if (item.ItemType == ItemType.Gear)
                     this.SetUpGearButton(gearGroup.GearSlots.Where(slot => slot.GearType == item.GearType).First(),

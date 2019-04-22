@@ -107,6 +107,13 @@ namespace BeyondPixels.ECS.Systems.Items
 
                     if (healthComponent.CurrentValue > healthComponent.MaxValue)
                         healthComponent.CurrentValue = healthComponent.MaxValue;
+
+                    if (healthComponent.MaxValue > healthComponent.CurrentValue 
+                        && EntityManager.HasComponent<ApplyInitialHealthModifierComponent>(characterEntity))
+                    {
+                        healthComponent.CurrentValue = healthComponent.MaxValue;
+                        PostUpdateCommands.RemoveComponent<ApplyInitialHealthModifierComponent>(characterEntity);
+                    }
                 }
 
                 properValue = (magicStatComponent.BaseValue

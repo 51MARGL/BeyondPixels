@@ -40,12 +40,13 @@ namespace BeyondPixels.ECS.Systems.Level
                 return;
 
             var destroyChunks = this._destroyGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
 
             for (var c = 0; c < destroyChunks.Length; c++)
             {
                 var chunk = destroyChunks[c];
-                var entities = chunk.GetNativeArray(GetArchetypeChunkEntityType());
-                var positionComponents = chunk.GetNativeArray(GetArchetypeChunkComponentType<PositionComponent>());
+                var entities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
+                var positionComponents = chunk.GetNativeArray(this.GetArchetypeChunkComponentType<PositionComponent>());
                 for (var i = 0; i < chunk.Count; i++)
                 {
                     var ownerEntity = entities[i];
@@ -56,12 +57,19 @@ namespace BeyondPixels.ECS.Systems.Level
                     {
                         if (pickedUpComponent.Owner == ownerEntity)
                         {
-                            if (this.EntityManager.HasComponent<EquipedComponent>(itemEntity))
-                                this.PostUpdateCommands.RemoveComponent<EquipedComponent>(itemEntity);
+                            if (random.NextInt(0, 100) > 75)
+                            {
+                                if (this.EntityManager.HasComponent<EquipedComponent>(itemEntity))
+                                    this.PostUpdateCommands.RemoveComponent<EquipedComponent>(itemEntity);
 
-                            this.PostUpdateCommands.RemoveComponent<PickedUpComponent>(itemEntity);
+                                this.PostUpdateCommands.RemoveComponent<PickedUpComponent>(itemEntity);
 
-                            itemsList.Add(itemEntity);
+                                itemsList.Add(itemEntity);
+                            }
+                            else
+                            {
+                                this.PostUpdateCommands.AddComponent(itemEntity, new DestroyComponent());
+                            }
                         }
                     });
                     if (itemsList.Length > 0)
@@ -73,7 +81,7 @@ namespace BeyondPixels.ECS.Systems.Level
 
                         this.PostUpdateCommands.AddComponent(lootBagEntity, new LootBagComponent());
 
-                        for (int it = 0; it < itemsList.Length; it++)
+                        for (var it = 0; it < itemsList.Length; it++)
                         {
                             this.PostUpdateCommands.AddComponent(itemsList[it], new PickedUpComponent
                             {
@@ -83,7 +91,7 @@ namespace BeyondPixels.ECS.Systems.Level
                     }
                 }
             }
-            destroyChunks.Dispose();            
+            destroyChunks.Dispose();
         }
     }
 }

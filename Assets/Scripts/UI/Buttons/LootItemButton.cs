@@ -68,7 +68,7 @@ namespace BeyondPixels.UI.Buttons
                 sb.Append(Environment.NewLine);
             }
             sb.Append(Environment.NewLine);
-            sb.Append(item.Description);
+            sb.Append(item.Description.Replace("{value}", item.ModifierValue.ToString()));
 
             UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), "LMB: Pick Up", true);
         }

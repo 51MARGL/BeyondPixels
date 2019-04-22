@@ -2,5 +2,5 @@
 
 namespace BeyondPixels.ECS.Components.Items
 {
-    public struct UseComponent : IComponentData { }
+    public struct ApplyInitialHealthModifierComponent : IComponentData { }
 }

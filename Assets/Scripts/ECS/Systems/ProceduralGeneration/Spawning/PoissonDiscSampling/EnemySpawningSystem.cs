@@ -288,7 +288,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             #endregion
 
             #region items
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel);
                 commandBuffer.AddComponent(weaponEntity, new PickedUpComponent
@@ -297,7 +297,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 });
                 commandBuffer.AddComponent(weaponEntity, new EquipedComponent());
             }
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel);
                 commandBuffer.AddComponent(spellBookEntity, new PickedUpComponent
@@ -306,7 +306,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 });
                 commandBuffer.AddComponent(spellBookEntity, new EquipedComponent());
             }
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel);
                 commandBuffer.AddComponent(helmetEntity, new PickedUpComponent
@@ -315,7 +315,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 });
                 commandBuffer.AddComponent(helmetEntity, new EquipedComponent());
             }
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel);
                 commandBuffer.AddComponent(chestEntity, new PickedUpComponent
@@ -324,7 +324,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 });
                 commandBuffer.AddComponent(chestEntity, new EquipedComponent());
             }
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel);
                 commandBuffer.AddComponent(bootsEntity, new PickedUpComponent
@@ -333,7 +333,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 });
                 commandBuffer.AddComponent(bootsEntity, new EquipedComponent());
             }
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var randomCount = random.NextInt(1, 3);
                 for (int i = 0; i < randomCount; i++)
@@ -345,7 +345,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     });
                 }
             }
-            if (random.NextInt(0, 100) > 75)
+            if (random.NextInt(0, 100) > 50)
             {
                 var randomCount = random.NextInt(1, 3);
                 for (int i = 0; i < randomCount; i++)
@@ -357,7 +357,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     });
                 }
             }
-
+            commandBuffer.AddComponent(enemyEntity, new ApplyInitialHealthModifierComponent());
             #endregion
 
             commandBuffer.RemoveComponent<EnemyInitializeComponent>(enemyEntity);

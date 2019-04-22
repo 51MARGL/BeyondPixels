@@ -129,9 +129,13 @@ namespace BeyondPixels.UI.ECS.Systems
                     var coolDownComponent = this.EntityManager.GetComponentData<CoolDownComponent>(spellEntity);
                     if (coolDownComponent.CoolDownTime > 0)
                     {
+                        var magicStat = EntityManager.GetComponentData<MagicStatComponent>(activeSpellComponent.Owner);
+                        var coolDownTime = math.max(1f, spell.CoolDown -
+                               (spell.CoolDown / 100f * magicStat.CurrentValue));
+
                         button.CoolDownImage.enabled = true;
                         button.CoolDownText.enabled = true;
-                        button.CoolDownImage.fillAmount -= 1.0f / spell.CoolDown * Time.deltaTime;
+                        button.CoolDownImage.fillAmount -= 1.0f / coolDownTime * Time.deltaTime;
                         button.CoolDownText.text = coolDownComponent.CoolDownTime.ToString("F1");
                     }
                 }

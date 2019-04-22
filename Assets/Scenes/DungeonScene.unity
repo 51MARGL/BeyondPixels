@@ -469,11 +469,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.Switch
-      value: 3
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
 --- !u!1 &215447244 stripped
@@ -488,59 +483,6 @@ Animator:
     type: 3}
   m_PrefabInstance: {fileID: 8465872444750662660}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &515830685
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 515830687}
-  - component: {fileID: 515830686}
-  m_Layer: 8
-  m_Name: FPSCounter
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &515830686
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 515830685}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 277ea0951ff7ba7489ffa947537226b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startRect:
-    serializedVersion: 2
-    x: 10
-    y: 10
-    width: 75
-    height: 50
-  updateColor: 1
-  allowDrag: 1
-  frequency: 0.5
-  nbDecimal: 0
---- !u!4 &515830687
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 515830685}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 71.69812, y: 5.8945384, z: -36.120567}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &641076510 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1538367443916898170, guid: d90062516bbc3d343a0c313cfce8ecc4,
@@ -778,7 +720,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1485594324
 PrefabInstance:
@@ -1616,32 +1558,32 @@ PrefabInstance:
     - target: {fileID: 8868365975843335130, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8868365975843335130, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8868365975843335130, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 15.5
       objectReference: {fileID: 0}
     - target: {fileID: 8868365975843335130, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -15.5
       objectReference: {fileID: 0}
     - target: {fileID: 8868365975843335130, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 31
       objectReference: {fileID: 0}
     - target: {fileID: 8868365975843335130, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 31
       objectReference: {fileID: 0}
     - target: {fileID: 3091870272219478622, guid: d81d3e30d7cd4e9469da3e8c898b8a78,
         type: 3}

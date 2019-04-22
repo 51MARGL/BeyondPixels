@@ -35,6 +35,9 @@ namespace BeyondPixels.UI.Buttons
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            if (!this.HasItem)
+                return;
+
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
             var itemComponent = entityManager.GetComponentData<ItemComponent>(ItemEntity);
             var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
