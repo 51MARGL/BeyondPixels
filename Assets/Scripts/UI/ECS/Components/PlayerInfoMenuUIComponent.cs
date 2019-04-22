@@ -41,7 +41,6 @@ namespace BeyondPixels.UI.ECS.Components
         {
             public GameObject Grid;
             public GameObject ItemButtonPrefab;
-            public int ColumnCount;
         }
 
         [Serializable]

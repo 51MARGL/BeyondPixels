@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class InventoryItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class LootItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public Image ItemIcon;
         public Entity ItemEntity;
@@ -20,15 +20,13 @@ namespace BeyondPixels.UI.Buttons
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left
-                || eventData.button == PointerEventData.InputButton.Right)
+            if (eventData.button == PointerEventData.InputButton.Left)
             {
                 var entityManager = World.Active.GetOrCreateManager<EntityManager>();
                 var eventEntity = entityManager.CreateEntity();
-                entityManager.AddComponentData(eventEntity, new InventoryItemButtonPressedComponent
+                entityManager.AddComponentData(eventEntity, new LootItemButtonPressedComponent
                 {
-                    ItemEntity = ItemEntity,
-                    MouseButton = (int)eventData.button
+                    ItemEntity = ItemEntity
                 });
 
                 UIManager.Instance.HideTooltip();
@@ -38,52 +36,41 @@ namespace BeyondPixels.UI.Buttons
         public void OnPointerEnter(PointerEventData eventData)
         {
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-            var itemComponent = entityManager.GetComponentData<ItemComponent>(ItemEntity);
+            var itemComponent = entityManager.GetComponentData<ItemComponent>(this.ItemEntity);
             var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
-            var header = item.Name;            
+            var header = item.Name;
             var sb = new StringBuilder();
             sb.Append($"Item Level: {itemComponent.Level}");
             sb.Append(Environment.NewLine);
             sb.Append(Environment.NewLine);
-            if (entityManager.HasComponent<AttackStatModifierComponent>(ItemEntity))
+            if (entityManager.HasComponent<AttackStatModifierComponent>(this.ItemEntity))
             {
-                var statComponent = entityManager.GetComponentData<AttackStatModifierComponent>(ItemEntity);
+                var statComponent = entityManager.GetComponentData<AttackStatModifierComponent>(this.ItemEntity);
                 sb.Append($"Attack: +{statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
-            if (entityManager.HasComponent<DefenceStatModifierComponent>(ItemEntity))
+            if (entityManager.HasComponent<DefenceStatModifierComponent>(this.ItemEntity))
             {
-                var statComponent = entityManager.GetComponentData<DefenceStatModifierComponent>(ItemEntity);
+                var statComponent = entityManager.GetComponentData<DefenceStatModifierComponent>(this.ItemEntity);
                 sb.Append($"Defence: +{statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
-            if (entityManager.HasComponent<HealthStatModifierComponent>(ItemEntity))
+            if (entityManager.HasComponent<HealthStatModifierComponent>(this.ItemEntity))
             {
-                var statComponent = entityManager.GetComponentData<HealthStatModifierComponent>(ItemEntity);
+                var statComponent = entityManager.GetComponentData<HealthStatModifierComponent>(this.ItemEntity);
                 sb.Append($"Health: +{statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
-            if (entityManager.HasComponent<MagicStatModifierComponent>(ItemEntity))
+            if (entityManager.HasComponent<MagicStatModifierComponent>(this.ItemEntity))
             {
-                var statComponent = entityManager.GetComponentData<MagicStatModifierComponent>(ItemEntity);
+                var statComponent = entityManager.GetComponentData<MagicStatModifierComponent>(this.ItemEntity);
                 sb.Append($"Magic: +{statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
             sb.Append(Environment.NewLine);
-            sb.Append(item.Description.Replace("{value}", item.ModifierValue.ToString()));
+            sb.Append(item.Description);
 
-            var btnDesc = string.Empty;
-            switch (item.ItemType)
-            {
-                case ItemType.Food:
-                case ItemType.Potion:
-                    btnDesc = "LMB: Use    RMB: Destroy";
-                    break;
-                case ItemType.Gear:
-                    btnDesc = "LMB: Equip    RMB: Destroy";
-                    break;
-            }
-            UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), btnDesc);
+            UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), "LMB: Pick Up", true);
         }
 
         public void OnPointerExit(PointerEventData eventData)

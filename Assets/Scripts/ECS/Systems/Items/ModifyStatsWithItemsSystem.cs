@@ -30,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 },
                 None = new ComponentType[]
                 {
-                    typeof(AdjustStatsComponent), typeof(AddStatPointComponent)
+                    typeof(AddStatPointComponent)
                 }
             });
         }
@@ -61,23 +61,23 @@ namespace BeyondPixels.ECS.Systems.Items
                         if (this.EntityManager.HasComponent<AttackStatModifierComponent>(gearEntity))
                         {
                             var modifierComponent = this.EntityManager.GetComponentData<AttackStatModifierComponent>(gearEntity);
-                            attackModifier += modifierComponent.Value;
+                            attackModifier += modifierComponent.Value * itemComponent.Level;
                         }
                         if (this.EntityManager.HasComponent<DefenceStatModifierComponent>(gearEntity))
                         {
                             var modifierComponent = this.EntityManager.GetComponentData<DefenceStatModifierComponent>(gearEntity);
-                            defenceModifier += modifierComponent.Value;
+                            defenceModifier += modifierComponent.Value * itemComponent.Level;
 
                         }
                         if (this.EntityManager.HasComponent<HealthStatModifierComponent>(gearEntity))
                         {
                             var modifierComponent = this.EntityManager.GetComponentData<HealthStatModifierComponent>(gearEntity);
-                            healthModifier += modifierComponent.Value;
+                            healthModifier += modifierComponent.Value * itemComponent.Level;
                         }
                         if (this.EntityManager.HasComponent<MagicStatModifierComponent>(gearEntity))
                         {
                             var modifierComponent = this.EntityManager.GetComponentData<MagicStatModifierComponent>(gearEntity);
-                            magicModifier += modifierComponent.Value;
+                            magicModifier += modifierComponent.Value * itemComponent.Level;
                         }
                     }
                 });
@@ -104,6 +104,9 @@ namespace BeyondPixels.ECS.Systems.Items
 
                     healthComponent.MaxValue = healthComponent.BaseValue
                         + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
+
+                    if (healthComponent.CurrentValue > healthComponent.MaxValue)
+                        healthComponent.CurrentValue = healthComponent.MaxValue;
                 }
 
                 properValue = (magicStatComponent.BaseValue

@@ -4,10 +4,12 @@ using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
+using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.SaveGame;
+using BeyondPixels.ECS.Systems.Items;
 using BeyondPixels.SceneBootstraps;
 
 using Unity.Collections;
@@ -283,6 +285,79 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.XPRewardComponent);
             commandBuffer.AddComponent(enemyEntity, new AdjustStatsComponent());
             Object.Destroy(statsInitializeComponent);
+            #endregion
+
+            #region items
+            if (random.NextInt(0, 100) > 75)
+            {
+                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel);
+                commandBuffer.AddComponent(weaponEntity, new PickedUpComponent
+                {
+                    Owner = enemyEntity
+                });
+                commandBuffer.AddComponent(weaponEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel);
+                commandBuffer.AddComponent(spellBookEntity, new PickedUpComponent
+                {
+                    Owner = enemyEntity
+                });
+                commandBuffer.AddComponent(spellBookEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel);
+                commandBuffer.AddComponent(helmetEntity, new PickedUpComponent
+                {
+                    Owner = enemyEntity
+                });
+                commandBuffer.AddComponent(helmetEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel);
+                commandBuffer.AddComponent(chestEntity, new PickedUpComponent
+                {
+                    Owner = enemyEntity
+                });
+                commandBuffer.AddComponent(chestEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel);
+                commandBuffer.AddComponent(bootsEntity, new PickedUpComponent
+                {
+                    Owner = enemyEntity
+                });
+                commandBuffer.AddComponent(bootsEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var randomCount = random.NextInt(1, 3);
+                for (int i = 0; i < randomCount; i++)
+                {
+                    var foodEntity = ItemFactory.GetRandomFood();
+                    commandBuffer.AddComponent(foodEntity, new PickedUpComponent
+                    {
+                        Owner = enemyEntity
+                    });
+                }
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var randomCount = random.NextInt(1, 3);
+                for (int i = 0; i < randomCount; i++)
+                {
+                    var potionEntity = ItemFactory.GetHealthPotion();
+                    commandBuffer.AddComponent(potionEntity, new PickedUpComponent
+                    {
+                        Owner = enemyEntity
+                    });
+                }
+            }
+
             #endregion
 
             commandBuffer.RemoveComponent<EnemyInitializeComponent>(enemyEntity);

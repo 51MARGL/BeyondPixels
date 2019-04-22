@@ -40,9 +40,8 @@ namespace BeyondPixels.UI.Buttons
             var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
             var header = item.Name;
             var sb = new StringBuilder();
-            sb.Append($"Cost: {item.Costs * itemComponent.Level}");
-            sb.Append(Environment.NewLine);
             sb.Append($"Item Level: {itemComponent.Level}");
+            sb.Append(Environment.NewLine);
             sb.Append(Environment.NewLine);
             if (entityManager.HasComponent<AttackStatModifierComponent>(ItemEntity))
             {

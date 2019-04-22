@@ -19,6 +19,7 @@ TagManager:
   - SpellBook
   - Light
   - UseTrigger
+  - LootBag
   layers:
   - Default
   - TransparentFX

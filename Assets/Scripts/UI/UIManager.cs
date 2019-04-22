@@ -1,5 +1,4 @@
 ﻿using BeyondPixels.UI.ECS.Components;
-
 using UnityEngine;
 
 namespace BeyondPixels.UI
@@ -9,11 +8,23 @@ namespace BeyondPixels.UI
         public static UIManager Instance { get; private set; }
         public GameUIComponent GameUIComponent;
         public PlayerInfoMenuUIComponent PlayerInfoMenuUIComponent;
+        public LootBagMenuUIComponent LootBagMenuUIComponent;
         public ToolTipUIComponent ToolTip;
 
         public void Start()
         {
             UIManager.Instance = this;
+        }
+
+        public void CloseAllMenus()
+        {
+            this.PlayerInfoMenuUIComponent.GetComponent<CanvasGroup>().alpha = 0;
+            this.PlayerInfoMenuUIComponent.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+            this.LootBagMenuUIComponent.GetComponent<CanvasGroup>().alpha = 0;
+            this.LootBagMenuUIComponent.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+            this.ToolTip.GetComponent<CanvasGroup>().alpha = 0;
         }
 
         public void ShowTooltip(Vector3 position, string header, string content, string buttonsDescription, bool below = false)

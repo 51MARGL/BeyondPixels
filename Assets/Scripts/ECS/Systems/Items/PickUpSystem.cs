@@ -38,7 +38,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Items
                 CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
             }.Schedule(this, inputDeps);
             this._endFrameBarrier.AddJobHandleForProducer(handle);
-            return inputDeps;
+            return handle;
         }
     }
 }

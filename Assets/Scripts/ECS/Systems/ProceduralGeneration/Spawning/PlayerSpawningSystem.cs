@@ -10,6 +10,7 @@ using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Spells;
+using BeyondPixels.ECS.Systems.Items;
 using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
 
@@ -198,149 +199,61 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 
 
             #region items
-            var weaponEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(weaponEntity, new ItemComponent
-            {
-                StoreIndex = 6,
-                IconIndex = 0,
-                Level = 2
-            });
-            this.PostUpdateCommands.AddComponent(weaponEntity, new AttackStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
-            this.PostUpdateCommands.AddComponent(weaponEntity, new MagicStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
+            var weaponEntity = ItemFactory.GetRandomWeapon(2);
             this.PostUpdateCommands.AddComponent(weaponEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var spellBookEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(spellBookEntity, new ItemComponent
-            {
-                StoreIndex = 7,
-                IconIndex = 0,
-                Level = 1
-            });
-            this.PostUpdateCommands.AddComponent(spellBookEntity, new MagicStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
+            var spellBookEntity = ItemFactory.GetRandomMagicWeapon(1);
             this.PostUpdateCommands.AddComponent(spellBookEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var helmetEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(helmetEntity, new ItemComponent
-            {
-                StoreIndex = 3,
-                IconIndex = 0,
-                Level = 2
-            });
-            this.PostUpdateCommands.AddComponent(helmetEntity, new DefenceStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
+            var helmetEntity = ItemFactory.GetRandomHelmet(2);
             this.PostUpdateCommands.AddComponent(helmetEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var chestEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(chestEntity, new ItemComponent
-            {
-                StoreIndex = 4,
-                IconIndex = 0,
-                Level = 2
-            });
-            this.PostUpdateCommands.AddComponent(chestEntity, new DefenceStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
-            this.PostUpdateCommands.AddComponent(chestEntity, new AttackStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
+            var chestEntity = ItemFactory.GetRandomChest(3);
             this.PostUpdateCommands.AddComponent(chestEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var bootsEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(bootsEntity, new ItemComponent
-            {
-                StoreIndex = 5,
-                IconIndex = 0,
-                Level = 2
-            });
-            this.PostUpdateCommands.AddComponent(bootsEntity, new DefenceStatModifierComponent
-            {
-                Value = random.NextInt(1, 6)
-            });
+            var bootsEntity = ItemFactory.GetRandomBoots(2);
             this.PostUpdateCommands.AddComponent(bootsEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var foodEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(foodEntity, new ItemComponent
-            {
-                StoreIndex = 0,
-                IconIndex = 2,
-                Level = 1
-            });
+            var foodEntity = ItemFactory.GetRandomFood();
             this.PostUpdateCommands.AddComponent(foodEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var foodEntity2 = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(foodEntity2, new ItemComponent
-            {
-                StoreIndex = 0,
-                IconIndex = 0,
-                Level = 1
-            });
+            var foodEntity2 = ItemFactory.GetRandomFood();
             this.PostUpdateCommands.AddComponent(foodEntity2, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var foodEntity3 = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(foodEntity3, new ItemComponent
-            {
-                StoreIndex = 0,
-                IconIndex = 0,
-                Level = 1
-            });
+            var foodEntity3 = ItemFactory.GetRandomFood();
             this.PostUpdateCommands.AddComponent(foodEntity3, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var potionEntity = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(potionEntity, new ItemComponent
-            {
-                StoreIndex = 1,
-                IconIndex = 0,
-                Level = 1
-            });
+            var potionEntity = ItemFactory.GetHealthPotion();
             this.PostUpdateCommands.AddComponent(potionEntity, new PickedUpComponent
             {
                 Owner = playerEntity
             });
 
-            var potionEntity2 = this.PostUpdateCommands.CreateEntity();
-            this.PostUpdateCommands.AddComponent(potionEntity2, new ItemComponent
-            {
-                StoreIndex = 1,
-                IconIndex = 0,
-                Level = 1
-            });
+            var potionEntity2 = ItemFactory.GetHealthPotion();
             this.PostUpdateCommands.AddComponent(potionEntity2, new PickedUpComponent
             {
                 Owner = playerEntity

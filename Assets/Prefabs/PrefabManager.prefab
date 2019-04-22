@@ -58,6 +58,7 @@ MonoBehaviour:
     type: 3}
   DungeonLevelExit: {fileID: 6663314661412270260, guid: 595a6413d666ccb468dc63dfc6454de2,
     type: 3}
+  LootBag: {fileID: 7515535471392751238, guid: 7889d30b555bf1640a4f80cf396649e9, type: 3}
   EnemyPrefabs:
   - SpawnRadius: 5
     Prefab: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}
