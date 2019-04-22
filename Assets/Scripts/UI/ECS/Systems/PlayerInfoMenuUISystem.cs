@@ -25,6 +25,7 @@ namespace BeyondPixels.UI.ECS.Systems
         }
 
         private int LastItemsCount;
+        private Entity LastPlayerEntity;
         private ComponentGroup _playerGroup;
         private ComponentGroup _equipedItemsGroup;
         private ComponentGroup _inventoryItemsGroup;
@@ -284,7 +285,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
             });
 
-            if (itemCounter == this.LastItemsCount)
+            if (itemCounter == this.LastItemsCount && this.LastPlayerEntity == owner)
             {
                 foodList.Dispose();
                 potionList.Dispose();
@@ -299,6 +300,7 @@ namespace BeyondPixels.UI.ECS.Systems
             }
 
             this.LastItemsCount = itemCounter;
+            this.LastPlayerEntity = owner;
 
             for (var i = inventoryGroup.Grid.transform.childCount - 1; i >= 0; i--)
                 GameObject.Destroy(inventoryGroup.Grid.transform.GetChild(i).gameObject);

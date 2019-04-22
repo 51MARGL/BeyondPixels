@@ -25,8 +25,6 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                     healthStatComponent.CurrentValue = properValue;
                     healthComponent.MaxValue = healthComponent.BaseValue 
                         + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
-                    healthComponent.CurrentValue = healthComponent.BaseValue
-                        + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
                 }
             }
         }

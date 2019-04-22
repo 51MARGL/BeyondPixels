@@ -290,7 +290,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             #region items
             if (random.NextInt(0, 100) > 50)
             {
-                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel);
+                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random);
                 commandBuffer.AddComponent(weaponEntity, new PickedUpComponent
                 {
                     Owner = enemyEntity
@@ -299,7 +299,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
             if (random.NextInt(0, 100) > 50)
             {
-                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel);
+                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random);
                 commandBuffer.AddComponent(spellBookEntity, new PickedUpComponent
                 {
                     Owner = enemyEntity
@@ -308,7 +308,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
             if (random.NextInt(0, 100) > 50)
             {
-                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel);
+                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random);
                 commandBuffer.AddComponent(helmetEntity, new PickedUpComponent
                 {
                     Owner = enemyEntity
@@ -317,7 +317,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
             if (random.NextInt(0, 100) > 50)
             {
-                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel);
+                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random);
                 commandBuffer.AddComponent(chestEntity, new PickedUpComponent
                 {
                     Owner = enemyEntity
@@ -326,31 +326,31 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
             if (random.NextInt(0, 100) > 50)
             {
-                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel);
+                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random);
                 commandBuffer.AddComponent(bootsEntity, new PickedUpComponent
                 {
                     Owner = enemyEntity
                 });
                 commandBuffer.AddComponent(bootsEntity, new EquipedComponent());
             }
-            if (random.NextInt(0, 100) > 50)
+            if (random.NextInt(0, 100) > 75)
             {
                 var randomCount = random.NextInt(1, 3);
                 for (int i = 0; i < randomCount; i++)
                 {
-                    var foodEntity = ItemFactory.GetRandomFood();
+                    var foodEntity = ItemFactory.GetRandomFood(ref random);
                     commandBuffer.AddComponent(foodEntity, new PickedUpComponent
                     {
                         Owner = enemyEntity
                     });
                 }
             }
-            if (random.NextInt(0, 100) > 50)
+            if (random.NextInt(0, 100) > 75)
             {
                 var randomCount = random.NextInt(1, 3);
                 for (int i = 0; i < randomCount; i++)
                 {
-                    var potionEntity = ItemFactory.GetHealthPotion();
+                    var potionEntity = ItemFactory.GetHealthPotion(ref random);
                     commandBuffer.AddComponent(potionEntity, new PickedUpComponent
                     {
                         Owner = enemyEntity
