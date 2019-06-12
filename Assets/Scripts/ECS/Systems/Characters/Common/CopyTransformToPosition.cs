@@ -9,21 +9,8 @@ using UnityEngine.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    public class CopyTransformToPosition : JobComponentSystem
+    public class CopyTransformToPosition : ComponentSystem
     {
-        [BurstCompile]
-        private struct CopyTransformToPositionJob : IJobParallelForTransform
-        {
-            public ComponentDataArray<PositionComponent> PositionComponents;
-
-            public void Execute(int index, TransformAccess transform)
-            {
-                var position = this.PositionComponents[index];
-                position.CurrentPosition = new float2(transform.position.x, transform.position.y);
-                this.PositionComponents[index] = position;
-            }
-        }
-
         private ComponentGroup _transformGroup;
 
         protected override void OnCreateManager()
@@ -31,14 +18,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             this._transformGroup = this.GetComponentGroup(typeof(PositionComponent), typeof(UnityEngine.Transform));
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            var transformArray = this._transformGroup.GetTransformAccessArray();
-            return new CopyTransformToPositionJob
-            {
-                //no other method for now
-                PositionComponents = this._transformGroup.GetComponentDataArray<PositionComponent>()
-            }.Schedule(transformArray, inputDeps);
+            Entities.With(_transformGroup).ForEach((UnityEngine.Transform transform, ref PositionComponent positionComponent) => {
+                positionComponent.CurrentPosition = new float2(transform.position.x, transform.position.y);
+            });
         }
     }
 }

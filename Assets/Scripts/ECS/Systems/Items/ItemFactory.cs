@@ -1,11 +1,20 @@
 ﻿using System;
 using BeyondPixels.ECS.Components.Items;
+using Unity.Collections;
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Items
 {
     public class ItemFactory
     {
+        private enum WeaponStatsModifiers
+        {
+            Attack = 1,
+            Defence = 2,
+            Magick = 3,
+            Health = 4
+        }
+
         public static Entity GetRandomFood(ref Unity.Mathematics.Random random)
         {
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
@@ -64,116 +73,11 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            if (random.NextInt(0, 100) > 50)
-            {
-                var randomStat = random.NextInt(0, 3);
-                if (randomStat == 0)
-                {
-                    entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 1)
-                {
-                    entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 2)
-                {
-                    entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-            }
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            randomStatModifiersArray[0] = WeaponStatsModifiers.Defence;
+            randomStatModifiersArray[1] = WeaponStatsModifiers.Magick;
+            randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
+            AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
 
             return itemEntity;
         }
@@ -193,121 +97,16 @@ namespace BeyondPixels.ECS.Systems.Items
                 IconIndex = iconIndex,
                 Level = level
             });
-            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent 
+            entityManager.AddComponentData(itemEntity, new MagickStatModifierComponent 
             {
                 Value = random.NextInt(1, 6)
             });
 
-            if (random.NextInt(0, 100) > 50)
-            {
-                var randomStat = random.NextInt(0, 3);
-                if (randomStat == 0)
-                {
-                    entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 1)
-                {
-                    entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 2)
-                {
-                    entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-            }
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            randomStatModifiersArray[0] = WeaponStatsModifiers.Defence;
+            randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
+            randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
+            AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
 
             return itemEntity;
         }
@@ -332,116 +131,11 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            if (random.NextInt(0, 100) > 50)
-            {
-                var randomStat = random.NextInt(0, 3);
-                if (randomStat == 0)
-                {
-                    entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 1)
-                {
-                    entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 2)
-                {
-                    entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-            }
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            randomStatModifiersArray[0] = WeaponStatsModifiers.Magick;
+            randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
+            randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
+            AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
 
             return itemEntity;
         }
@@ -466,116 +160,11 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            if (random.NextInt(0, 100) > 50)
-            {
-                var randomStat = random.NextInt(0, 3);
-                if (randomStat == 0)
-                {
-                    entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 1)
-                {
-                    entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 2)
-                {
-                    entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-            }
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            randomStatModifiersArray[0] = WeaponStatsModifiers.Magick;
+            randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
+            randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
+            AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
 
             return itemEntity;
         }
@@ -600,118 +189,66 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            if (random.NextInt(0, 100) > 50)
-            {
-                var randomStat = random.NextInt(0, 3);
-                if (randomStat == 0)
-                {
-                    entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 1)
-                {
-                    entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-                else if (randomStat == 2)
-                {
-                    entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
-                    {
-                        Value = random.NextInt(1, 4)
-                    });
-
-                    if (random.NextInt(0, 100) > 75)
-                    {
-                        randomStat = random.NextInt(0, 2);
-                        if (randomStat == 0)
-                        {
-                            entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                        else if (randomStat == 1)
-                        {
-                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
-                            {
-                                Value = random.NextInt(1, 4)
-                            });
-                            if (random.NextInt(0, 100) > 90)
-                                entityManager.AddComponentData(itemEntity, new MagicStatModifierComponent
-                                {
-                                    Value = random.NextInt(1, 4)
-                                });
-                        }
-                    }
-                }
-            }
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            randomStatModifiersArray[0] = WeaponStatsModifiers.Magick;
+            randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
+            randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
+            AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
 
             return itemEntity;
+        }
+
+        private static void ShuffleStatsArray(NativeArray<WeaponStatsModifiers> array, ref Unity.Mathematics.Random random)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                var rIndex = random.NextInt(0, array.Length);
+                var tmp = array[rIndex];
+                array[rIndex] = array[i];
+                array[i] = tmp;
+            }
+        }
+
+        private static void AddRandomStats(Entity itemEntity, EntityManager entityManager, NativeArray<WeaponStatsModifiers> randomStatModifiersArray, ref Unity.Mathematics.Random random)
+        {
+            var chance = 50;
+            ShuffleStatsArray(randomStatModifiersArray, ref random);
+            for (int i = 0; i < randomStatModifiersArray.Length; i++)
+            {
+                if (random.NextInt(0, 100) > chance)
+                {
+                    chance += 20;
+                    switch (randomStatModifiersArray[i])
+                    {
+                        case WeaponStatsModifiers.Attack:
+                            entityManager.AddComponentData(itemEntity, new AttackStatModifierComponent
+                            {
+                                Value = random.NextInt(1, 4)
+                            });
+                            break;
+                        case WeaponStatsModifiers.Defence:
+                            entityManager.AddComponentData(itemEntity, new DefenceStatModifierComponent
+                            {
+                                Value = random.NextInt(1, 4)
+                            });
+                            break;
+                        case WeaponStatsModifiers.Magick:
+                            entityManager.AddComponentData(itemEntity, new MagickStatModifierComponent
+                            {
+                                Value = random.NextInt(1, 4)
+                            });
+                            break;
+                        case WeaponStatsModifiers.Health:
+                            entityManager.AddComponentData(itemEntity, new HealthStatModifierComponent
+                            {
+                                Value = random.NextInt(1, 4)
+                            });
+                            break;
+                    }
+                }
+                else
+                    return;
+            }
         }
     }
 }

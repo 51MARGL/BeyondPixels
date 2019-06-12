@@ -33,10 +33,6 @@ namespace BeyondPixels.ColliderEvents
         {
             if (this.IsInside && Input.GetKeyDown(KeyCode.E))
             {
-                var entityManager = World.Active.GetExistingManager<EntityManager>();
-
-                var eventEntity = entityManager.CreateEntity();
-
                 var gameObject = new GameObject("Exit");
                 var component = gameObject.AddComponent<PlayerExitCutsceneComponent>();
                 component.ExitCaveDoor = this.transform.GetChild(0).gameObject;

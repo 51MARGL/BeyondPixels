@@ -1,6 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Objects;
 
 using Unity.Collections;
 using Unity.Entities;
@@ -10,7 +9,8 @@ namespace BeyondPixels.ECS.Systems.Level
 {
     public class XPRewardSystem : JobComponentSystem
     {
-        private struct XPRewardSystemJob : IJobProcessComponentDataWithEntity<DestroyComponent, XPRewardComponent, LevelComponent>
+        [RequireComponentTag(typeof(CollectXPRewardComponent))]
+        private struct XPRewardSystemJob : IJobProcessComponentDataWithEntity<XPRewardComponent, LevelComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -23,7 +23,6 @@ namespace BeyondPixels.ECS.Systems.Level
 
             public void Execute(Entity entity,
                                 int index,
-                                [ReadOnly] ref DestroyComponent destroyComponent,
                                 [ReadOnly] ref XPRewardComponent xpRewardComponent,
                                 [ReadOnly] ref LevelComponent levelComponent)
             {
@@ -39,6 +38,8 @@ namespace BeyondPixels.ECS.Systems.Level
                         this.CommandBuffer.SetComponent(index, entities[i], xpComponentComponent);
                     }
                 }
+                this.CommandBuffer.RemoveComponent<CollectXPRewardComponent>(index, entity);
+                this.CommandBuffer.RemoveComponent<XPRewardComponent>(index, entity);
             }
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;

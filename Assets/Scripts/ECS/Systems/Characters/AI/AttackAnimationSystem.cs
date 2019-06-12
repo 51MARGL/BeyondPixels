@@ -1,8 +1,9 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
+using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.Utilities;
 
 using Unity.Entities;
-
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
@@ -20,7 +21,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             {
                 All = new ComponentType[]
                 {
-                    typeof(Animator), typeof(AttackStateComponent)
+                    typeof(Animator), typeof(AttackStateComponent), typeof(MovementComponent)
                 },
                 None = new ComponentType[]
                 {
@@ -38,12 +39,16 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnUpdate()
         {
-            this.Entities.With(this._attackStartGroup).ForEach((Entity entity, Animator animatorComponent) =>
+            this.Entities.With(this._attackStartGroup).ForEach((Entity entity, Animator animatorComponent, ref MovementComponent movementComponent) =>
             {
+                
                 animatorComponent.ActivateLayer("AttackLayer");
                 animatorComponent.SetTrigger("Attack");
 
+                var movement = movementComponent;
+                movement.Direction = float2.zero;
                 this.PostUpdateCommands.AddComponent(entity, new AttackStateInitialComponent());
+                this.PostUpdateCommands.SetComponent(entity, movement);
             });
             this.Entities.With(this._attackingGroup).ForEach((Entity entity, Animator animatorComponent) =>
             {

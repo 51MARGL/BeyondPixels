@@ -35,8 +35,6 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 if (!movementComponent.Direction.Equals(float2.zero))
                 {
                     animatorComponent.ActivateLayer("RunLayer");
-
-                    //Sets the animation parameter so that model faces the correct direction
                     animatorComponent.SetFloat("velocity.x", movementComponent.Direction.x);
                     animatorComponent.SetFloat("velocity.y", movementComponent.Direction.y);
                 }

@@ -1,12 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.SceneBootstraps;
-
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Level
 {
@@ -27,29 +21,14 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
         }
         protected override void OnUpdate()
         {
-            if (this._characterGroup.CalculateLength() != 0)
+            this.Entities.With(this._characterGroup).ForEach((Entity entity, ref LevelComponent levelComponent, ref PositionComponent positionComponent, ref CharacterComponent characterComponent) =>
             {
-                var positions = new NativeArray<float2>(this._characterGroup.CalculateLength(), Allocator.TempJob);
-                var k = 0;
-                this.Entities.With(this._characterGroup).ForEach((Entity entity, ref LevelComponent levelComponent, ref PositionComponent positionComponent, ref CharacterComponent characterComponent) =>
-                {
-                    if (characterComponent.CharacterType == CharacterType.Player)
-                        positions[k++] = positionComponent.CurrentPosition;
+                levelComponent.CurrentLevel++;
+                levelComponent.NextLevelXP *= 2;
+                levelComponent.SkillPoints++;
 
-                    levelComponent.CurrentLevel++;
-                    levelComponent.NextLevelXP *= 2;
-                    levelComponent.SkillPoints++;
-
-                    this.PostUpdateCommands.RemoveComponent<LevelUpComponent>(entity);
-                });
-
-                for (var i = 0; i < k; i++)
-                    GameObject.Instantiate(PrefabManager.Instance.LevelUpEffectPrefab,
-                                           new float3(positions[i].x, positions[i].y + 0.8f, 0),
-                                           Quaternion.Euler(90, 0, 0));
-
-                positions.Dispose();
-            }
+                this.PostUpdateCommands.RemoveComponent<LevelUpComponent>(entity);
+            });
         }
     }
 }

@@ -74,9 +74,9 @@ namespace BeyondPixels.ECS.Systems.Items
                             var modifierComponent = this.EntityManager.GetComponentData<HealthStatModifierComponent>(gearEntity);
                             healthModifier += modifierComponent.Value * itemComponent.Level;
                         }
-                        if (this.EntityManager.HasComponent<MagicStatModifierComponent>(gearEntity))
+                        if (this.EntityManager.HasComponent<MagickStatModifierComponent>(gearEntity))
                         {
-                            var modifierComponent = this.EntityManager.GetComponentData<MagicStatModifierComponent>(gearEntity);
+                            var modifierComponent = this.EntityManager.GetComponentData<MagickStatModifierComponent>(gearEntity);
                             magicModifier += modifierComponent.Value * itemComponent.Level;
                         }
                     }

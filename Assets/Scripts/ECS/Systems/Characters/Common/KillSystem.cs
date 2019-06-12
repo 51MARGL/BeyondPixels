@@ -1,16 +1,12 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Level;
+using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
-using BeyondPixels.SceneBootstraps;
-
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    public class DeathSystem : ComponentSystem
+    public class KillSystem : ComponentSystem
     {
         private ComponentGroup _group;
 
@@ -21,11 +17,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 All = new ComponentType[]
                 {
                     typeof(HealthComponent), typeof(CharacterComponent),
-                    typeof(PositionComponent)
-                },
-                None = new ComponentType[]
-                {
-                    typeof(KilledComponent)
+                    typeof(PositionComponent), typeof(KilledComponent)
                 }
             });
         }
@@ -34,10 +26,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         {
             this.Entities.With(this._group).ForEach((Entity entity, ref HealthComponent healthComponent, ref PositionComponent positionComponent) =>
             {
-                if (healthComponent.CurrentValue <= 0)
-                {
-                    this.PostUpdateCommands.AddComponent(entity, new KilledComponent());
-                }
+                this.PostUpdateCommands.AddComponent(entity, new DestroyComponent());
+                this.PostUpdateCommands.AddComponent(entity, new DropLootComponent());
+                if (EntityManager.HasComponent<XPRewardComponent>(entity))
+                    this.PostUpdateCommands.AddComponent(entity, new CollectXPRewardComponent());
             });
         }
     }

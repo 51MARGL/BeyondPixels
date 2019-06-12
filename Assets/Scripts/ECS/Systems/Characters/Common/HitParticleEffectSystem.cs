@@ -38,24 +38,19 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             if (this._damageGroup.CalculateLength() == 0)
                 return;
 
-            var positions = new NativeArray<float2>(this._damageGroup.CalculateLength(), Allocator.TempJob);
+            var positions = new NativeArray<PositionComponent>(this._damageGroup.CalculateLength(), Allocator.TempJob);
 
             var k = 0;
             this.Entities.With(this._damageGroup).ForEach((Entity damageEntity, ref FinalDamageComponent damageComponent, ref CollisionInfo collisionInfo) =>
             {
-                var eventTarget = collisionInfo.Target;
-                var damageValue = damageComponent.DamageAmount;
-                this.Entities.With(this._characterGroup).ForEach((Entity characterEntity, ref PositionComponent positionComponent) =>
-                {
-                    if (eventTarget == characterEntity && damageValue > 0)
-                        positions[k++] = positionComponent.CurrentPosition;
-                });
+                if (damageComponent.DamageAmount > 0)
+                    positions[k++] = EntityManager.GetComponentData<PositionComponent>(collisionInfo.Target);
             });
 
             for (var i = 0; i < k; i++)
             {
                 GameObject.Instantiate(PrefabManager.Instance.BloodSplashPrefab,
-                                       new float3(positions[i].x, positions[i].y, -1),
+                                       new float3(positions[i].CurrentPosition.x, positions[i].CurrentPosition.y, -1),
                                        Quaternion.identity);
             }
             positions.Dispose();

@@ -61,9 +61,9 @@ namespace BeyondPixels.UI.Buttons
                 sb.Append($"Health: +{statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
-            if (entityManager.HasComponent<MagicStatModifierComponent>(this.ItemEntity))
+            if (entityManager.HasComponent<MagickStatModifierComponent>(this.ItemEntity))
             {
-                var statComponent = entityManager.GetComponentData<MagicStatModifierComponent>(this.ItemEntity);
+                var statComponent = entityManager.GetComponentData<MagickStatModifierComponent>(this.ItemEntity);
                 sb.Append($"Magic: +{statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }

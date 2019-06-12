@@ -85,6 +85,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                         if (distance <= wpnComponent.AttackRange
                             && currentTime - flwStateComponent.LastTimeAttacked > wpnComponent.CoolDown)
                         {
+                            mvmComponent.Direction = playerPositionComponent.CurrentPosition - currentPosition; ;
                             flwStateComponent.LastTimeAttacked = currentTime;
                             this.PostUpdateCommands.AddComponent(entity,
                                 new AttackStateComponent
