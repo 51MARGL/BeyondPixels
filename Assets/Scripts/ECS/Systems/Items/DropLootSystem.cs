@@ -19,7 +19,8 @@ namespace BeyondPixels.ECS.Systems.Level
             {
                 All = new ComponentType[]
                 {
-                    typeof(DropLootComponent)
+                    typeof(DropLootComponent),
+                    typeof(PositionComponent)
                 }
             });
             this._lootGroup = this.GetComponentGroup(new EntityArchetypeQuery
@@ -28,6 +29,10 @@ namespace BeyondPixels.ECS.Systems.Level
                 {
                     typeof(ItemComponent),
                     typeof(PickedUpComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(DestroyComponent)
                 }
             });
         }
@@ -38,7 +43,6 @@ namespace BeyondPixels.ECS.Systems.Level
                 return;
 
             var dropChunks = this._dropGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
 
             for (var c = 0; c < dropChunks.Length; c++)
             {
@@ -56,25 +60,18 @@ namespace BeyondPixels.ECS.Systems.Level
                         {
                             if (pickedUpComponent.Owner == ownerEntity)
                             {
-                                if (random.NextInt(0, 100) > 75)
-                                {
-                                    if (this.EntityManager.HasComponent<EquipedComponent>(itemEntity))
-                                        this.PostUpdateCommands.RemoveComponent<EquipedComponent>(itemEntity);
+                                if (this.EntityManager.HasComponent<EquipedComponent>(itemEntity))
+                                    this.PostUpdateCommands.RemoveComponent<EquipedComponent>(itemEntity);
 
-                                    this.PostUpdateCommands.RemoveComponent<PickedUpComponent>(itemEntity);
+                                this.PostUpdateCommands.RemoveComponent<PickedUpComponent>(itemEntity);
 
-                                    itemsList.Add(itemEntity);
-                                }
-                                else
-                                {
-                                    this.PostUpdateCommands.AddComponent(itemEntity, new DestroyComponent());
-                                }
+                                itemsList.Add(itemEntity);
                             }
                         });
                         if (itemsList.Length > 0)
                         {
                             var lootBag = GameObject.Instantiate(PrefabManager.Instance.LootBag,
-                                new Vector3(position.x, position.y, 0), Quaternion.identity);
+                                new Vector3(position.x, position.y - 0.25f, 0), Quaternion.identity);
 
                             var lootBagEntity = lootBag.GetComponent<GameObjectEntity>().Entity;
 

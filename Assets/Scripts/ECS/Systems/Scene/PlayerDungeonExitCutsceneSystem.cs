@@ -27,7 +27,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
             {
                 All = new ComponentType[]
                 {
-                    typeof(PlayerExitCutsceneComponent)
+                    typeof(PlayerExitCutsceneComponent), typeof(PositionComponent), typeof(Transform)
                 },
                 None = new ComponentType[]
                 {
@@ -46,16 +46,16 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         protected override void OnUpdate()
         {
-            this.Entities.With(this._triggerCutsceneGroup).ForEach((Entity triggerEntity, PlayerExitCutsceneComponent playerExitCutsceneComponent) =>
+            this.Entities.With(this._triggerCutsceneGroup).ForEach((Entity exitEntity, Transform levelExitTransform, ref PositionComponent exitPositionComponent) =>
             {
                 var player = GameObject.FindGameObjectWithTag("Player");
                 var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
                 var rigidbody = player.GetComponent<Rigidbody2D>();
                 var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonExit;
-                var levelExit = playerExitCutsceneComponent.ExitCaveDoor;
+                var levelExit = levelExitTransform.GetChild(0).gameObject;
 
                 var playerPosition = new float2(player.transform.position.x, player.transform.position.y);
-                var desiredPosition = new float2(levelExit.transform.position.x, levelExit.transform.position.y);
+                var desiredPosition = exitPositionComponent.CurrentPosition;
                 desiredPosition.y -= 1f;
 
                 if (!this.EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
@@ -103,7 +103,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 rigidbody.isKinematic = true;
                 this.PostUpdateCommands.AddComponent(playerEntity, new PlayerExitCutscenePlaying());
                 director.Play();
-                this.PostUpdateCommands.AddComponent(triggerEntity, new DestroyComponent());
+                this.PostUpdateCommands.RemoveComponent<PlayerExitCutsceneComponent>(exitEntity);
             });
 
             this.Entities.With(this._playerDoneCutSceneGroup).ForEach((Entity playerEntity, Transform transform, Rigidbody2D rigidbody) =>

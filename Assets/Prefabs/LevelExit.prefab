@@ -431,6 +431,7 @@ GameObject:
   - component: {fileID: 6663314661412270261}
   - component: {fileID: 6642170240612692523}
   - component: {fileID: 1922401943051497479}
+  - component: {fileID: 478014327597184243}
   m_Layer: 8
   m_Name: LevelExit
   m_TagString: Untagged
@@ -495,6 +496,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Canvas: {fileID: 2385643687517319584}
+--- !u!114 &478014327597184243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6663314661412270260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf10cdea1344482e91a4f2b58506b77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6663314661448823829
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -572,15 +585,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1087316936065991, guid: 83fbeabbf6a33954e80e0efc586820b5, type: 3}
-      propertyPath: m_SortingOrder
-      value: 41
-      objectReference: {fileID: 0}
-    - target: {fileID: 1087316936065991, guid: 83fbeabbf6a33954e80e0efc586820b5, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 553908750372588855, guid: abf2e6d6f4e75e64bac91caf3628a11e,
-        type: 3}
     - target: {fileID: 213995748260398457, guid: 83fbeabbf6a33954e80e0efc586820b5,
         type: 3}
       propertyPath: m_Color.r
@@ -591,6 +595,15 @@ PrefabInstance:
       propertyPath: m_Color.b
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1087316936065991, guid: 83fbeabbf6a33954e80e0efc586820b5, type: 3}
+      propertyPath: m_SortingOrder
+      value: 41
+      objectReference: {fileID: 0}
+    - target: {fileID: 1087316936065991, guid: 83fbeabbf6a33954e80e0efc586820b5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 553908750372588855, guid: abf2e6d6f4e75e64bac91caf3628a11e,
+        type: 3}
     - target: {fileID: 6636573050663983011, guid: 83fbeabbf6a33954e80e0efc586820b5,
         type: 3}
       propertyPath: m_Color.r

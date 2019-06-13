@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Items;
+﻿using BeyondPixels.ECS.Components.Characters.Level;
+using BeyondPixels.ECS.Components.Items;
 
 using Unity.Entities;
 
@@ -48,6 +49,7 @@ namespace BeyondPixels.ColliderEvents
             var entityManager = World.Active.GetExistingManager<EntityManager>();
             var entity = this.GetComponent<GameObjectEntity>().Entity;
             entityManager.AddComponentData(entity, new DropLootComponent());
+            entityManager.AddComponentData(entity, new CollectXPRewardComponent());
             Object.Destroy(this.GetComponent<CircleCollider2D>());
         }
     }

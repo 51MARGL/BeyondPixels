@@ -2,5 +2,5 @@
 
 namespace BeyondPixels.ECS.Components.Scenes
 {
-    public struct PlayerExitCutsceneComponent : IComponentData { }
+    public struct LevelExitComponent : IComponentData { }
 }

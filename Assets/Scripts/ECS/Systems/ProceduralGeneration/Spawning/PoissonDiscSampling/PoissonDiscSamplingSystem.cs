@@ -27,6 +27,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 var gridSize = poissonDiscSamplingComponent.GridSize;
                 var requestCells = this.GetCellsByRequestID(poissonDiscSamplingComponent.RequestID, gridSize);
                 var validCellList = this.GetValidCells(requestCells);
+                if (validCellList.Length == 0)
+                    return;
+
                 var finalSamplesList = new NativeList<SampleComponent>(Allocator.Temp);
                 var currentSamplesList = new NativeList<SampleComponent>(Allocator.Temp);
                 var random = new Random((uint)this.RandomSeed + 1);
@@ -63,50 +66,55 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     {
                         randomIndex = random.NextInt(0, validCellList.Length);
                         randomCell = validCellList[randomIndex];
-                        currentSamplesList.Add(new SampleComponent
+                        var candidate = new SampleComponent
                         {
                             Radius = maxRadius,
                             RequestID = poissonDiscSamplingComponent.RequestID,
                             Position = randomCell.Position
-                        });
-                    }
-                    randomIndex = random.NextInt(0, currentSamplesList.Length);
-                    randomSample = currentSamplesList[randomIndex];
-
-                    var candidateFound = false;
-
-                    for (var i = 0; i < poissonDiscSamplingComponent.SamplesLimit; i++)
-                    {
-                        var randomAngle = (float)(random.NextInt() * math.PI * 2);
-                        var randomDirection = new float2(math.sin(randomAngle), math.cos(randomAngle));
-                        var radius = maxRadius;
-                        if (poissonDiscSamplingComponent.RadiusFromArray == 1)
-                            radius = requestRadiuses[random.NextInt(0, requestRadiuses.Length)];
-
-                        var candidate = new SampleComponent
-                        {
-                            Radius = radius,
-                            RequestID = poissonDiscSamplingComponent.RequestID,
-                            Position =
-                            (int2)(randomSample.Position + randomDirection *
-                                   random.NextInt(radius, 2 * radius))
                         };
 
+                        currentSamplesList.Add(candidate);
                         if (this.IsValid(candidate, gridSize, finalSamplesList, requestCells, maxRadius))
-                        {
-                            finalSamplesList.Add(candidate);
+                            this.AddToFinal(gridSize, ref requestCells, validCellList, ref finalSamplesList, candidate);
+                        else
                             this.RemoveFromValid(candidate, validCellList);
-                            cell = requestCells[candidate.Position.y * gridSize.x + candidate.Position.x];
-                            cell.SampleIndex = finalSamplesList.Length;
-                            requestCells[candidate.Position.y * gridSize.x + candidate.Position.x] = cell;
-                            candidateFound = true;
-                            break;
-                        }
                     }
-                    if (!candidateFound)
+                    else
                     {
-                        currentSamplesList.RemoveAtSwapBack(randomIndex);
-                        this.RemoveFromValid(randomSample, validCellList);
+                        var candidateFound = false;
+
+                        randomIndex = random.NextInt(0, currentSamplesList.Length);
+                        randomSample = currentSamplesList[randomIndex];
+
+                        for (var i = 0; i < poissonDiscSamplingComponent.SamplesLimit; i++)
+                        {
+                            var randomAngle = (float)(random.NextInt() * math.PI * 2);
+                            var randomDirection = new float2(math.sin(randomAngle), math.cos(randomAngle));
+                            var radius = maxRadius;
+                            if (poissonDiscSamplingComponent.RadiusFromArray == 1)
+                                radius = requestRadiuses[random.NextInt(0, requestRadiuses.Length)];
+
+                            var candidate = new SampleComponent
+                            {
+                                Radius = radius,
+                                RequestID = poissonDiscSamplingComponent.RequestID,
+                                Position =
+                                (int2)(randomSample.Position + randomDirection *
+                                       random.NextInt(radius, 2 * radius))
+                            };
+
+                            if (this.IsValid(candidate, gridSize, finalSamplesList, requestCells, maxRadius))
+                            {
+                                this.AddToFinal(gridSize, ref requestCells, validCellList, ref finalSamplesList, candidate);
+                                candidateFound = true;
+                                break;
+                            }
+                        }
+                        if (!candidateFound)
+                        {
+                            currentSamplesList.RemoveAtSwapBack(randomIndex);
+                            this.RemoveFromValid(randomSample, validCellList);
+                        }
                     }
                 }
 
@@ -117,6 +125,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 }
 
                 this.CommandBuffer.DestroyEntity(index, entity);
+            }
+
+            private void AddToFinal(int2 gridSize, ref NativeArray<PoissonCellComponent> requestCells, NativeList<PoissonCellComponent> validCellList, ref NativeList<SampleComponent> finalSamplesList, SampleComponent candidate)
+            {
+                finalSamplesList.Add(candidate);
+                this.RemoveFromValid(candidate, validCellList);
+                var cell = requestCells[candidate.Position.y * gridSize.x + candidate.Position.x];
+                cell.SampleIndex = finalSamplesList.Length;
+                requestCells[candidate.Position.y * gridSize.x + candidate.Position.x] = cell;
             }
 
             private NativeArray<PoissonCellComponent> GetCellsByRequestID(int id, int2 gridSize)

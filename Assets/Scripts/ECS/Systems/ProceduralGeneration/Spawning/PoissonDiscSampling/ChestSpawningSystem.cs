@@ -1,8 +1,11 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Level;
+using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.Scenes;
+using BeyondPixels.ECS.Systems.Items;
 using BeyondPixels.SceneBootstraps;
 
 using Unity.Collections;
@@ -14,24 +17,26 @@ using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
 {
-    public class ExitSpawningSystem : JobComponentSystem
+    public class ChestSpawningSystem : JobComponentSystem
     {
-        private const int SystemRequestID = 3;
+        private const int SystemRequestID = 4;
 
-        private struct ExitSpawnStartedComponent : IComponentData { }
+        private struct ChestSpawnStartedComponent : IComponentData { }
         private struct InitializeValidationGridJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<FinalTileComponent> Tiles;
-            public float2 PlayerPosition;
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<float2> Positions;
 
             public void Execute(Entity boardEntity, int index, ref FinalBoardComponent finalBoardComponent)
             {
                 var poissonDiscEntity = this.CommandBuffer.CreateEntity(index);
                 var boardSize = finalBoardComponent.Size;
-                var radius = 30;
+                var radius = 50;
                 this.CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
                     GridSize = boardSize,
@@ -40,11 +45,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     Radius = radius
                 });
 
-                var cellList = this.GetCells(boardSize, radius);
+                var cellList = this.GetCells(boardSize, 10);
                 while (cellList.Length == 0)
                 {
                     radius -= 5;
-                    cellList = this.GetCells(boardSize, radius);
+                    cellList = this.GetCells(boardSize, 10);
                 }
 
                 for (var i = 0; i < cellList.Length; i++)
@@ -52,7 +57,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     var entity = this.CommandBuffer.CreateEntity(index);
                     this.CommandBuffer.AddComponent(index, entity, cellList[i]);
                 }
-                this.CommandBuffer.AddComponent(index, boardEntity, new ExitSpawnStartedComponent());
+                this.CommandBuffer.AddComponent(index, boardEntity, new ChestSpawnStartedComponent());
             }
 
             private NativeList<PoissonCellComponent> GetCells(int2 boardSize, int radius)
@@ -76,16 +81,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             private int GetValidationIndex(int tileIndex, int2 boardSize, int radius)
             {
                 var tile = this.Tiles[tileIndex];
-                if (tile.TileType == TileType.Wall
-                    && math.distance(this.PlayerPosition, tile.Position) >= radius
+
+                for (var i = 0; i < this.Positions.Length; i++)
+                    if (math.distance(this.Positions[i], tile.Position) < radius)
+                        return -2;
+
+                if (tile.TileType == TileType.Floor
                     && tile.Position.x > 2 && tile.Position.x < boardSize.x - 2
                     && tile.Position.y > 2 && tile.Position.y < boardSize.y - 2
                     && this.Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor
                     && this.Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
                     && this.Tiles[(tile.Position.y - 1) * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
-                    && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
-                    && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
-                    && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall)
+                    && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
+                    && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
+                    && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall)
                     return -1;
 
                 return -2;
@@ -98,7 +107,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             public void Execute(Entity entity, int index, [ReadOnly] ref FinalBoardComponent finalBoardComponent)
             {
-                this.CommandBuffer.AddComponent(index, entity, new ExitSpawnedComponent());
+                this.CommandBuffer.AddComponent(index, entity, new ChestSpawnedComponent());
             }
         }
 
@@ -116,6 +125,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private ComponentGroup _tilesGroup;
         private ComponentGroup _boardSpawnInitGroup;
+        private ComponentGroup _exitsGroup;
         private ComponentGroup _boardSpawnReadyGroup;
         private ComponentGroup _samplesGroup;
 
@@ -134,22 +144,30 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 All = new ComponentType[]
                 {
                     typeof(FinalBoardComponent),
-                    typeof(PlayerSpawnedComponent)
+                    typeof(PlayerSpawnedComponent),
+                    typeof(ExitSpawnedComponent)
                 },
                 None = new ComponentType[]
                 {
-                    typeof(ExitSpawnStartedComponent)
+                    typeof(ChestSpawnStartedComponent)
+                }
+            });
+            this._exitsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            {
+                All = new ComponentType[]
+                {
+                    typeof(LevelExitComponent), typeof(PositionComponent)
                 }
             });
             this._boardSpawnReadyGroup = this.GetComponentGroup(new EntityArchetypeQuery
             {
                 All = new ComponentType[]
                 {
-                    typeof(FinalBoardComponent), typeof(ExitSpawnStartedComponent)
+                    typeof(FinalBoardComponent), typeof(ChestSpawnStartedComponent)
                 },
                 None = new ComponentType[]
                 {
-                    typeof(ExitSpawnedComponent)
+                    typeof(ChestSpawnedComponent)
                 }
             });
             this._samplesGroup = this.GetComponentGroup(new EntityArchetypeQuery
@@ -190,8 +208,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
 
                     inputDeps.Complete();
+                    var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
+                    var playerLvlComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity);
+                    var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+
                     for (var i = 0; i < samplesList.Length; i++)
-                        this.InstantiateExit(samplesList[i].Position);
+                        this.InstantiateChest(samplesList[i].Position, playerLvlComponent, ref random);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -204,27 +226,116 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         {
             var playerPos = PlayerSpawningSystem.PlayerPosition;
             var playerPosition = new float2(playerPos.x, playerPos.y);
+            var positionComponents = this._exitsGroup.ToComponentDataArray<PositionComponent>(Allocator.TempJob);
+            var positions = new NativeArray<float2>(positionComponents.Length + 1, Allocator.TempJob);
+
+            for (var i = 0; i < positionComponents.Length; i++)
+                positions[i] = positionComponents[i].CurrentPosition;
+            positions[positions.Length - 1] = playerPosition;
+            positionComponents.Dispose();
+
             var initializeValidationGridJobHandle = new InitializeValidationGridJob
             {
                 CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 Tiles = this._tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob),
-                PlayerPosition = playerPosition
+                Positions = positions
             }.Schedule(this, inputDeps);
             this._endFrameBarrier.AddJobHandleForProducer(initializeValidationGridJobHandle);
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateExit(int2 position)
+        private void InstantiateChest(int2 position, LevelComponent playerLvlComponent, ref Unity.Mathematics.Random random)
         {
-            var exit = Object.Instantiate(PrefabManager.Instance.DungeonLevelExit,
-                new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);
+            var commandBuffer = this._endFrameBarrier.CreateCommandBuffer();
 
-            var entity = exit.GetComponent<GameObjectEntity>().Entity;
-            EntityManager.AddComponentData(entity, new LevelExitComponent());
-            EntityManager.AddComponentData(entity, new PositionComponent {
+            var chest = Object.Instantiate(PrefabManager.Instance.Chest,
+                new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);
+            var chestEnity = chest.GetComponent<GameObjectEntity>().Entity;
+            commandBuffer.AddComponent(chestEnity, new PositionComponent
+            {
                 CurrentPosition = position,
                 InitialPosition = position
             });
+            commandBuffer.AddComponent(chestEnity, new XPRewardComponent
+            {
+                XPAmount = 25
+            });
+
+            var lvlComponent = new LevelComponent
+            {
+                CurrentLevel =
+                    math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
+                                               playerLvlComponent.CurrentLevel + 3))
+            };
+            commandBuffer.AddComponent(chestEnity, lvlComponent);
+
+
+            #region items
+            if (random.NextInt(0, 100) > 50)
+            {
+                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random);
+                commandBuffer.AddComponent(weaponEntity, new PickedUpComponent
+                {
+                    Owner = chestEnity
+                });
+            }
+            if (random.NextInt(0, 100) > 50)
+            {
+                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random);
+                commandBuffer.AddComponent(spellBookEntity, new PickedUpComponent
+                {
+                    Owner = chestEnity
+                });
+            }
+            if (random.NextInt(0, 100) > 50)
+            {
+                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random);
+                commandBuffer.AddComponent(helmetEntity, new PickedUpComponent
+                {
+                    Owner = chestEnity
+                });
+            }
+            if (random.NextInt(0, 100) > 50)
+            {
+                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random);
+                commandBuffer.AddComponent(chestEntity, new PickedUpComponent
+                {
+                    Owner = chestEnity
+                });
+            }
+            if (random.NextInt(0, 100) > 50)
+            {
+                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random);
+                commandBuffer.AddComponent(bootsEntity, new PickedUpComponent
+                {
+                    Owner = chestEnity
+                });
+            }
+            if (random.NextInt(0, 100) > 25)
+            {
+                var randomCount = random.NextInt(1, 3);
+                for (var i = 0; i < randomCount; i++)
+                {
+                    var foodEntity = ItemFactory.GetRandomFood(ref random);
+                    commandBuffer.AddComponent(foodEntity, new PickedUpComponent
+                    {
+                        Owner = chestEnity
+                    });
+                }
+            }
+            if (random.NextInt(0, 100) > 25)
+            {
+                var randomCount = random.NextInt(1, 3);
+                for (var i = 0; i < randomCount; i++)
+                {
+                    var potionEntity = ItemFactory.GetHealthPotion(ref random);
+                    commandBuffer.AddComponent(potionEntity, new PickedUpComponent
+                    {
+                        Owner = chestEnity
+                    });
+                }
+            }
+            #endregion
         }
     }
 }
