@@ -1,9 +1,7 @@
 ﻿using System;
-using BeyondPixels.UI.Buttons;
-using TMPro;
 
 using UnityEngine;
-using UnityEngine.UI;
+using static BeyondPixels.UI.ECS.Components.PlayerInfoMenuUIComponent;
 
 namespace BeyondPixels.UI.ECS.Components
 {
@@ -12,10 +10,6 @@ namespace BeyondPixels.UI.ECS.Components
         public LootGroupWrapper LootGroup;
 
         [Serializable]
-        public class LootGroupWrapper
-        {
-            public GameObject Grid;
-            public GameObject ItemButtonPrefab;
-        }
+        public class LootGroupWrapper : InventoryGroupWrapper { }
     }
 }

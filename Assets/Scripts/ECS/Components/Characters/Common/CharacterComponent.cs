@@ -10,6 +10,7 @@ namespace BeyondPixels.ECS.Components.Characters.Common
     public enum CharacterType
     {
         Player = 1,
-        Enemy = 2
+        Enemy = 2,
+        Ally = 3
     }
 }

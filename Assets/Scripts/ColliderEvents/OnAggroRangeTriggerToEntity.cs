@@ -7,104 +7,84 @@ namespace BeyondPixels.ColliderEvents
 {
     public class OnAggroRangeTriggerToEntity : MonoBehaviour
     {
-        private bool hasTarget;
-
-        private void OnTriggerEnter2D(Collider2D collider)
+        protected virtual void OnTriggerEnter2D(Collider2D collider)
         {
-            if (collider.gameObject.CompareTag("Player"))
+            var wallLayer = LayerMask.GetMask("World");
+            var distance = math.distance(this.transform.position, collider.transform.position);
+            var hits = Physics2D.RaycastAll(this.transform.position,
+                                            collider.transform.position - this.transform.position,
+                                            distance, wallLayer);
+
+            foreach (var hit in hits)
             {
-                var wallLayer = LayerMask.GetMask("World");
-                var distance = math.distance(this.transform.position, collider.transform.position);
-                var hits = Physics2D.RaycastAll(this.transform.position,
-                                                collider.transform.position - this.transform.position,
-                                                distance, wallLayer);
-
-                foreach (var hit in hits)
-                {
-                    if (hit.transform.tag == "Wall")
-                        return;
-                }
-
-                var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
-                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
-                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                if (hit.transform.tag == "Wall")
                     return;
-
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
-                                                             typeof(AggroRangeCollisionComponent));
-
-                entityManager.SetComponentData(eventEntity, new CollisionInfo
-                {
-                    Sender = sender,
-                    Target = target,
-                    EventType = EventType.TriggerEnter
-                });
-
-                this.hasTarget = true;
             }
-        }
 
-        private void OnTriggerExit2D(Collider2D collider)
-        {
-            if (collider.gameObject.CompareTag("Player"))
-            {
-                var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
-                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
-                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
-                    return;
-
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
-
-                entityManager.SetComponentData(eventEntity, new CollisionInfo
-                {
-                    Sender = sender,
-                    Target = target,
-                    EventType = EventType.TriggerExit
-                });
-
-                this.hasTarget = false;
-            }
-        }
-
-        private void OnTriggerStay2D(Collider2D collider)
-        {
-            if (this.hasTarget)
+            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
+            var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+            if (!entityManager.Exists(sender) || !entityManager.Exists(target))
                 return;
 
-            if (collider.gameObject.CompareTag("Player"))
+            var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
+                                                         typeof(AggroRangeCollisionComponent));
+
+            entityManager.SetComponentData(eventEntity, new CollisionInfo
             {
-                var wallLayer = LayerMask.GetMask("World");
-                var distance = math.distance(this.transform.position, collider.transform.position);
-                var hits = Physics2D.RaycastAll(this.transform.position,
-                                                collider.transform.position - this.transform.position,
-                                                distance, wallLayer);
+                Sender = sender,
+                Target = target,
+                EventType = EventType.TriggerEnter
+            });
+        }
 
-                foreach (var hit in hits)
-                {
-                    if (hit.transform.tag == "Wall")
-                        return;
-                }
+        protected virtual void OnTriggerExit2D(Collider2D collider)
+        {
+            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
+            var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+            if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                return;
 
-                var entityManager = World.Active.GetExistingManager<EntityManager>();
-                var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
-                var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
-                if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+            var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
+
+            entityManager.SetComponentData(eventEntity, new CollisionInfo
+            {
+                Sender = sender,
+                Target = target,
+                EventType = EventType.TriggerExit
+            });
+        }
+
+        protected virtual void OnTriggerStay2D(Collider2D collider)
+        {
+            var wallLayer = LayerMask.GetMask("World");
+            var distance = math.distance(this.transform.position, collider.transform.position);
+            var hits = Physics2D.RaycastAll(this.transform.position,
+                                            collider.transform.position - this.transform.position,
+                                            distance, wallLayer);
+
+            foreach (var hit in hits)
+            {
+                if (hit.transform.tag == "Wall")
                     return;
-
-                var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
-                                                             typeof(AggroRangeCollisionComponent));
-
-                entityManager.SetComponentData(eventEntity, new CollisionInfo
-                {
-                    Sender = sender,
-                    Target = target,
-                    EventType = EventType.TriggerEnter
-                });
-
-                this.hasTarget = true;
             }
+
+            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
+            var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
+            if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                return;
+
+            var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
+                                                         typeof(AggroRangeCollisionComponent));
+
+            entityManager.SetComponentData(eventEntity, new CollisionInfo
+            {
+                Sender = sender,
+                Target = target,
+                EventType = EventType.TriggerEnter
+            });
         }
     }
 }

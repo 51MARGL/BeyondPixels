@@ -14,7 +14,7 @@ namespace BeyondPixels.ColliderEvents
             if (!entityManager.Exists(this.GetComponentInParent<GameObjectEntity>().Entity))
                 return;
 
-            if (collider.CompareTag("Enemy"))
+            if (collider.CompareTag("Enemy") || collider.CompareTag("Ally"))
             {
                 var target = collider.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(target) || !entityManager.HasComponent<Disabled>(target))
@@ -37,7 +37,7 @@ namespace BeyondPixels.ColliderEvents
             if (!entityManager.Exists(this.GetComponentInParent<GameObjectEntity>().Entity))
                 return;
 
-            if (collider.CompareTag("Enemy"))
+            if (collider.CompareTag("Enemy") || collider.CompareTag("Ally"))
             {
                 var target = collider.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(target) || entityManager.HasComponent<Disabled>(target))

@@ -37,19 +37,22 @@ namespace BeyondPixels.ECS.Systems.Items
                 {
                     var ray = Camera.main.ScreenPointToRay(inputComponent.MousePosition);
                     var layerMask = LayerMask.GetMask("World");
-                    var raycastHit = Physics2D.GetRayIntersection(ray, 100f, layerMask);
+                    var hits = Physics2D.GetRayIntersectionAll(ray, 100f, layerMask);
 
-                    if (raycastHit.transform != null && raycastHit.transform.tag == "LootBag")
+                    foreach (var hit in hits)
                     {
-                        var targetPosition = new float2(raycastHit.transform.position.x, raycastHit.transform.position.y);
-                        if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                        if (hit.transform != null && hit.transform.tag == "LootBag")
+                        {
+                            var targetPosition = new float2(hit.transform.position.x, hit.transform.position.y);
+                            if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                                return;
+
+                            var targetEntity = hit.transform.GetComponent<GameObjectEntity>().Entity;
+
+                            if (!this.EntityManager.HasComponent<OpenLootBagComponent>(targetEntity))
+                                this.PostUpdateCommands.AddComponent(targetEntity, new OpenLootBagComponent());
                             return;
-
-                        var targetEntity = raycastHit.transform.GetComponent<GameObjectEntity>().Entity;
-
-                        if (!this.EntityManager.HasComponent<OpenLootBagComponent>(targetEntity))
-                            this.PostUpdateCommands.AddComponent(targetEntity, new OpenLootBagComponent());
-
+                        }
                     }
                 }
             });

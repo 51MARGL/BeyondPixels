@@ -30,17 +30,6 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     typeof(AttackStateComponent)
                 }
             });
-            this._targetGroup = this.GetComponentGroup(new EntityArchetypeQuery
-            {
-                All = new ComponentType[]
-                {
-                    typeof(PositionComponent), typeof(PlayerComponent)
-                },
-                None = new ComponentType[]
-                {
-                    typeof(DestroyComponent), typeof(InCutsceneComponent)
-                }
-            });
         }
 
         protected override void OnUpdate()
@@ -52,53 +41,42 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                                 ref WeaponComponent weaponComponent,
                                                 ref PositionComponent positionComponent) =>
             {
-                if (this._targetGroup.CalculateLength() == 0)
+                if (!EntityManager.Exists(followStateComponent.Target))
                 {
                     this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
                     return;
                 }
 
-                var flwStateComponent = followStateComponent;
-                var wpnComponent = weaponComponent;
                 var currentPosition = positionComponent.CurrentPosition;
-                var mvmComponent = movementComponent;
+                var targetPosition = this.EntityManager.GetComponentData<PositionComponent>(followStateComponent.Target).CurrentPosition;
 
-                this.Entities.With(this._targetGroup).ForEach((Entity playerEntity, ref PositionComponent playerPositionComponent) =>
+                var distance = math.distance(targetPosition, currentPosition);
+                if (distance <= weaponComponent.AttackRange)
+                    movementComponent.Direction = float2.zero;
+                else
                 {
-                    if (playerEntity == flwStateComponent.Target)
-                    {
-                        var distance = math.distance(playerPositionComponent.CurrentPosition, currentPosition);
-                        if (distance <= wpnComponent.AttackRange)
-                            mvmComponent.Direction = float2.zero;
-                        else
-                        {
-                            var curr = new Vector3(currentPosition.x, currentPosition.y, 0);
-                            var dest = new Vector3(playerPositionComponent.CurrentPosition.x, playerPositionComponent.CurrentPosition.y, 0);
-                            navMeshAgent.nextPosition = curr;
-                            navMeshAgent.SetDestination(dest);
+                    var curr = new Vector3(currentPosition.x, currentPosition.y, 0);
+                    var dest = new Vector3(targetPosition.x, targetPosition.y, 0);
+                    navMeshAgent.nextPosition = curr;
+                    navMeshAgent.SetDestination(dest);
 
-                            if (navMeshAgent.path.status == NavMeshPathStatus.PathComplete)
-                                mvmComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
-                        }
+                    if (navMeshAgent.path.status == NavMeshPathStatus.PathComplete)
+                        movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                }
 
-                        var currentTime = Time.time;
-                        if (distance <= wpnComponent.AttackRange
-                            && currentTime - flwStateComponent.LastTimeAttacked > wpnComponent.CoolDown)
+                var currentTime = Time.time;
+                if (distance <= weaponComponent.AttackRange
+                    && currentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
+                {
+                    movementComponent.Direction = targetPosition - currentPosition; ;
+                    followStateComponent.LastTimeAttacked = currentTime;
+                    this.PostUpdateCommands.AddComponent(entity,
+                        new AttackStateComponent
                         {
-                            mvmComponent.Direction = playerPositionComponent.CurrentPosition - currentPosition; ;
-                            flwStateComponent.LastTimeAttacked = currentTime;
-                            this.PostUpdateCommands.AddComponent(entity,
-                                new AttackStateComponent
-                                {
-                                    StartedAt = currentTime,
-                                    Target = flwStateComponent.Target
-                                });
-                        }
-                        return;
-                    }
-                });
-                followStateComponent = flwStateComponent;
-                movementComponent = mvmComponent;
+                            StartedAt = currentTime,
+                            Target = followStateComponent.Target
+                        });
+                }
             });
         }
     }

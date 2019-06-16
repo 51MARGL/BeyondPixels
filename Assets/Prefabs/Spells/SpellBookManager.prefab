@@ -53,8 +53,8 @@ MonoBehaviour:
     CastTime: 1
     Duration: 3
     CoolDown: 25
-    DamageOnImpact: 5
-    DamagePerSecond: 5
+    DamageOnImpact: 0
+    DamagePerSecond: 10
     DamageType: 1
     LockOnTarget: 1
     SelfTarget: 0

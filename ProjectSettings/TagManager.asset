@@ -20,6 +20,7 @@ TagManager:
   - Light
   - UseTrigger
   - LootBag
+  - Ally
   layers:
   - Default
   - TransparentFX
@@ -37,7 +38,7 @@ TagManager:
   - MiniMap
   - NavMesh
   - MapTopView
-  - 
+  - Ally
   - 
   - 
   - 

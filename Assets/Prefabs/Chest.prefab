@@ -353,6 +353,7 @@ GameObject:
   - component: {fileID: 8010360825340248623}
   - component: {fileID: 410389807853575585}
   - component: {fileID: 8010360825340248611}
+  - component: {fileID: 198776043787557293}
   - component: {fileID: 8010360825340248610}
   - component: {fileID: 8010360825340248608}
   m_Layer: 8
@@ -471,7 +472,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.5}
+  m_Size: {x: 0.75, y: 0.5}
   m_EdgeRadius: 0
 --- !u!58 &8010360825340248611
 CircleCollider2D:
@@ -486,9 +487,25 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.25}
   serializedVersion: 2
   m_Radius: 1.25
+--- !u!208 &198776043787557293
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8010360825340248622}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.375, y: 0.425, z: 0.1}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: -0.15, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!114 &8010360825340248610
 MonoBehaviour:
   m_ObjectHideFlags: 0

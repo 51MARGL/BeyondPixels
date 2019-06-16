@@ -8,10 +8,11 @@ namespace BeyondPixels.ColliderEvents
 {
     public class OnWeaponTriggerToEntity : MonoBehaviour
     {
+        public string TargetTag;
         private void OnTriggerEnter2D(Collider2D collider)
         {
             if (collider.gameObject.CompareTag("Hitbox")
-                && !this.transform.parent.gameObject.CompareTag(collider.transform.parent.tag))
+                && collider.transform.parent.gameObject.CompareTag(this.TargetTag))
             {
                 var entityManager = World.Active.GetExistingManager<EntityManager>();
                 var sender = this.GetComponentInParent<GameObjectEntity>().Entity;

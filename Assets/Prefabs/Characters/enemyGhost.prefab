@@ -70,6 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a98277fc594dae54487c66f5576cbdd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TargetTag: Player
 --- !u!1 &1125304382384988
 GameObject:
   m_ObjectHideFlags: 0
@@ -761,7 +762,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4795364078127688}
   - component: {fileID: 58191778733255026}
-  - component: {fileID: 114557187859864824}
+  - component: {fileID: 1960031540911329751}
   m_Layer: 8
   m_Name: AgroRange
   m_TagString: AgroRange
@@ -799,7 +800,7 @@ CircleCollider2D:
   m_Offset: {x: 1, y: 0}
   serializedVersion: 2
   m_Radius: 3
---- !u!114 &114557187859864824
+--- !u!114 &1960031540911329751
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -808,7 +809,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1847830851773104}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f150fddb5a7294428d659b1ea04d078, type: 3}
+  m_Script: {fileID: 11500000, guid: 07adcdd7c4252fa49b982ebd5dda8096, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &931333689916769532

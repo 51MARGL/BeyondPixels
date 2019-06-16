@@ -12,13 +12,9 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class InventoryItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class InventoryItemButton : ItemButton
     {
-        public Image ItemIcon;
-        public Entity ItemEntity;
-        public TextMeshProUGUI Amount;
-
-        public void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left
                 || eventData.button == PointerEventData.InputButton.Right)
@@ -35,7 +31,7 @@ namespace BeyondPixels.UI.Buttons
             }
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public override void OnPointerEnter(PointerEventData eventData)
         {
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
             var itemComponent = entityManager.GetComponentData<ItemComponent>(ItemEntity);
@@ -84,11 +80,6 @@ namespace BeyondPixels.UI.Buttons
                     break;
             }
             UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), btnDesc);
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            UIManager.Instance.HideTooltip();
         }
     }
 }

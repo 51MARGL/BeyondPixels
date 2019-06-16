@@ -60,6 +60,8 @@ MonoBehaviour:
     type: 3}
   LootBag: {fileID: 7515535471392751238, guid: 7889d30b555bf1640a4f80cf396649e9, type: 3}
   Chest: {fileID: 8010360825340248622, guid: d33f0cb09c0ff874eb0712a43818fe31, type: 3}
+  Cage: {fileID: 2003967439130067419, guid: d46809b8a834cbf4e995527f247e814a, type: 3}
+  Ally: {fileID: 8369842100041373969, guid: 41734307ec10e774c811075cde00b7de, type: 3}
   EnemyPrefabs:
   - SpawnRadius: 5
     Prefab: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}

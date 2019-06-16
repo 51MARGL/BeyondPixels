@@ -12,13 +12,9 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class LootItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class LootItemButton : ItemButton
     {
-        public Image ItemIcon;
-        public Entity ItemEntity;
-        public TextMeshProUGUI Amount;
-
-        public void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
@@ -33,7 +29,7 @@ namespace BeyondPixels.UI.Buttons
             }
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public override void OnPointerEnter(PointerEventData eventData)
         {
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
             var itemComponent = entityManager.GetComponentData<ItemComponent>(this.ItemEntity);
@@ -71,11 +67,6 @@ namespace BeyondPixels.UI.Buttons
             sb.Append(item.Description.Replace("{value}", item.ModifierValue.ToString()));
 
             UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), "LMB: Pick Up", true);
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            UIManager.Instance.HideTooltip();
         }
     }
 }

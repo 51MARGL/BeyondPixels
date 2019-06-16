@@ -23,7 +23,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 ComponentType.ReadOnly(typeof(LightsSpawnedComponent)),
                 ComponentType.ReadOnly(typeof(PlayerSpawnedComponent)),
                 ComponentType.ReadOnly(typeof(ExitSpawnedComponent)),
-                ComponentType.ReadOnly(typeof(ChestSpawnedComponent))
+                ComponentType.ReadOnly(typeof(ChestSpawnedComponent)),
+                ComponentType.ReadOnly(typeof(CageSpawnedComponent))
             );
             this._tileGroup = this.GetComponentGroup(
                ComponentType.ReadOnly(typeof(FinalTileComponent)));

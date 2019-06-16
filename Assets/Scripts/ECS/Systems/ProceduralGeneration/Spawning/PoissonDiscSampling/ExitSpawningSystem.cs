@@ -41,11 +41,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 });
 
                 var cellList = this.GetCells(boardSize, radius);
-                while (cellList.Length == 0)
-                {
-                    radius -= 5;
-                    cellList = this.GetCells(boardSize, radius);
-                }
 
                 for (var i = 0; i < cellList.Length; i++)
                 {

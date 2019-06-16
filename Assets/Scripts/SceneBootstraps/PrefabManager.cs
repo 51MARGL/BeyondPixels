@@ -16,6 +16,8 @@ namespace BeyondPixels.SceneBootstraps
         public GameObject DungeonLevelExit;
         public GameObject LootBag;
         public GameObject Chest;
+        public GameObject Cage;
+        public GameObject Ally;
         public EnemyPrefab[] EnemyPrefabs;
 
         [Serializable]

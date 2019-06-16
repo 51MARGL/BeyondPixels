@@ -477,12 +477,12 @@ PrefabInstance:
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
       propertyPath: DungeonGenerators.BSP.BoardWidth
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
         type: 3}
       propertyPath: DungeonGenerators.BSP.BoardHeight
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
@@ -2111,11 +2111,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
-    - target: {fileID: 1538367443916898170, guid: d90062516bbc3d343a0c313cfce8ecc4,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1538367443916898167, guid: d90062516bbc3d343a0c313cfce8ecc4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2169,16 +2164,6 @@ PrefabInstance:
     - target: {fileID: 1538367443916898167, guid: d90062516bbc3d343a0c313cfce8ecc4,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1538367443916898164, guid: d90062516bbc3d343a0c313cfce8ecc4,
-        type: 3}
-      propertyPath: far clip plane
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 1538367443916898164, guid: d90062516bbc3d343a0c313cfce8ecc4,
-        type: 3}
-      propertyPath: m_Depth
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
