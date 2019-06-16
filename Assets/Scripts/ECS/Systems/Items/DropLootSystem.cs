@@ -85,6 +85,7 @@ namespace BeyondPixels.ECS.Systems.Level
                                 });
                             }
                         }
+                        itemsList.Dispose();
                     }
             }
             dropChunks.Dispose();

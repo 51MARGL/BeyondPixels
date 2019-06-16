@@ -60,6 +60,9 @@ namespace BeyondPixels.UI.ECS.Systems
                 ref LevelComponent levelComponent,
                 ref XPComponent xpComponent) =>
             {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                    UIManager.Instance.CloseAllMenus();
+
                 var playerUIHealthGroup = uiComponent.HealthGroup;
 
                 var currentHealth = healthComponent.CurrentValue;
@@ -113,46 +116,47 @@ namespace BeyondPixels.UI.ECS.Systems
                     playerUISpellBarGroup.SpellCastCanvasGroup.alpha = 0;
                     playerUISpellBarGroup.SpellCastBar.fillAmount = 0;
                 }
-            });
 
-            this.Entities.With(this._activeSpellGroup).ForEach((Entity spellEntity, ref ActiveSpellComponent activeSpellComponent) =>
-            {
-                var playerUISpellButtonsGroup = uiComponent.SpellButtonsGroup;
-                var button = playerUISpellButtonsGroup.ActionButtons[activeSpellComponent.ActionIndex - 1];
-                var spell = spellBook.Spells[activeSpellComponent.SpellIndex];
-
-                if (button.SpellIcon.sprite != spell.Icon)
-                    button.SpellIcon.sprite = spell.Icon;
-
-                if (this.EntityManager.HasComponent<CoolDownComponent>(spellEntity))
+                this.Entities.With(this._activeSpellGroup).ForEach((Entity spellEntity, ref ActiveSpellComponent activeSpellComponent) =>
                 {
-                    var coolDownComponent = this.EntityManager.GetComponentData<CoolDownComponent>(spellEntity);
-                    if (coolDownComponent.CoolDownTime > 0)
+                    var playerUISpellButtonsGroup = uiComponent.SpellButtonsGroup;
+                    var button = playerUISpellButtonsGroup.ActionButtons[activeSpellComponent.ActionIndex - 1];
+                    var spell = spellBook.Spells[activeSpellComponent.SpellIndex];
+
+                    if (button.SpellIcon.sprite != spell.Icon)
+                        button.SpellIcon.sprite = spell.Icon;
+
+                    if (this.EntityManager.HasComponent<CoolDownComponent>(spellEntity))
                     {
-                        var magicStat = EntityManager.GetComponentData<MagicStatComponent>(activeSpellComponent.Owner);
-                        var coolDownTime = math.max(1f, spell.CoolDown -
-                               (spell.CoolDown / 100f * magicStat.CurrentValue));
+                        var coolDownComponent = this.EntityManager.GetComponentData<CoolDownComponent>(spellEntity);
+                        if (coolDownComponent.CoolDownTime > 0)
+                        {
+                            var magicStat = this.EntityManager.GetComponentData<MagicStatComponent>(activeSpellComponent.Owner);
+                            var coolDownTime = math.max(1f, spell.CoolDown -
+                                   (spell.CoolDown / 100f * magicStat.CurrentValue));
 
-                        button.CoolDownImage.enabled = true;
-                        button.CoolDownText.enabled = true;
-                        button.CoolDownImage.fillAmount -= 1.0f / coolDownTime * Time.deltaTime;
-                        button.CoolDownText.text = coolDownComponent.CoolDownTime.ToString("F1");
+                            button.CoolDownImage.enabled = true;
+                            button.CoolDownText.enabled = true;
+                            button.CoolDownImage.fillAmount -= 1.0f / coolDownTime * Time.deltaTime;
+                            button.CoolDownText.text = coolDownComponent.CoolDownTime.ToString("F1");
+                        }
                     }
-                }
-                else if (button.CoolDownImage.enabled || button.CoolDownText.enabled)
-                {
-                    button.CoolDownImage.enabled = false;
-                    button.CoolDownText.enabled = false;
-                    button.CoolDownImage.fillAmount = 1;
-                }
-                if (spell.TargetRequired)
-                {
-                    if (this.EntityManager.HasComponent<TargetComponent>(activeSpellComponent.Owner))
-                        button.SpellIcon.color = new Color(1, 1, 1, 1);
-                    else
-                        button.SpellIcon.color = new Color(1, 1, 1, 0.25f);
-                }
+                    else if (button.CoolDownImage.enabled || button.CoolDownText.enabled)
+                    {
+                        button.CoolDownImage.enabled = false;
+                        button.CoolDownText.enabled = false;
+                        button.CoolDownImage.fillAmount = 1;
+                    }
+                    if (spell.TargetRequired)
+                    {
+                        if (this.EntityManager.HasComponent<TargetComponent>(activeSpellComponent.Owner))
+                            button.SpellIcon.color = new Color(1, 1, 1, 1);
+                        else
+                            button.SpellIcon.color = new Color(1, 1, 1, 0.25f);
+                    }
+                });
             });
+
 
             this.Entities.With(this._spellButtonEventsGroup).ForEach((Entity eventEntity, ref ActionButtonPressedComponent eventComponent) =>
             {

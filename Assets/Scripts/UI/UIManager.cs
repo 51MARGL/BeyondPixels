@@ -10,6 +10,7 @@ namespace BeyondPixels.UI
         public PlayerInfoMenuUIComponent PlayerInfoMenuUIComponent;
         public LootBagMenuUIComponent LootBagMenuUIComponent;
         public ToolTipUIComponent ToolTip;
+        public GameObject GameOverMenu;
 
         public void Start()
         {
@@ -23,6 +24,9 @@ namespace BeyondPixels.UI
 
             this.LootBagMenuUIComponent.GetComponent<CanvasGroup>().alpha = 0;
             this.LootBagMenuUIComponent.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+            this.GameOverMenu.GetComponent<CanvasGroup>().alpha = 0;
+            this.GameOverMenu.GetComponent<CanvasGroup>().blocksRaycasts = false;
 
             this.ToolTip.GetComponent<CanvasGroup>().alpha = 0;
         }

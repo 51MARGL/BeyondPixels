@@ -40,7 +40,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) > 0.5f)
                 {
                     var curr = new Vector3(positionComponent.CurrentPosition.x, positionComponent.CurrentPosition.y, 0);
-                    var dest = new Vector3(positionComponent.InitialPosition.x, positionComponent.InitialPosition.y, 0);
+                    var dest = new Vector3(positionComponent.InitialPosition.x, positionComponent.InitialPosition.y, 0);                    
                     navMeshAgent.nextPosition = curr;
                     navMeshAgent.SetDestination(dest);
 

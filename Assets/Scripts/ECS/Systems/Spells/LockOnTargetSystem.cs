@@ -1,7 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
-
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -13,6 +13,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class LockOnTargetSystem : JobComponentSystem
     {
+        [BurstCompile]
         public struct LockOnTargetJob : IJobParallelForTransform
         {
             [ReadOnly]

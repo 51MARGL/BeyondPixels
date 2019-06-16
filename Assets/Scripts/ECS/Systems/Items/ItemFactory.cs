@@ -73,12 +73,12 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             randomStatModifiersArray[0] = WeaponStatsModifiers.Defence;
             randomStatModifiersArray[1] = WeaponStatsModifiers.Magick;
             randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
             AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
-
+            randomStatModifiersArray.Dispose();
             return itemEntity;
         }
 
@@ -102,12 +102,12 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             randomStatModifiersArray[0] = WeaponStatsModifiers.Defence;
             randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
             randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
             AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
-
+            randomStatModifiersArray.Dispose();
             return itemEntity;
         }
 
@@ -131,12 +131,12 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             randomStatModifiersArray[0] = WeaponStatsModifiers.Magick;
             randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
             randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
             AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
-
+            randomStatModifiersArray.Dispose();
             return itemEntity;
         }
 
@@ -160,12 +160,12 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             randomStatModifiersArray[0] = WeaponStatsModifiers.Magick;
             randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
             randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
             AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
-
+            randomStatModifiersArray.Dispose();
             return itemEntity;
         }
 
@@ -189,12 +189,12 @@ namespace BeyondPixels.ECS.Systems.Items
                 Value = random.NextInt(1, 6)
             });
 
-            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            var randomStatModifiersArray = new NativeArray<WeaponStatsModifiers>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             randomStatModifiersArray[0] = WeaponStatsModifiers.Magick;
             randomStatModifiersArray[1] = WeaponStatsModifiers.Attack;
             randomStatModifiersArray[2] = WeaponStatsModifiers.Health;
             AddRandomStats(itemEntity, entityManager, randomStatModifiersArray, ref random);
-
+            randomStatModifiersArray.Dispose();
             return itemEntity;
         }
 

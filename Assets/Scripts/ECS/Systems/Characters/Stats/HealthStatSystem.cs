@@ -1,6 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Stats;
-
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -10,6 +10,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class HealthStatSystem : JobComponentSystem
     {
+        [BurstCompile]
         [RequireComponentTag(typeof(AdjustStatsComponent))]
         private struct HealthStatJob : IJobProcessComponentData<HealthComponent, HealthStatComponent>
         {
@@ -23,8 +24,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                 if (healthStatComponent.CurrentValue != properValue)
                 {
                     healthStatComponent.CurrentValue = properValue;
-                    healthComponent.MaxValue = healthComponent.BaseValue 
+                    var healthValue = healthComponent.BaseValue
                         + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
+
+                    if (healthComponent.CurrentValue == healthComponent.BaseValue)
+                        healthComponent.CurrentValue = healthValue;
+                    healthComponent.MaxValue = healthValue;
                 }
             }
         }

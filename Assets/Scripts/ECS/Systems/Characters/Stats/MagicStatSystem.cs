@@ -1,5 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Stats;
-
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,6 +8,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class MagicStatSystem : JobComponentSystem
     {
+        [BurstCompile]
         [RequireComponentTag(typeof(AdjustStatsComponent))]
         private struct DefenceStatJob : IJobProcessComponentData<MagicStatComponent>
         {

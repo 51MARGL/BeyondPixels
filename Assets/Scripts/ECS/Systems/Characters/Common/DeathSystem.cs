@@ -1,44 +1,41 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Objects;
-using BeyondPixels.SceneBootstraps;
 
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
-
-using UnityEngine;
+using Unity.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    public class DeathSystem : ComponentSystem
+    public class DeathSystem : JobComponentSystem
     {
-        private ComponentGroup _group;
+        [ExcludeComponent(typeof(KilledComponent))]
+        private struct DeathJob : IJobProcessComponentDataWithEntity<HealthComponent, CharacterComponent>
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+            public void Execute(Entity entity,
+                                int index,
+                                [ReadOnly] ref HealthComponent healthComponent,
+                                [ReadOnly] ref CharacterComponent characterComponent)
+            {
+                if (healthComponent.CurrentValue <= 0)
+                    this.CommandBuffer.AddComponent(index, entity, new KilledComponent());
+            }
+        }
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
         protected override void OnCreateManager()
         {
-            this._group = this.GetComponentGroup(new EntityArchetypeQuery
-            {
-                All = new ComponentType[]
-                {
-                    typeof(HealthComponent), typeof(CharacterComponent),
-                    typeof(PositionComponent)
-                },
-                None = new ComponentType[]
-                {
-                    typeof(KilledComponent)
-                }
-            });
+            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
         }
 
-        protected override void OnUpdate()
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            this.Entities.With(this._group).ForEach((Entity entity, ref HealthComponent healthComponent, ref PositionComponent positionComponent) =>
+            var destroyJobHandle = new DeathJob
             {
-                if (healthComponent.CurrentValue <= 0)
-                {
-                    this.PostUpdateCommands.AddComponent(entity, new KilledComponent());
-                }
-            });
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+            }.Schedule(this, inputDeps);
+            this._endFrameBarrier.AddJobHandleForProducer(destroyJobHandle);
+            return destroyJobHandle;
         }
     }
 }

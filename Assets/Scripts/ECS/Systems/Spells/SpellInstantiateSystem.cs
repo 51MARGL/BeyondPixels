@@ -27,32 +27,33 @@ namespace BeyondPixels.ECS.Systems.Spells
         protected override void OnUpdate()
         {
             var spellBookComponent = SpellBookManagerComponent.Instance.SpellBook;
-            using (var spellChunks = this._spellToCastGroup.CreateArchetypeChunkArray(Allocator.TempJob))
-                for (var s = 0; s < spellChunks.Length; s++)
+            var spellChunks = this._spellToCastGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (var s = 0; s < spellChunks.Length; s++)
+            {
+                var spellChunk = spellChunks[s];
+                var spellEntities = spellChunk.GetNativeArray(this.GetArchetypeChunkEntityType());
+                var activeSpellComponents = spellChunk.GetNativeArray(this.GetArchetypeChunkComponentType<ActiveSpellComponent>(true));
+                var instantiateSpellComponents = spellChunk.GetNativeArray(this.GetArchetypeChunkComponentType<InstantiateSpellComponent>(true));
+                for (var i = 0; i < spellChunk.Count; i++)
                 {
-                    var spellChunk = spellChunks[s];
-                    var spellEntities = spellChunk.GetNativeArray(this.GetArchetypeChunkEntityType());
-                    var activeSpellComponents = spellChunk.GetNativeArray(this.GetArchetypeChunkComponentType<ActiveSpellComponent>(true));
-                    var instantiateSpellComponents = spellChunk.GetNativeArray(this.GetArchetypeChunkComponentType<InstantiateSpellComponent>(true));
-                    for (var i = 0; i < spellChunk.Count; i++)
-                    {
-                        var spellPrefab = spellBookComponent.Spells[activeSpellComponents[i].SpellIndex];
+                    var spellPrefab = spellBookComponent.Spells[activeSpellComponents[i].SpellIndex];
 
-                        var position = new float2(0, 0);
-                        if (spellPrefab.SelfTarget || spellPrefab.TargetRequired)
-                            position = this.EntityManager.GetComponentData<PositionComponent>(
-                                            instantiateSpellComponents[i].Target
-                                        ).CurrentPosition;
+                    var position = new float2(0, 0);
+                    if (spellPrefab.SelfTarget || spellPrefab.TargetRequired)
+                        position = this.EntityManager.GetComponentData<PositionComponent>(
+                                        instantiateSpellComponents[i].Target
+                                    ).CurrentPosition;
 
-                        this.PostUpdateCommands.RemoveComponent<SpellCastingComponent>(instantiateSpellComponents[i].Caster);
-                        this.PostUpdateCommands.RemoveComponent<InstantiateSpellComponent>(spellEntities[i]);
+                    this.PostUpdateCommands.RemoveComponent<SpellCastingComponent>(instantiateSpellComponents[i].Caster);
+                    this.PostUpdateCommands.RemoveComponent<InstantiateSpellComponent>(spellEntities[i]);
 
-                        this.InstantiateSpellPrefab(spellPrefab,
-                            instantiateSpellComponents[i].Caster,
-                            instantiateSpellComponents[i].Target,
-                            new float3(position.x, position.y, 100));
-                    }
+                    this.InstantiateSpellPrefab(spellPrefab,
+                        instantiateSpellComponents[i].Caster,
+                        instantiateSpellComponents[i].Target,
+                        new float3(position.x, position.y, 100));
                 }
+            }
+            spellChunks.Dispose();
         }
 
         private void InstantiateSpellPrefab(Spell spell, Entity caster, Entity target, float3 position)
