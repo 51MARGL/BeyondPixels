@@ -71,21 +71,19 @@ namespace BeyondPixels.UI.ECS.Systems
                 var infoMenuComponent = UIManager.Instance.PlayerInfoMenuUIComponent;
                 if (Input.GetKeyDown(KeyCode.I))
                 {
-                    if (infoMenuComponent.GetComponent<CanvasGroup>().alpha == 1)
+                    if (infoMenuComponent.IsVisible)
                     {
-                        infoMenuComponent.GetComponent<CanvasGroup>().alpha = 0;
-                        infoMenuComponent.GetComponent<CanvasGroup>().blocksRaycasts = false;
+                        infoMenuComponent.Hide();
                     }
                     else
                     {
                         UIManager.Instance.CloseAllMenus();
-                        infoMenuComponent.GetComponent<CanvasGroup>().alpha = 1;
-                        infoMenuComponent.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                        infoMenuComponent.Show();
                     }
                 }
 
                 #region playerInfoMenu
-                if (infoMenuComponent.GetComponent<CanvasGroup>().alpha == 1)
+                if (infoMenuComponent.IsVisible)
                 {
                     infoMenuComponent.LevelGroup.Level.text = levelComponent.CurrentLevel.ToString();
                     infoMenuComponent.LevelGroup.SkillPoints.text = levelComponent.SkillPoints.ToString();

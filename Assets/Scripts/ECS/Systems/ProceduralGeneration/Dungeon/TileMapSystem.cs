@@ -227,6 +227,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             this.TilesList.Clear();
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
+            tilemapComponent.TilemapWallsTop.GetComponent<TilemapRenderer>().mode = TilemapRenderer.Mode.Individual;
             TileMapSystem.TileMapDrawing = false;
         }
 

@@ -90,7 +90,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
                     && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
                     && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
-                    && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x - 1].TileType == TileType.Floor
+                    && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x + 1].TileType == TileType.Floor
                     && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Floor)
                     return -1;
 

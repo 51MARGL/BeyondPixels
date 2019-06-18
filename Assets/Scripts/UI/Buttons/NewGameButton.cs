@@ -5,13 +5,13 @@ using UnityEngine.EventSystems;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class QuitButton : SubmitButton
-    {
+    public class NewGameButton : SubmitButton
+    {        
         protected override void Submit()
         {
             var entityManager = World.Active.GetOrCreateManager<EntityManager>();
             var eventEntity = entityManager.CreateEntity();
-            entityManager.AddComponentData(eventEntity, new QuitButtonPressedComponent());
+            entityManager.AddComponentData(eventEntity, new NewGameButtonPressedComponent());
         }
     }
 }

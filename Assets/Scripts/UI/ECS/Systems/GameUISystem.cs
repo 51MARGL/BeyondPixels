@@ -60,9 +60,6 @@ namespace BeyondPixels.UI.ECS.Systems
                 ref LevelComponent levelComponent,
                 ref XPComponent xpComponent) =>
             {
-                if (Input.GetKeyDown(KeyCode.Escape))
-                    UIManager.Instance.CloseAllMenus();
-
                 var playerUIHealthGroup = uiComponent.HealthGroup;
 
                 var currentHealth = healthComponent.CurrentValue;

@@ -12,21 +12,15 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class ItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public abstract class ItemButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public Image ItemIcon;
         public Entity ItemEntity;
         public TextMeshProUGUI Amount;
 
-        public virtual void OnPointerClick(PointerEventData eventData)
-        {
+        public abstract void OnPointerClick(PointerEventData eventData);
 
-        }
-
-        public virtual void OnPointerEnter(PointerEventData eventData)
-        {
-            
-        }
+        public abstract void OnPointerEnter(PointerEventData eventData);
 
         public void OnPointerExit(PointerEventData eventData)
         {

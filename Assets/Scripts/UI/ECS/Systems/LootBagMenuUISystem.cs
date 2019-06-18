@@ -52,21 +52,20 @@ namespace BeyondPixels.UI.ECS.Systems
                 var lootMenuComponent = UIManager.Instance.LootBagMenuUIComponent;
 
                 if (openLootBagComponent.IsOpened == 0
-                    && lootMenuComponent.GetComponent<CanvasGroup>().alpha == 0)
+                    && !lootMenuComponent.IsVisible)
                 {
                     UIManager.Instance.CloseAllMenus();
-                    lootMenuComponent.GetComponent<CanvasGroup>().alpha = 1;
-                    lootMenuComponent.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                    lootMenuComponent.Show();
                     openLootBagComponent.IsOpened = 1;
                 }
                 else if (openLootBagComponent.IsOpened == 1
-                        && lootMenuComponent.GetComponent<CanvasGroup>().alpha == 0)
+                        && !lootMenuComponent.IsVisible)
                 {
                     this.PostUpdateCommands.RemoveComponent<OpenLootBagComponent>(bagEntity);
                     return;
                 }
 
-                if (lootMenuComponent.GetComponent<CanvasGroup>().alpha == 1)
+                if (lootMenuComponent.IsVisible)
                 {
                     var inventoryGroup = lootMenuComponent.LootGroup;
                     var itemCount = this._itemsGroup.CalculateLength();
@@ -99,8 +98,7 @@ namespace BeyondPixels.UI.ECS.Systems
             var resItemCount = base.SetUpInventoryItems(inventoryGroup, itemCount, owner);
             if (resItemCount == 0)
             {
-                UIManager.Instance.LootBagMenuUIComponent.GetComponent<CanvasGroup>().alpha = 0;
-                UIManager.Instance.LootBagMenuUIComponent.GetComponent<CanvasGroup>().blocksRaycasts = false;
+                UIManager.Instance.LootBagMenuUIComponent.Hide();
 
                 this.PostUpdateCommands.AddComponent(owner, new DestroyComponent());
             }

@@ -1,5 +1,6 @@
 ﻿using System;
 using BeyondPixels.UI.Buttons;
+using BeyondPixels.UI.Menus;
 using TMPro;
 
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 
 namespace BeyondPixels.UI.ECS.Components
 {
-    public class PlayerInfoMenuUIComponent : MonoBehaviour
+    public class PlayerInfoMenuUIComponent : MenuUI
     {
         public LevelGroupWrapper LevelGroup;
         public StatsGroupWrapper StatsGroup;

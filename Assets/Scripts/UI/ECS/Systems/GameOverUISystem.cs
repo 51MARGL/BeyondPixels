@@ -41,38 +41,33 @@ namespace BeyondPixels.UI.ECS.Systems
             this.Entities.With(this._gameOverGroup).ForEach((Entity entity) =>
             {
                 var gameOverMenu = UIManager.Instance.GameOverMenu;
-                if (gameOverMenu.GetComponent<CanvasGroup>().alpha == 0)
+                if (!gameOverMenu.IsVisible)
                 {
                     UIManager.Instance.CloseAllMenus();
                     var canvas = UIManager.Instance.transform.GetChild(0);
                     for (int i = 0; i < canvas.childCount; i++)
-                    {
-                        var child = canvas.GetChild(i);
-                        if (child.name != gameOverMenu.name)
-                            child.gameObject.SetActive(false);
-                    }
+                        canvas.GetChild(i).gameObject.SetActive(false);
 
-                    gameOverMenu.GetComponent<CanvasGroup>().alpha = 1;
-                    gameOverMenu.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                    gameOverMenu.Show();
                 }
-            });
 
-            this.Entities.With(this._restartGroup).ForEach((Entity eventEntity) =>
-            {
-                var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
-                this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
+                this.Entities.With(this._restartGroup).ForEach((Entity eventEntity) =>
                 {
-                    SceneIndex = SceneManager.GetActiveScene().buildIndex
+                    var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
+                    this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
+                    {
+                        SceneIndex = SceneManager.GetActiveScene().buildIndex
+                    });
+
+                    this.PostUpdateCommands.DestroyEntity(eventEntity);
                 });
 
-                this.PostUpdateCommands.DestroyEntity(eventEntity);
-            });
+                this.Entities.With(this._quitGroup).ForEach((Entity eventEntity) =>
+                {
+                    this.PostUpdateCommands.DestroyEntity(eventEntity);
 
-            this.Entities.With(this._quitGroup).ForEach((Entity eventEntity) =>
-            {
-                Application.Quit();
-
-                this.PostUpdateCommands.DestroyEntity(eventEntity);
+                    Application.Quit();
+                });
             });
         }
     }
