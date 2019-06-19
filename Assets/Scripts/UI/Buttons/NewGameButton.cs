@@ -1,17 +1,20 @@
 ﻿using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
-using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace BeyondPixels.UI.Buttons
 {
-    public class NewGameButton : SubmitButton
-    {        
-        protected override void Submit()
+    public class NewGameButton : SubmitConfirmButton
+    {
+        protected override void InitConfirmDialog()
         {
-            var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-            var eventEntity = entityManager.CreateEntity();
-            entityManager.AddComponentData(eventEntity, new NewGameButtonPressedComponent());
+            base.InitConfirmDialog();
+
+            this.ConfirmDialog.YesButton.OnSubmitEvent += () =>
+            {
+                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+                var eventEntity = entityManager.CreateEntity();
+                entityManager.AddComponentData(eventEntity, new NewGameButtonPressedComponent());
+            };
         }
     }
 }

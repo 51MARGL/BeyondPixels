@@ -1,17 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-
-using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Items;
-using BeyondPixels.ECS.Components.SaveGame;
+using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.Scenes;
+using BeyondPixels.ECS.Systems.SaveGame;
 using Unity.Entities;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace BeyondPixels.ECS.Systems.SaveGame
+namespace BeyondPixels.ECS.Systems.Game
 {
     public class StartNewGameSystem : ComponentSystem
     {
@@ -32,29 +29,14 @@ namespace BeyondPixels.ECS.Systems.SaveGame
         {
             this.Entities.With(this._startGroup).ForEach((Entity entity) =>
             {
-                this.DeleteSave();
+                SaveGameManager.DeleteSave();
+
                 var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
                 this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
                 {
                     SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
                 });
             });
-        }
-
-        private void DeleteSave()
-        {
-            var saveFolder = Path.Combine(Application.persistentDataPath, "SaveGame");
-            var fileName = "savegame.save";
-            var savePath = Path.Combine(saveFolder, fileName);
-
-            if (File.Exists(savePath))
-            {
-                try
-                {
-                    File.Delete(savePath);
-                }
-                catch (Exception) { }
-            }
         }
     }
 }

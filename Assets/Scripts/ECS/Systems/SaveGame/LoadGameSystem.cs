@@ -31,8 +31,8 @@ namespace BeyondPixels.ECS.Systems.SaveGame
         {
             this.Entities.With(this._loadGroup).ForEach((Entity entity) =>
             {
-                var playerData = this.LoadGame();
-                if (playerData != null)
+                if (SaveGameManager.LoadData() is SaveData playerData)
+                {
                     this.Entities.WithAll<PlayerComponent>().ForEach((Entity playerEntity) =>
                     {
                         this.PostUpdateCommands.SetComponent(playerEntity, playerData.LevelComponent);
@@ -66,30 +66,9 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                                     this.PostUpdateCommands.AddComponent(itemEntity, playerData.ItemDataList[i].MagicModifier);
                             }
                     });
+                }
                 this.PostUpdateCommands.DestroyEntity(entity);
             });
-        }
-
-        private SaveData LoadGame()
-        {
-            SaveData playerData = null;
-            var saveFolder = Path.Combine(Application.persistentDataPath, "SaveGame");
-            var fileName = "savegame.save";
-            var savePath = Path.Combine(saveFolder, fileName);
-
-            if (!File.Exists(savePath))
-                return playerData;
-
-            try
-            {
-                var binaryFormatter = new BinaryFormatter();
-
-                using (var fileStream = new FileStream(savePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    playerData = (SaveData)binaryFormatter.Deserialize(fileStream);
-            }
-            catch (Exception) { }
-
-            return playerData;
         }
     }
 }

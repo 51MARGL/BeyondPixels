@@ -1036,11 +1036,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TileMapCamera
       objectReference: {fileID: 0}
-    - target: {fileID: 1058751178188175784, guid: 0546739264a7e0c438341fb1a1a08252,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1058751178188175787, guid: 0546739264a7e0c438341fb1a1a08252,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1095,11 +1090,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1058751178188175789, guid: 0546739264a7e0c438341fb1a1a08252,
-        type: 3}
-      propertyPath: far clip plane
-      value: 10000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0546739264a7e0c438341fb1a1a08252, type: 3}

@@ -6,12 +6,17 @@ namespace BeyondPixels.UI
     public class UIManager : MonoBehaviour
     {
         public static UIManager Instance { get; private set; }
+        public Canvas Canvas;
         public GameUIComponent GameUIComponent;
         public PlayerInfoMenuUIComponent PlayerInfoMenuUIComponent;
         public LootBagMenuUIComponent LootBagMenuUIComponent;
         public ToolTipUIComponent ToolTip;
         public GameOverMenuUIComponent GameOverMenu;
         public MainMenuUIComponent MainMenu;
+
+        [SerializeField]
+        protected YesNoDialogUIComponent YesNoDialog;
+        public YesNoDialogUIComponent CurrentYesNoDialog { get; private set; }
 
         public void Start()
         {
@@ -45,6 +50,13 @@ namespace BeyondPixels.UI
         public void HideTooltip()
         {
             this.ToolTip.gameObject.SetActive(false);
+        }
+
+        public YesNoDialogUIComponent CreateYesNoDialog()
+        {
+            var dialogObj = GameObject.Instantiate(this.YesNoDialog.gameObject, this.Canvas.transform);
+            this.CurrentYesNoDialog = dialogObj.GetComponent<YesNoDialogUIComponent>();
+            return this.CurrentYesNoDialog;
         }
     }
 }

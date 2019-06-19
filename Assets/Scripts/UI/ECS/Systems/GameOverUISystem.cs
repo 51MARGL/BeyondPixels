@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.Scenes;
+﻿using BeyondPixels.ECS.Components.Game;
+using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
 
@@ -44,7 +45,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 if (!gameOverMenu.IsVisible)
                 {
                     UIManager.Instance.CloseAllMenus();
-                    var canvas = UIManager.Instance.transform.GetChild(0);
+                    var canvas = UIManager.Instance.Canvas.transform;
                     for (int i = 0; i < canvas.childCount; i++)
                         canvas.GetChild(i).gameObject.SetActive(false);
 
@@ -53,11 +54,8 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 this.Entities.With(this._restartGroup).ForEach((Entity eventEntity) =>
                 {
-                    var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
-                    this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
-                    {
-                        SceneIndex = SceneManager.GetActiveScene().buildIndex
-                    });
+                    var loadEntity = this.PostUpdateCommands.CreateEntity();
+                    this.PostUpdateCommands.AddComponent(loadEntity, new LoadLastGameComponent());
 
                     this.PostUpdateCommands.DestroyEntity(eventEntity);
                 });

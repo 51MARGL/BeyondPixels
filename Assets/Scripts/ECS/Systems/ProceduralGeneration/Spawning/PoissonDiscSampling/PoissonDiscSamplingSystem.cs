@@ -91,8 +91,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                             var randomAngle = (float)(random.NextInt() * math.PI * 2);
                             var randomDirection = new float2(math.sin(randomAngle), math.cos(randomAngle));
                             var radius = maxRadius;
+                            var stepRadius = radius;
                             if (poissonDiscSamplingComponent.RadiusFromArray == 1)
+                            {
                                 radius = requestRadiuses[random.NextInt(0, requestRadiuses.Length)];
+                                stepRadius = math.max(radius, maxRadius);
+                            }
 
                             var candidate = new SampleComponent
                             {
@@ -100,7 +104,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                                 RequestID = poissonDiscSamplingComponent.RequestID,
                                 Position =
                                 (int2)(randomSample.Position + randomDirection *
-                                       random.NextInt(radius, 2 * radius))
+                                       random.NextInt(stepRadius, 2 * stepRadius))
                             };
 
                             if (this.IsValid(candidate, gridSize, finalSamplesList, requestCells, maxRadius))

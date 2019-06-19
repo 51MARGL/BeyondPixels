@@ -33,10 +33,10 @@ namespace BeyondPixels.ECS.Systems.SaveGame
 
         protected override void OnUpdate()
         {
-            this.Entities.With(this._saveGroup).ForEach((Entity entity) =>
+            this.Entities.With(this._saveGroup).ForEach((EntityQueryBuilder.F_E)((Entity entity) =>
             {
                 SaveData playerData = null;
-                this.Entities.WithAll<PlayerComponent>().ForEach((Entity playerEntity) =>
+                this.Entities.WithAll<PlayerComponent>().ForEach((EntityQueryBuilder.F_E)((Entity playerEntity) =>
                 {
                     playerData = new SaveData
                     {
@@ -50,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                     };
 
                     playerData.ItemDataList = new List<ItemData>();
-                    this.Entities.WithAll<ItemComponent, PickedUpComponent>().ForEach((Entity itemEntity, 
+                    this.Entities.WithAll<ItemComponent, PickedUpComponent>().ForEach((EntityQueryBuilder.F_EDD<ItemComponent, PickedUpComponent>)((Entity itemEntity, 
                         ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
                     {
                         if (pickedUpComponent.Owner == playerEntity)
@@ -58,54 +58,26 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                             {
                                 IsEquiped = EntityManager.HasComponent<EquipedComponent>(itemEntity),
                                 ItemComponent = itemComponent,
-                                AttackModifier =  EntityManager.HasComponent<AttackStatModifierComponent>(itemEntity) ?
+                                AttackModifier = EntityManager.HasComponent<AttackStatModifierComponent>(itemEntity) ?
                                                   EntityManager.GetComponentData<AttackStatModifierComponent>(itemEntity) :
                                                   new AttackStatModifierComponent(),
                                 DefenceModifier = EntityManager.HasComponent<DefenceStatModifierComponent>(itemEntity) ?
                                                   EntityManager.GetComponentData<DefenceStatModifierComponent>(itemEntity) :
                                                   new DefenceStatModifierComponent(),
-                                HealthModifier =  EntityManager.HasComponent<HealthStatModifierComponent>(itemEntity) ?
+                                HealthModifier = EntityManager.HasComponent<HealthStatModifierComponent>(itemEntity) ?
                                                   EntityManager.GetComponentData<HealthStatModifierComponent>(itemEntity) :
                                                   new HealthStatModifierComponent(),
-                                MagicModifier =   EntityManager.HasComponent<MagickStatModifierComponent>(itemEntity) ?
+                                MagicModifier = EntityManager.HasComponent<MagickStatModifierComponent>(itemEntity) ?
                                                   EntityManager.GetComponentData<MagickStatModifierComponent>(itemEntity) :
                                                   new MagickStatModifierComponent(),
                             });
-                    });
-                });
+                    }));
+                }));
                 if (playerData != null)
-                    this.SaveGame(playerData);
+                    SaveGameManager.SaveData(playerData);
 
                 this.PostUpdateCommands.DestroyEntity(entity);
-            });
-        }
-
-        private void SaveGame(SaveData playerSaveData)
-        {
-            var saveFolder = Path.Combine(Application.persistentDataPath, "SaveGame");
-            var fileName = "savegame.save";
-            var savePath = Path.Combine(saveFolder, fileName);
-            var saveBckpPath = savePath + Guid.NewGuid() + ".bckp";
-
-            try
-            {
-                Directory.CreateDirectory(saveFolder);
-
-                if (File.Exists(savePath))
-                    File.Move(savePath, saveBckpPath);
-
-                var binaryFormatter = new BinaryFormatter();
-
-                using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                    binaryFormatter.Serialize(fileStream, playerSaveData);
-
-                File.Delete(saveBckpPath);
-            }
-            catch (Exception)
-            {
-                if (File.Exists(saveBckpPath))
-                    File.Move(saveBckpPath, savePath);
-            }
+            }));
         }
     }
 }

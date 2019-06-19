@@ -144,17 +144,11 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 var itemsHashMap = new NativeMultiHashMap<int, ItemHashValue>(foodList.Length + potionList.Length + treasureList.Length, Allocator.Temp);
                 for (var i = 0; i < foodList.Length; i++)
-                    itemsHashMap.Add(foodList[i].ItemComponent.StoreIndex
-                        + foodList[i].ItemComponent.IconIndex,
-                        foodList[i]);
+                    itemsHashMap.Add(this.GetItemHash(foodList[i]), foodList[i]);
                 for (var i = 0; i < potionList.Length; i++)
-                    itemsHashMap.Add(foodList.Length + 1 + potionList[i].ItemComponent.StoreIndex
-                        + potionList[i].ItemComponent.IconIndex,
-                        potionList[i]);
+                    itemsHashMap.Add(this.GetItemHash(potionList[i]), potionList[i]);
                 for (var i = 0; i < treasureList.Length; i++)
-                    itemsHashMap.Add(potionList.Length + foodList.Length + 1 + treasureList[i].ItemComponent.StoreIndex
-                        + treasureList[i].ItemComponent.IconIndex,
-                        treasureList[i]);
+                    itemsHashMap.Add(this.GetItemHash(treasureList[i]), treasureList[i]);
 
                 if (itemsHashMap.Length > 0)
                 {
@@ -203,6 +197,14 @@ namespace BeyondPixels.UI.ECS.Systems
             bootsList.Dispose();
 
             return itemCounter;
+        }
+
+        protected int GetItemHash(ItemHashValue hashValue)
+        {
+            var item = 
+                ItemsManagerComponent.Instance.ItemsStoreComponent.Items[hashValue.ItemComponent.StoreIndex];
+
+            return (item.Name + hashValue.ItemComponent.IconIndex).GetHashCode();
         }
 
         protected abstract ItemButton AddInventoryButton(ItemHashValue hashValue, InventoryGroupWrapper inventoryGroup);

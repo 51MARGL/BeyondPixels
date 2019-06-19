@@ -1,9 +1,4 @@
-﻿using System;
-using System.Text;
-
-using BeyondPixels.ECS.Components.Items;
-using BeyondPixels.UI.ECS.Components;
-using TMPro;
+﻿using TMPro;
 using Unity.Entities;
 
 using UnityEngine;

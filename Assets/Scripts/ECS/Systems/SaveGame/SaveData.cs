@@ -7,8 +7,10 @@ using BeyondPixels.ECS.Components.Items;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
 {
+    public interface ISaveData { }
+
     [Serializable]
-    public class SaveData
+    public class SaveData : ISaveData
     {
         public LevelComponent LevelComponent;
         public XPComponent XPComponent;

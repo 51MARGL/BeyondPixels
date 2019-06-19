@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.UI.ECS.Components;
@@ -70,6 +71,12 @@ namespace BeyondPixels.UI.ECS.Systems
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                if (UIManager.Instance.CurrentYesNoDialog != null)
+                {
+                    UIManager.Instance.CloseAllMenus();
+                    return;
+                }
+
                 var mainMenu = UIManager.Instance.MainMenu;
                 if (!mainMenu.IsVisible)
                 {
@@ -93,8 +100,8 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 this.Entities.With(this._newGameGroup).ForEach((Entity eventEntity) =>
                 {
-                    var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
-                    this.PostUpdateCommands.AddComponent(sceneLoadEntity, new StartNewGameComponent());
+                    var startEntity = this.PostUpdateCommands.CreateEntity();
+                    this.PostUpdateCommands.AddComponent(startEntity, new StartNewGameComponent());
 
                     mainMenu.Hide();
                     this.PostUpdateCommands.DestroyEntity(eventEntity);
@@ -103,10 +110,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 this.Entities.With(this._restartGroup).ForEach((Entity eventEntity) =>
                 {
                     var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
-                    this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
-                    {
-                        SceneIndex = SceneManager.GetActiveScene().buildIndex
-                    });
+                    this.PostUpdateCommands.AddComponent(sceneLoadEntity, new LoadLastGameComponent());
 
                     mainMenu.Hide();
                     this.PostUpdateCommands.DestroyEntity(eventEntity);
