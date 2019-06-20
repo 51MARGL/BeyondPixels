@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Components
 {
-    public class YesNoDialogUIComponent : MenuWithNavigationButtonsUI
+    public class YesNoDialogUIComponent : MenuWithNavigationButtonsUI, IDisposable
     {
         public TextMeshProUGUI Text;
         public SubmitButton YesButton;
@@ -26,6 +26,16 @@ namespace BeyondPixels.UI.ECS.Components
             base.Hide();
 
             this.OnCloseEvent();
+
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            this.YesButton.OnSubmitEvent -= this.Hide;
+            this.NoButton.OnSubmitEvent -= this.Hide;
+            this.YesButton.OnCancelEvent -= this.Hide;
+            this.NoButton.OnCancelEvent -= this.Hide;
 
             GameObject.Destroy(this.gameObject);
         }
