@@ -72,8 +72,11 @@ namespace BeyondPixels.UI.ECS.Systems
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 if (UIManager.Instance.CurrentYesNoDialog != null)
+                    return;
+
+                if (UIManager.Instance.MainMenu.IgnoreEsc)
                 {
-                    UIManager.Instance.CloseAllMenus();
+                    UIManager.Instance.MainMenu.IgnoreEsc = false;
                     return;
                 }
 
@@ -118,8 +121,7 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 this.Entities.With(this._optionsGroup).ForEach((Entity eventEntity) =>
                 {
-
-                    mainMenu.Hide();
+                    UIManager.Instance.OptionsMenu.Show();
                     this.PostUpdateCommands.DestroyEntity(eventEntity);
                 });
 

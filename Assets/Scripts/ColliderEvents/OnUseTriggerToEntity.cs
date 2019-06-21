@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
+using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.Items;
-
+using TMPro;
 using Unity.Entities;
 
 using UnityEngine;
@@ -10,6 +11,8 @@ namespace BeyondPixels.ColliderEvents
     public class OnUseTriggerToEntity : MonoBehaviour
     {
         public Canvas Canvas;
+        public TextMeshProUGUI Text;
+
         protected bool IsInside;
 
         protected virtual void OnTriggerEnter2D(Collider2D collider)
@@ -18,6 +21,9 @@ namespace BeyondPixels.ColliderEvents
             {
                 this.Canvas.enabled = true;
                 this.IsInside = true;
+
+                this.Text.text = "Press " 
+                    + SettingsManager.Instance.GetKeyBindValue(KeyBindName.Use).ToString();
             }
         }
 
@@ -32,7 +38,8 @@ namespace BeyondPixels.ColliderEvents
 
         public virtual void Update()
         {
-            if (this.IsInside && Input.GetKeyDown(KeyCode.E))
+            if (this.IsInside
+                && Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Use)))
             {
                 this.Use();
             }

@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
+using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.UI.Buttons;
@@ -69,7 +70,7 @@ namespace BeyondPixels.UI.ECS.Systems
             {
 
                 var infoMenuComponent = UIManager.Instance.PlayerInfoMenuUIComponent;
-                if (Input.GetKeyDown(KeyCode.I))
+                if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Inventory)))
                 {
                     if (infoMenuComponent.IsVisible)
                     {

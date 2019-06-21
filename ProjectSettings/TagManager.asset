@@ -21,6 +21,7 @@ TagManager:
   - UseTrigger
   - LootBag
   - Ally
+  - KeyBindButton
   layers:
   - Default
   - TransparentFX

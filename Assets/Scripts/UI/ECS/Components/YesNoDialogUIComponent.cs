@@ -25,7 +25,7 @@ namespace BeyondPixels.UI.ECS.Components
         {
             base.Hide();
 
-            this.OnCloseEvent();
+            this.OnCloseEvent?.Invoke();
 
             this.Dispose();
         }

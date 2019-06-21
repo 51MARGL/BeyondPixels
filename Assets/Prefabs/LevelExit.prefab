@@ -496,6 +496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Canvas: {fileID: 2385643687517319584}
+  Text: {fileID: 2627695224358172310}
 --- !u!114 &478014327597184243
 MonoBehaviour:
   m_ObjectHideFlags: 0

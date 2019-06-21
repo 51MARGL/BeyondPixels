@@ -5,6 +5,8 @@ namespace BeyondPixels.UI.ECS.Components
 {
     public class MainMenuUIComponent : MenuWithNavigationButtonsUI
     {
+        public bool IgnoreEsc;
+
         public override void Show()
         {
             base.Show();

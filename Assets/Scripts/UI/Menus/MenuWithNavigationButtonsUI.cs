@@ -10,7 +10,7 @@ namespace BeyondPixels.UI.Menus
         public void OnPointerClick(PointerEventData eventData)
         {
             EventSystem.current.SetSelectedGameObject(null);
-            this.DefaultSelected.Select();
+            this.DefaultSelected?.Select();
         }
 
         public override void Show()
@@ -18,7 +18,7 @@ namespace BeyondPixels.UI.Menus
             base.Show();
 
             EventSystem.current.SetSelectedGameObject(null);
-            this.DefaultSelected.Select();
+            this.DefaultSelected?.Select();
         }
     }
 }

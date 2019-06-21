@@ -519,6 +519,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Canvas: {fileID: 8010360824612194269}
+  Text: {fileID: 8010360824276629988}
   Animator: {fileID: 8010360825340248623}
 --- !u!114 &8010360825340248608
 MonoBehaviour:

@@ -13,6 +13,7 @@ namespace BeyondPixels.UI
         public ToolTipUIComponent ToolTip;
         public GameOverMenuUIComponent GameOverMenu;
         public MainMenuUIComponent MainMenu;
+        public OptionsMenuUIComponent OptionsMenu;
 
         [SerializeField]
         protected YesNoDialogUIComponent YesNoDialog;
@@ -27,6 +28,7 @@ namespace BeyondPixels.UI
         {
             this.PlayerInfoMenuUIComponent.Hide();
             this.LootBagMenuUIComponent.Hide();
+            this.OptionsMenu.Hide();
             this.MainMenu.Hide();
 
             this.HideTooltip();

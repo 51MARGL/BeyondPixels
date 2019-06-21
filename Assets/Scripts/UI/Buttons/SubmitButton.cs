@@ -10,28 +10,28 @@ namespace BeyondPixels.UI.Buttons
         public event Action OnSubmitEvent;
         public event Action OnCancelEvent;
 
-        public void OnSubmit(BaseEventData eventData)
+        public virtual void OnSubmit(BaseEventData eventData)
         {
             this.OnSubmitEvent();
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)
-                this.OnSubmitEvent();
+                this.OnSubmitEvent?.Invoke();
         }
 
-        public void OnCancel(BaseEventData eventData)
+        public virtual void OnCancel(BaseEventData eventData)
         {
-            this.OnCancelEvent();
+            this.OnCancelEvent?.Invoke();
         }
 
-        public void OnDeselect(BaseEventData eventData)
+        public virtual void OnDeselect(BaseEventData eventData)
         {
             this.GetComponent<Selectable>().OnPointerExit(null);
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public virtual void OnPointerEnter(PointerEventData eventData)
         {
             if (!EventSystem.current.alreadySelecting)
                 EventSystem.current.SetSelectedGameObject(this.gameObject);

@@ -1,6 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
-
+using BeyondPixels.ECS.Components.Game;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
@@ -46,25 +46,28 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             var mouseClicked = 0;
             var actionButtonPressed = 0;
             var selectTargetButtonPressed = 0;
-            if (Input.GetKey(KeyCode.A))
+            if (Time.timeScale == 0f)
+                return inputDeps;
+
+            if (Input.GetKey(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Left)))
                 direction += new float2(-1, 0);
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Right)))
                 direction += new float2(1, 0);
-            if (Input.GetKey(KeyCode.W))
+            if (Input.GetKey(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Up)))
                 direction += new float2(0, 1);
-            if (Input.GetKey(KeyCode.S))
+            if (Input.GetKey(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Down)))
                 direction += new float2(0, -1);
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Attack)))
                 attackPressed = 1;
             if (Input.GetMouseButtonDown(0))
                 mouseClicked = 1;
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Action1)))
                 actionButtonPressed = 1;
-            if (Input.GetKeyDown(KeyCode.Alpha2))
+            if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Action2)))
                 actionButtonPressed = 2;
-            if (Input.GetKeyDown(KeyCode.Alpha3))
+            if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Action3)))
                 actionButtonPressed = 3;
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.PickTarget)))
                 selectTargetButtonPressed = 1;
 
             return new InputJob
