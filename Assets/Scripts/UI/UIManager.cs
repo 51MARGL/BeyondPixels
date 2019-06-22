@@ -19,7 +19,7 @@ namespace BeyondPixels.UI
         protected YesNoDialogUIComponent YesNoDialog;
         public YesNoDialogUIComponent CurrentYesNoDialog { get; private set; }
 
-        public void Start()
+        public void Awake()
         {
             UIManager.Instance = this;
         }

@@ -22,7 +22,7 @@ namespace BeyondPixels.UI.Buttons
 
         public void UpdateText(string text)
         {
-            this.KeyText.text = text;
+            this.KeyText.text = text.Replace("Alpha", "");
         }
     }
 }

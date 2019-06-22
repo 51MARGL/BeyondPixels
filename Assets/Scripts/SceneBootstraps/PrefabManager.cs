@@ -27,7 +27,7 @@ namespace BeyondPixels.SceneBootstraps
             public GameObject Prefab;
         }
 
-        public void Start()
+        public void Awake()
         {
             PrefabManager.Instance = this;
         }

@@ -3,8 +3,10 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-namespace BeyondPixels.ECS.Systems.SaveGame
+namespace BeyondPixels.ECS.Components.SaveGame
 {
+    public interface ISaveData { }
+
     public class SaveGameManager
     {
         public static string SaveFolder =

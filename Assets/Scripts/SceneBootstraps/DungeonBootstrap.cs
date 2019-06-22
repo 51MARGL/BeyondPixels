@@ -1,13 +1,11 @@
 ﻿using System;
-
-using BeyondPixels.ECS.Components.Scenes;
+using BeyondPixels.UI;
 using BeyondPixels.Utilities;
 
 using Unity.Entities;
 using Unity.Mathematics;
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace BeyondPixels.SceneBootstraps
 {
@@ -140,26 +138,14 @@ namespace BeyondPixels.SceneBootstraps
                     });
                     break;
             }
+
+            UIManager.Instance.MainMenu.InGameMenu = true;
             #endregion
         }
 
         public void FixedUpdate()
         {
             this.FixedGroup.Update();
-        }
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-
-                var sceneLoadEntity = entityManager.CreateEntity();
-                entityManager.AddComponentData(sceneLoadEntity, new SceneLoadComponent
-                {
-                    SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
-                });
-            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace BeyondPixels.ECS.Components.Items
         public static ItemsManagerComponent Instance { get; private set; }
         public ItemsStoreComponent ItemsStoreComponent { get; private set; }
 
-        public void Start()
+        public void Awake()
         {
             ItemsManagerComponent.Instance = this;
             this.ItemsStoreComponent = this.GetComponent<ItemsStoreComponent>();

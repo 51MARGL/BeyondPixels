@@ -29,7 +29,7 @@ namespace BeyondPixels.UI.ECS.Components
                 var index = i;
                 var keyBindButton = this.KeyBindButtons[index];
                 keyBindButton.UpdateText(
-                    SettingsManager.Instance.GetKeyBindValue(keyBindButton.BindName).ToString().Replace("Alpha", ""));
+                    SettingsManager.Instance.GetKeyBindValue(keyBindButton.BindName).ToString());
                 keyBindButton.OnSubmitEvent += () =>
                 {
                     if (this.PendingBindButton == null)
@@ -119,7 +119,7 @@ namespace BeyondPixels.UI.ECS.Components
                         }
 
                         SettingsManager.Instance.SetKeyBind(this.PendingBindButton.BindName, vKey);
-                        this.PendingBindButton.UpdateText(vKey.ToString().Replace("Alpha", ""));
+                        this.PendingBindButton.UpdateText(vKey.ToString());
                         this.PendingBindButton.SetDefault();
                         this.PendingBindButton = null;
 

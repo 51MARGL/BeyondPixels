@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using BeyondPixels.ECS.Components.Game;
+using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.ECS.Systems.SaveGame;
 using Unity.Entities;
@@ -34,7 +35,7 @@ namespace BeyondPixels.ECS.Systems.Game
                 var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
                 this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
                 {
-                    SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
+                    SceneIndex = SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/DungeonScene.unity")
                 });
             });
         }

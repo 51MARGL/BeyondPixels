@@ -1,12 +1,9 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Game;
-using BeyondPixels.ECS.Components.SaveGame;
-using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace BeyondPixels.UI.ECS.Systems
 {
@@ -63,13 +60,13 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected override void OnUpdate()
         {
-            if (_cutsceneGroup.CalculateLength() > 0)
+            if (this._cutsceneGroup.CalculateLength() > 0)
             {
                 UIManager.Instance.CloseAllMenus();
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) && UIManager.Instance.MainMenu.InGameMenu)
             {
                 if (UIManager.Instance.CurrentYesNoDialog != null)
                     return;

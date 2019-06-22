@@ -4,11 +4,10 @@ using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
+using BeyondPixels.ECS.Components.SaveGame;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
 {
-    public interface ISaveData { }
-
     [Serializable]
     public class SaveData : ISaveData
     {

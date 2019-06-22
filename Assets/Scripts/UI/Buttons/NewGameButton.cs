@@ -1,4 +1,5 @@
-﻿using BeyondPixels.UI.ECS.Components;
+﻿using BeyondPixels.ECS.Components.SaveGame;
+using BeyondPixels.UI.ECS.Components;
 using Unity.Entities;
 
 namespace BeyondPixels.UI.Buttons
@@ -7,14 +8,23 @@ namespace BeyondPixels.UI.Buttons
     {
         protected override void InitConfirmDialog()
         {
-            base.InitConfirmDialog();
-
-            this.ConfirmDialog.YesButton.OnSubmitEvent += () =>
+            if (SaveGameManager.SaveExists)
             {
-                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-                var eventEntity = entityManager.CreateEntity();
-                entityManager.AddComponentData(eventEntity, new NewGameButtonPressedComponent());
-            };
+                base.InitConfirmDialog();
+
+                this.ConfirmDialog.YesButton.OnSubmitEvent += this.StartNewGame;
+            }
+            else
+            {
+                this.StartNewGame();
+            }
+        }
+
+        protected virtual void StartNewGame()
+        {
+            var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+            var eventEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(eventEntity, new NewGameButtonPressedComponent());
         }
     }
 }

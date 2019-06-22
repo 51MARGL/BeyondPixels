@@ -119,7 +119,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
                     this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
                     {
-                        SceneIndex = SceneManager.GetSceneByName("DungeonScene").buildIndex
+                        SceneIndex = SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/DungeonScene.unity")
                     });
                 }
             });

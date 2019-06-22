@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.Collections.Generic;
 
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
@@ -11,8 +8,6 @@ using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.SaveGame;
 
 using Unity.Entities;
-
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
 {
@@ -33,10 +28,10 @@ namespace BeyondPixels.ECS.Systems.SaveGame
 
         protected override void OnUpdate()
         {
-            this.Entities.With(this._saveGroup).ForEach((EntityQueryBuilder.F_E)((Entity entity) =>
+            this.Entities.With(this._saveGroup).ForEach((Entity entity) =>
             {
                 SaveData playerData = null;
-                this.Entities.WithAll<PlayerComponent>().ForEach((EntityQueryBuilder.F_E)((Entity playerEntity) =>
+                this.Entities.WithAll<PlayerComponent>().ForEach((Entity playerEntity) =>
                 {
                     playerData = new SaveData
                     {
@@ -50,34 +45,34 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                     };
 
                     playerData.ItemDataList = new List<ItemData>();
-                    this.Entities.WithAll<ItemComponent, PickedUpComponent>().ForEach((EntityQueryBuilder.F_EDD<ItemComponent, PickedUpComponent>)((Entity itemEntity, 
+                    this.Entities.WithAll<ItemComponent, PickedUpComponent>().ForEach((Entity itemEntity,
                         ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
                     {
                         if (pickedUpComponent.Owner == playerEntity)
                             playerData.ItemDataList.Add(new ItemData
                             {
-                                IsEquiped = EntityManager.HasComponent<EquipedComponent>(itemEntity),
+                                IsEquiped = this.EntityManager.HasComponent<EquipedComponent>(itemEntity),
                                 ItemComponent = itemComponent,
-                                AttackModifier = EntityManager.HasComponent<AttackStatModifierComponent>(itemEntity) ?
-                                                  EntityManager.GetComponentData<AttackStatModifierComponent>(itemEntity) :
+                                AttackModifier = this.EntityManager.HasComponent<AttackStatModifierComponent>(itemEntity) ?
+                                                  this.EntityManager.GetComponentData<AttackStatModifierComponent>(itemEntity) :
                                                   new AttackStatModifierComponent(),
-                                DefenceModifier = EntityManager.HasComponent<DefenceStatModifierComponent>(itemEntity) ?
-                                                  EntityManager.GetComponentData<DefenceStatModifierComponent>(itemEntity) :
+                                DefenceModifier = this.EntityManager.HasComponent<DefenceStatModifierComponent>(itemEntity) ?
+                                                  this.EntityManager.GetComponentData<DefenceStatModifierComponent>(itemEntity) :
                                                   new DefenceStatModifierComponent(),
-                                HealthModifier = EntityManager.HasComponent<HealthStatModifierComponent>(itemEntity) ?
-                                                  EntityManager.GetComponentData<HealthStatModifierComponent>(itemEntity) :
+                                HealthModifier = this.EntityManager.HasComponent<HealthStatModifierComponent>(itemEntity) ?
+                                                  this.EntityManager.GetComponentData<HealthStatModifierComponent>(itemEntity) :
                                                   new HealthStatModifierComponent(),
-                                MagicModifier = EntityManager.HasComponent<MagickStatModifierComponent>(itemEntity) ?
-                                                  EntityManager.GetComponentData<MagickStatModifierComponent>(itemEntity) :
+                                MagicModifier = this.EntityManager.HasComponent<MagickStatModifierComponent>(itemEntity) ?
+                                                  this.EntityManager.GetComponentData<MagickStatModifierComponent>(itemEntity) :
                                                   new MagickStatModifierComponent(),
                             });
-                    }));
-                }));
+                    });
+                });
                 if (playerData != null)
                     SaveGameManager.SaveData(playerData);
 
                 this.PostUpdateCommands.DestroyEntity(entity);
-            }));
+            });
         }
     }
 }

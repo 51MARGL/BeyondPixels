@@ -1,14 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-
-using BeyondPixels.ECS.Components.Characters.Player;
+﻿using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.SaveGame;
 
 using Unity.Entities;
-
-using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
 {
