@@ -62,9 +62,10 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 this.Entities.With(this._quitGroup).ForEach((Entity eventEntity) =>
                 {
-                    this.PostUpdateCommands.DestroyEntity(eventEntity);
+                    var quitEntity = this.PostUpdateCommands.CreateEntity();
+                    this.PostUpdateCommands.AddComponent(quitEntity, new QuitGameComponent());
 
-                    Application.Quit();
+                    this.PostUpdateCommands.DestroyEntity(eventEntity);
                 });
             });
         }

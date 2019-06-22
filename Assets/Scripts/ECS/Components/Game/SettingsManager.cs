@@ -22,44 +22,39 @@ namespace BeyondPixels.ECS.Components.Game
         PickTarget = 11
     }
 
-    public class SettingsManager
+    public class SettingsManager : MonoBehaviour
     {
-        public static string SettingsFolder =
-            Path.Combine(Application.persistentDataPath, "Settings");
+        protected string SettingsFolder;
 
-        public static string SettingsFile =
-            Path.Combine(SettingsFolder, "settings.config");
+        protected string SettingsFile;
 
         [Serializable]
         [XmlRoot("settings")]
         public class SettingsSerialized
         {
             public bool Fullscreen;
-            public Resolution CurrentResolution;
+            public int ResWidth;
+            public int ResHeight;
+            public int ResRate;
             public List<(KeyBindName Key, KeyCode Value)> KeyBindsList;
         }
 
-        private static SettingsManager _instance;
-        public static SettingsManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new SettingsManager();
-                return _instance;
-            }
-        }
+        public static SettingsManager Instance { get; private set; }
 
         public Resolution[] Resolutions;
 
         public bool Fullscreen { get; private set; }
         public Resolution CurrentResolution { get; private set; }
-        public int CurrentResolutionIndex => Array.IndexOf(this.Resolutions, this.CurrentResolution);
+        public int CurrentResolutionIndex =>
+            Array.IndexOf(this.Resolutions, this.CurrentResolution);
 
         private Dictionary<KeyBindName, KeyCode> KeyBinds;
 
-        private SettingsManager()
+        public void Awake()
         {
+            Instance = this;
+            this.SettingsFolder = Path.Combine(Application.persistentDataPath, "Settings");
+            this.SettingsFile = Path.Combine(this.SettingsFolder, "settings.config");
             this.LoadSettings();
         }
 
@@ -71,9 +66,12 @@ namespace BeyondPixels.ECS.Components.Game
 
         public void SetResolution(int index)
         {
+            if (index == -1)
+                index = this.Resolutions.Length - 1;
+
             var res = this.Resolutions[index];
             this.CurrentResolution = res;
-            Screen.SetResolution(res.width, res.height, Screen.fullScreen, res.refreshRate);
+            Screen.SetResolution(res.width, res.height, this.Fullscreen, res.refreshRate);
         }
 
         public KeyCode GetKeyBindValue(KeyBindName bindName)
@@ -97,8 +95,8 @@ namespace BeyondPixels.ECS.Components.Game
             SettingsSerialized settings = null;
             try
             {
-                if (File.Exists(SettingsFile))
-                    using (var fileStream = new FileStream(SettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                if (File.Exists(this.SettingsFile))
+                    using (var fileStream = new FileStream(this.SettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         var xs = new XmlSerializer(typeof(SettingsSerialized));
                         settings = (SettingsSerialized)xs.Deserialize(fileStream);
@@ -106,17 +104,28 @@ namespace BeyondPixels.ECS.Components.Game
             }
             catch (Exception) { }
 
+            var resolutions = Screen.resolutions
+                .Distinct()
+                .Where(x => x.width >= 800)
+                .OrderByDescending(x => x.width)
+                .ThenBy(x => x.refreshRate)
+                .ToArray();
+
             if (settings != null)
             {
                 this.SetFullScreen(settings.Fullscreen);
-                this.Resolutions = Screen.resolutions;
-                this.CurrentResolution = settings.CurrentResolution;
+                this.Resolutions = resolutions;
+                this.CurrentResolution = this.Resolutions
+                    .FirstOrDefault(r => r.width == settings.ResWidth
+                                      && r.height == settings.ResHeight
+                                      && r.refreshRate == settings.ResRate);
+
                 this.SetResolution(this.CurrentResolutionIndex);
                 this.KeyBinds = settings.KeyBindsList.ToDictionary(b => b.Key, b => b.Value);
             }
             else
             {
-                this.Resolutions = Screen.resolutions;
+                this.Resolutions = resolutions;
                 this.KeyBinds = new Dictionary<KeyBindName, KeyCode>
                 {
                     { KeyBindName.Use, KeyCode.E },
@@ -143,19 +152,21 @@ namespace BeyondPixels.ECS.Components.Game
             var settings = new SettingsSerialized
             {
                 Fullscreen = this.Fullscreen,
-                CurrentResolution = this.CurrentResolution,
+                ResWidth = this.CurrentResolution.width,
+                ResHeight = this.CurrentResolution.height,
+                ResRate = this.CurrentResolution.refreshRate,
                 KeyBindsList = this.KeyBinds.Select(b => (b.Key, b.Value)).ToList()
             };
 
-            var saveBckpPath = SettingsFile + Guid.NewGuid() + ".bckp";
+            var saveBckpPath = this.SettingsFile + Guid.NewGuid() + ".bckp";
             try
-            {                
-                Directory.CreateDirectory(SettingsFolder);
+            {
+                Directory.CreateDirectory(this.SettingsFolder);
 
-                if (File.Exists(SettingsFile))
-                    File.Move(SettingsFile, saveBckpPath);
+                if (File.Exists(this.SettingsFile))
+                    File.Move(this.SettingsFile, saveBckpPath);
 
-                using (var fileStream = new FileStream(SettingsFile, FileMode.Create, FileAccess.Write, FileShare.Read))
+                using (var fileStream = new FileStream(this.SettingsFile, FileMode.Create, FileAccess.Write, FileShare.Read))
                     new XmlSerializer(typeof(SettingsSerialized)).Serialize(fileStream, settings);
 
                 File.Delete(saveBckpPath);
@@ -163,7 +174,7 @@ namespace BeyondPixels.ECS.Components.Game
             catch (Exception)
             {
                 if (File.Exists(saveBckpPath))
-                    File.Move(saveBckpPath, SettingsFile);
+                    File.Move(saveBckpPath, this.SettingsFile);
             }
         }
     }
