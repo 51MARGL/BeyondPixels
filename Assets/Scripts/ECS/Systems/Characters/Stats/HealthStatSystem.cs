@@ -10,7 +10,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class HealthStatSystem : JobComponentSystem
     {
-        [BurstCompile]
+        //[BurstCompile]
         [RequireComponentTag(typeof(AdjustStatsComponent))]
         private struct HealthStatJob : IJobProcessComponentData<HealthComponent, HealthStatComponent>
         {

@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class LockOnTargetSystem : JobComponentSystem
     {
-        [BurstCompile]
+        //[BurstCompile]
         public struct LockOnTargetJob : IJobParallelForTransform
         {
             [ReadOnly]

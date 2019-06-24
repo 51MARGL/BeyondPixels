@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class InputSystem : JobComponentSystem
     {
-        [BurstCompile]
+        //[BurstCompile]
         [ExcludeComponent(typeof(InCutsceneComponent))]
         private struct InputJob : IJobProcessComponentData<InputComponent, MovementComponent>
         {

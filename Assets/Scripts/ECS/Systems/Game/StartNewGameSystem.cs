@@ -35,7 +35,7 @@ namespace BeyondPixels.ECS.Systems.Game
                 var sceneLoadEntity = this.PostUpdateCommands.CreateEntity();
                 this.PostUpdateCommands.AddComponent(sceneLoadEntity, new SceneLoadComponent
                 {
-                    SceneIndex = SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/DungeonScene.unity")
+                    SceneIndex = SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/TutorialScene.unity")
                 });
             });
         }

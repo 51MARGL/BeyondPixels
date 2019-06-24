@@ -203,12 +203,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
 
                     inputDeps.Complete();
-                    var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
-                    var playerLvlComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity);
-                    var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
 
                     for (var i = 0; i < samplesList.Length; i++)
-                        this.InstantiateChest(samplesList[i].Position, playerLvlComponent, ref random);
+                        this.InstantiateChest(samplesList[i].Position);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -239,98 +236,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateChest(int2 position, LevelComponent playerLvlComponent, ref Unity.Mathematics.Random random)
+        private void InstantiateChest(int2 position)
         {
-            var commandBuffer = this._endFrameBarrier.CreateCommandBuffer();
-
             var chest = Object.Instantiate(PrefabManager.Instance.Chest,
-                new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);
-            var chestEnity = chest.GetComponent<GameObjectEntity>().Entity;
-            commandBuffer.AddComponent(chestEnity, new PositionComponent
-            {
-                CurrentPosition = position,
-                InitialPosition = position
-            });
-            commandBuffer.AddComponent(chestEnity, new XPRewardComponent
-            {
-                XPAmount = 25
-            });
-
-            var lvlComponent = new LevelComponent
-            {
-                CurrentLevel =
-                    math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
-                                               playerLvlComponent.CurrentLevel + 3))
-            };
-            commandBuffer.AddComponent(chestEnity, lvlComponent);
-
-
-            #region items
-            if (random.NextInt(0, 100) > 50)
-            {
-                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(weaponEntity, new PickedUpComponent
-                {
-                    Owner = chestEnity
-                });
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(spellBookEntity, new PickedUpComponent
-                {
-                    Owner = chestEnity
-                });
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(helmetEntity, new PickedUpComponent
-                {
-                    Owner = chestEnity
-                });
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(chestEntity, new PickedUpComponent
-                {
-                    Owner = chestEnity
-                });
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(bootsEntity, new PickedUpComponent
-                {
-                    Owner = chestEnity
-                });
-            }
-            if (random.NextInt(0, 100) > 25)
-            {
-                var randomCount = random.NextInt(1, 3);
-                for (var i = 0; i < randomCount; i++)
-                {
-                    var foodEntity = ItemFactory.GetRandomFood(ref random);
-                    commandBuffer.AddComponent(foodEntity, new PickedUpComponent
-                    {
-                        Owner = chestEnity
-                    });
-                }
-            }
-            if (random.NextInt(0, 100) > 25)
-            {
-                var randomCount = random.NextInt(1, 3);
-                for (var i = 0; i < randomCount; i++)
-                {
-                    var potionEntity = ItemFactory.GetHealthPotion(ref random);
-                    commandBuffer.AddComponent(potionEntity, new PickedUpComponent
-                    {
-                        Owner = chestEnity
-                    });
-                }
-            }
-            #endregion
+                new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);            
         }
     }
 }

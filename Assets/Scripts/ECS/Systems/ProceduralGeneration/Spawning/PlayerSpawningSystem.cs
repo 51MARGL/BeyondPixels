@@ -126,85 +126,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             if (this._boardReadyGroup.CalculateLength() > 0 && !PlayerInstantiated && !TileMapSystem.TileMapDrawing)
             {
                 this.SpawnPlayer(PlayerPosition);
-                var loadGameEntity = this.PostUpdateCommands.CreateEntity();
-                this.PostUpdateCommands.AddComponent(loadGameEntity, new LoadGameComponent());
                 PlayerInstantiated = true;
             }
         }
 
         private void SpawnPlayer(float3 position)
         {
-            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-
-            #region PlayerEntityArchetype
             var player = GameObject.Instantiate(PrefabManager.Instance.PlayerPrefab,
                                             position, Quaternion.identity);
-            var playerEntity = player.GetComponent<GameObjectEntity>().Entity;
-            var playerInitializeComponent = player.GetComponent<PlayerInitializeComponent>();
-            this.PostUpdateCommands.AddComponent(playerEntity, new PlayerComponent());
-            this.PostUpdateCommands.AddComponent(playerEntity, new InputComponent());
-
-            this.PostUpdateCommands.AddComponent(playerEntity, new CharacterComponent
-            {
-                CharacterType = CharacterType.Player
-            });
-            this.PostUpdateCommands.AddComponent(playerEntity, new HealthComponent
-            {
-                MaxValue = playerInitializeComponent.BaseHealth,
-                CurrentValue = playerInitializeComponent.BaseHealth,
-                BaseValue = playerInitializeComponent.BaseHealth
-            });
-            this.PostUpdateCommands.AddComponent(playerEntity, new MovementComponent
-            {
-                Direction = float2.zero,
-                Speed = playerInitializeComponent.MovementSpeed
-            });
-            this.PostUpdateCommands.AddComponent(playerEntity, new WeaponComponent
-            {
-                DamageValue = playerInitializeComponent.WeaponDamage
-            });
-            this.PostUpdateCommands.AddComponent(playerEntity, new PositionComponent
-            {
-                InitialPosition = new float2(player.transform.position.x, player.transform.position.y)
-            });
-            GameObject.Destroy(playerInitializeComponent);
-            this.PostUpdateCommands.RemoveComponent<PlayerInitializeComponent>(playerEntity);
-
-            #region statsInit
-            var statsInitializeComponent = player.GetComponent<StatsInitializeComponent>();
-            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.LevelComponent);
-            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.HealthStatComponent);
-            
-            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.AttackStatComponent);
-            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.DefenceStatComponent);
-            this.PostUpdateCommands.AddComponent(playerEntity, statsInitializeComponent.MagicStatComponent);
-            this.PostUpdateCommands.AddComponent(playerEntity, new XPComponent());
-            this.PostUpdateCommands.AddComponent(playerEntity, new AdjustStatsComponent());
-            GameObject.Destroy(statsInitializeComponent);
-            #endregion
-            #endregion
-
-            #region spellInit
-            for (var i = 0; i < 3; i++)
-            {
-                var spellEntity = this.PostUpdateCommands.CreateEntity();
-                this.PostUpdateCommands.AddComponent(spellEntity, new ActiveSpellComponent
-                {
-                    Owner = playerEntity,
-                    ActionIndex = i + 1,
-                    SpellIndex = i
-                });
-            }
-            #endregion
-
-            #region camera
-            var camera = GameObject.Find("PlayerVCamera").GetComponent<CinemachineVirtualCamera>();
-            camera.Follow = player.transform;
-            camera.LookAt = player.transform;
-            #endregion
-
-
-            this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
         }
     }
 }

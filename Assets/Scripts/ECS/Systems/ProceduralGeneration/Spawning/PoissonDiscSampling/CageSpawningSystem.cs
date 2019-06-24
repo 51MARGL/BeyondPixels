@@ -1,11 +1,8 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.Scenes;
-using BeyondPixels.ECS.Systems.Items;
 using BeyondPixels.SceneBootstraps;
 
 using Unity.Collections;
@@ -205,12 +202,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
 
                     inputDeps.Complete();
-                    var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
-                    var playerLvlComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity);
-                    var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
 
                     for (var i = 0; i < samplesList.Length; i++)
-                        this.InstantiateCage(samplesList[i].Position, playerLvlComponent, ref random);
+                        this.InstantiateCage(samplesList[i].Position);
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -241,30 +235,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateCage(int2 position, LevelComponent playerLvlComponent, ref Unity.Mathematics.Random random)
+        private void InstantiateCage(int2 position)
         {
-            var commandBuffer = this._endFrameBarrier.CreateCommandBuffer();
-
             var cage = Object.Instantiate(PrefabManager.Instance.Cage,
                 new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);
-            var cageEnity = cage.GetComponent<GameObjectEntity>().Entity;
-            commandBuffer.AddComponent(cageEnity, new PositionComponent
-            {
-                CurrentPosition = position,
-                InitialPosition = position
-            });
-            commandBuffer.AddComponent(cageEnity, new XPRewardComponent
-            {
-                XPAmount = 40
-            });
-
-            var lvlComponent = new LevelComponent
-            {
-                CurrentLevel =
-                    math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
-                                               playerLvlComponent.CurrentLevel + 3))
-            };
-            commandBuffer.AddComponent(cageEnity, lvlComponent);            
         }
     }
 }

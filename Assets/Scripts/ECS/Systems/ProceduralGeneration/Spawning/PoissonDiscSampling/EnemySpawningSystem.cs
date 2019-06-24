@@ -1,15 +1,8 @@
 ﻿using System.Linq;
-
-using BeyondPixels.ECS.Components.Characters.AI;
-using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.Characters.Stats;
-using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.SaveGame;
-using BeyondPixels.ECS.Systems.Items;
 using BeyondPixels.SceneBootstraps;
 
 using Unity.Collections;
@@ -18,7 +11,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSampling
 {
@@ -190,11 +182,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                     inputDeps.Complete();
 
-                    var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
-                    var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
-                    var playerLvlComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity);
                     for (var i = 0; i < samplesList.Length; i++)
-                        this.InstantiateEnemy(samplesList[i].Position, samplesList[i].Radius, playerLvlComponent, ref random);
+                        this.InstantiateEnemy(samplesList[i].Position, samplesList[i].Radius, this._endFrameBarrier.CreateCommandBuffer());
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -217,176 +206,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             return initializeValidationGridJobHandle;
         }
 
-        private void InstantiateEnemy(int2 position, int radius, LevelComponent playerLvlComponent, ref Unity.Mathematics.Random random)
+        private void InstantiateEnemy(int2 position, int radius, EntityCommandBuffer commandBuffer)
         {
-            var commandBuffer = this._endFrameBarrier.CreateCommandBuffer();
             var enemy = Object.Instantiate(PrefabManager.Instance.EnemyPrefabs.FirstOrDefault(e => e.SpawnRadius == radius).Prefab,
                 new Vector3(position.x + 0.5f, position.y + 0.5f, 0), Quaternion.identity);
-            var enemyEntity = enemy.GetComponent<GameObjectEntity>().Entity;
-            var enemyInitializeComponent = enemy.GetComponent<EnemyInitializeComponent>();
-            var navMeshAgent = enemy.GetComponent<NavMeshAgent>();
-            navMeshAgent.updatePosition = false;
-            navMeshAgent.updateRotation = false;
-            navMeshAgent.updateUpAxis = false;
 
-            commandBuffer.AddComponent(enemyEntity, new Disabled());
-            commandBuffer.AddComponent(enemyEntity, new CharacterComponent
-            {
-                CharacterType = CharacterType.Enemy
-            });
-            commandBuffer.AddComponent(enemyEntity, new HealthComponent
-            {
-                MaxValue = enemyInitializeComponent.BaseHealth,
-                CurrentValue = enemyInitializeComponent.BaseHealth,
-                BaseValue = enemyInitializeComponent.BaseHealth
-            });
-            commandBuffer.AddComponent(enemyEntity, new MovementComponent
-            {
-                Direction = float2.zero,
-                Speed = enemyInitializeComponent.MovementSpeed
-            });
-
-            commandBuffer.AddComponent(enemyEntity, new WeaponComponent
-            {
-                DamageValue = enemyInitializeComponent.WeaponDamage,
-                AttackRange = enemyInitializeComponent.AttackRange,
-                CoolDown = enemyInitializeComponent.AttackCoolDown
-            });
-            commandBuffer.AddComponent(enemyEntity, new IdleStateComponent
-            {
-                StartedAt = Time.time
-            });
-            commandBuffer.AddComponent(enemyEntity, new PositionComponent
-            {
-                InitialPosition = new float2(enemy.transform.position.x, enemy.transform.position.y)
-            });
-            Object.Destroy(enemyInitializeComponent);
-
-            #region statsInit
-            var statsInitializeComponent = enemy.GetComponent<StatsInitializeComponent>();
-            var lvlComponent = statsInitializeComponent.LevelComponent;
-            lvlComponent.CurrentLevel =
-                math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
-                                           playerLvlComponent.CurrentLevel + 3));
-
-            var healthStatComponent = statsInitializeComponent.HealthStatComponent;
-            var attackStatComponent = statsInitializeComponent.AttackStatComponent;
-            var defenceStatComponent = statsInitializeComponent.DefenceStatComponent;
-            var magicStatComponent = statsInitializeComponent.MagicStatComponent;
-
-            this.InitializeRandomStats(lvlComponent.CurrentLevel, ref random, ref healthStatComponent,
-                                ref attackStatComponent, ref defenceStatComponent, ref magicStatComponent);
-
-            commandBuffer.AddComponent(enemyEntity, lvlComponent);
-            commandBuffer.AddComponent(enemyEntity, healthStatComponent);
-            commandBuffer.AddComponent(enemyEntity, attackStatComponent);
-            commandBuffer.AddComponent(enemyEntity, defenceStatComponent);
-            commandBuffer.AddComponent(enemyEntity, magicStatComponent);
-            commandBuffer.AddComponent(enemyEntity, statsInitializeComponent.XPRewardComponent);
-            commandBuffer.AddComponent(enemyEntity, new AdjustStatsComponent());
-            Object.Destroy(statsInitializeComponent);
-            #endregion
-
-            #region items
-            if (random.NextInt(0, 100) > 50)
-            {
-                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(weaponEntity, new PickedUpComponent
-                {
-                    Owner = enemyEntity
-                });
-                commandBuffer.AddComponent(weaponEntity, new EquipedComponent());
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(spellBookEntity, new PickedUpComponent
-                {
-                    Owner = enemyEntity
-                });
-                commandBuffer.AddComponent(spellBookEntity, new EquipedComponent());
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(helmetEntity, new PickedUpComponent
-                {
-                    Owner = enemyEntity
-                });
-                commandBuffer.AddComponent(helmetEntity, new EquipedComponent());
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(chestEntity, new PickedUpComponent
-                {
-                    Owner = enemyEntity
-                });
-                commandBuffer.AddComponent(chestEntity, new EquipedComponent());
-            }
-            if (random.NextInt(0, 100) > 50)
-            {
-                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random);
-                commandBuffer.AddComponent(bootsEntity, new PickedUpComponent
-                {
-                    Owner = enemyEntity
-                });
-                commandBuffer.AddComponent(bootsEntity, new EquipedComponent());
-            }
-            if (random.NextInt(0, 100) > 75)
-            {
-                var randomCount = random.NextInt(1, 3);
-                for (int i = 0; i < randomCount; i++)
-                {
-                    var foodEntity = ItemFactory.GetRandomFood(ref random);
-                    commandBuffer.AddComponent(foodEntity, new PickedUpComponent
-                    {
-                        Owner = enemyEntity
-                    });
-                }
-            }
-            if (random.NextInt(0, 100) > 75)
-            {
-                var randomCount = random.NextInt(1, 3);
-                for (int i = 0; i < randomCount; i++)
-                {
-                    var potionEntity = ItemFactory.GetHealthPotion(ref random);
-                    commandBuffer.AddComponent(potionEntity, new PickedUpComponent
-                    {
-                        Owner = enemyEntity
-                    });
-                }
-            }
-            commandBuffer.AddComponent(enemyEntity, new ApplyInitialHealthModifierComponent());
-            #endregion
-
-            commandBuffer.RemoveComponent<EnemyInitializeComponent>(enemyEntity);
-        }
-        private void InitializeRandomStats(int currentLevel, ref Unity.Mathematics.Random random,
-                                           ref HealthStatComponent healthStatComponent,
-                                           ref AttackStatComponent attackStatComponent,
-                                           ref DefenceStatComponent defenceStatComponent,
-                                           ref MagicStatComponent magicStatComponent)
-        {
-            for (var i = 1; i < currentLevel; i++)
-            {
-                var randomStat = random.NextInt(0, 100);
-                switch (randomStat)
-                {
-                    case var _ when randomStat < 25:
-                        healthStatComponent.PointsSpent++;
-                        break;
-                    case var _ when randomStat < 50:
-                        attackStatComponent.PointsSpent++;
-                        break;
-                    case var _ when randomStat < 75:
-                        defenceStatComponent.PointsSpent++;
-                        break;
-                    case var _ when randomStat < 100:
-                        magicStatComponent.PointsSpent++;
-                        break;
-                }
-            }
+            commandBuffer.AddComponent(enemy.GetComponent<GameObjectEntity>().Entity, new Disabled());
         }
     }
 }

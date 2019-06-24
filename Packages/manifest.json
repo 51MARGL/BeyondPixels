@@ -5,7 +5,7 @@
     "com.unity.2d.tilemap.extras": "https://github.com/Unity-Technologies/2d-extras.git#package_2019.2",
     "com.unity.ads": "2.0.8",
     "com.unity.analytics": "3.3.2",
-    "com.unity.burst": "1.0.0-preview.6",
+    "com.unity.burst": "1.0.4",
     "com.unity.cinemachine": "2.3.3",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.collections": "0.0.9-preview.16",

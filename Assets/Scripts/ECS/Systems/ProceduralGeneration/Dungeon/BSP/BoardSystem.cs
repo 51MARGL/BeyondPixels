@@ -47,7 +47,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct FindCorridorsForLevelJob : IJobParallelFor
         {
             [WriteOnly]
@@ -99,7 +99,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct CorridorsQueueToArrayJob : IJob
         {
             [WriteOnly]
@@ -115,7 +115,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct CreateCorridorsJob : IJobParallelFor
         {
             [NativeDisableContainerSafetyRestriction]
@@ -182,7 +182,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct SetRoomTilesJob : IJobParallelFor
         {
             public NativeArray<NodeComponent> TreeArray;
@@ -215,7 +215,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct RemoveThinWallsJob : IJob
         {
             [ReadOnly]
@@ -349,7 +349,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             }
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct CleanUpJob : IJob
         {
             [ReadOnly]
