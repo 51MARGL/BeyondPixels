@@ -26,20 +26,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 {
     public class PlayerSpawningSystem : ComponentSystem
     {
-        private ComponentGroup _tilesGroup;
-        private ComponentGroup _boardGroup;
-        private ComponentGroup _boardReadyGroup;
+        private EntityQuery _tilesGroup;
+        private EntityQuery _boardGroup;
+        private EntityQuery _boardReadyGroup;
 
         protected override void OnCreateManager()
         {
-            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(FinalTileComponent)
                 }
             });
-            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -51,7 +51,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                     typeof(PlayerSpawnedComponent)
                 }
             });
-            this._boardReadyGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardReadyGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

@@ -9,7 +9,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
     public class DeathSystem : JobComponentSystem
     {
         [ExcludeComponent(typeof(KilledComponent))]
-        private struct DeathJob : IJobProcessComponentDataWithEntity<HealthComponent, CharacterComponent>
+        private struct DeathJob : IJobForEachWithEntity<HealthComponent, CharacterComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             public void Execute(Entity entity,
@@ -25,7 +25,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

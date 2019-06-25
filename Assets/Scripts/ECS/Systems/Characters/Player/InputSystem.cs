@@ -12,9 +12,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 {
     public class InputSystem : JobComponentSystem
     {
-        //[BurstCompile]
+        [BurstCompile]
         [ExcludeComponent(typeof(InCutsceneComponent))]
-        private struct InputJob : IJobProcessComponentData<InputComponent, MovementComponent>
+        private struct InputJob : IJobForEach<InputComponent, MovementComponent>
         {
             public float2 Direction;
             public int AttackPressed;

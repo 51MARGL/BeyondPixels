@@ -13,10 +13,10 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class SpellInstantiateSystem : ComponentSystem
     {
-        private ComponentGroup _spellToCastGroup;
+        private EntityQuery _spellToCastGroup;
         protected override void OnCreateManager()
         {
-            this._spellToCastGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._spellToCastGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ActiveSpellComponent), typeof(InstantiateSpellComponent)

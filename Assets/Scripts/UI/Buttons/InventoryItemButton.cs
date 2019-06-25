@@ -19,7 +19,7 @@ namespace BeyondPixels.UI.Buttons
             if (eventData.button == PointerEventData.InputButton.Left
                 || eventData.button == PointerEventData.InputButton.Right)
             {
-                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+                var entityManager = World.Active.EntityManager;
                 var eventEntity = entityManager.CreateEntity();
                 entityManager.AddComponentData(eventEntity, new InventoryItemButtonPressedComponent
                 {
@@ -33,7 +33,7 @@ namespace BeyondPixels.UI.Buttons
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
-            var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             var itemComponent = entityManager.GetComponentData<ItemComponent>(ItemEntity);
             var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
             var header = item.Name;            

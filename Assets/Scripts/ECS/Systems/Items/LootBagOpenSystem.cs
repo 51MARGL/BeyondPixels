@@ -12,11 +12,11 @@ namespace BeyondPixels.ECS.Systems.Items
 {
     public class LootBagOpenSystem : ComponentSystem
     {
-        private ComponentGroup _playerGroup;
+        private EntityQuery _playerGroup;
 
         protected override void OnCreateManager()
         {
-            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

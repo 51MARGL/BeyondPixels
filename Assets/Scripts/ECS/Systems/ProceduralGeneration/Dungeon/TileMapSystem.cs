@@ -18,14 +18,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
         public static bool TileMapDrawing = false;
         private NativeList<FinalTileComponent> TilesList;
 
-        private ComponentGroup _tilemapGroup;
-        private ComponentGroup _boardGroup;
-        private ComponentGroup _tilesGroup;
+        private EntityQuery _tilemapGroup;
+        private EntityQuery _boardGroup;
+        private EntityQuery _tilesGroup;
 
         protected override void OnCreateManager()
         {
             this.TilesList = new NativeList<FinalTileComponent>(Allocator.Persistent);
-            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -36,14 +36,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                     typeof(TilemapReadyComponent)
                 }
             });
-            this._tilemapGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._tilemapGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(DungeonTileMapComponent), typeof(Transform)
                 }
             });
-            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

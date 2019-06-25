@@ -9,11 +9,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class KillSystem : ComponentSystem
     {
-        private ComponentGroup _group;
+        private EntityQuery _group;
 
         protected override void OnCreateManager()
         {
-            this._group = this.GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

@@ -6,11 +6,11 @@ namespace BeyondPixels.ECS.Systems.Game
 {
     public class QuitGameSystem : ComponentSystem
     {
-        private ComponentGroup _quitGroup;
+        private EntityQuery _quitGroup;
 
         protected override void OnCreateManager()
         {
-            this._quitGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._quitGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

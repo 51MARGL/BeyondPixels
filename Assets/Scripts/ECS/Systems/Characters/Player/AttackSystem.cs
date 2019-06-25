@@ -11,7 +11,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
     {
         [ExcludeComponent(typeof(AttackComponent))]
         private struct AttackInitialJob :
-            IJobProcessComponentDataWithEntity<InputComponent, CharacterComponent>
+            IJobForEachWithEntity<InputComponent, CharacterComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -30,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         }
 
         private struct AttackComboJob :
-            IJobProcessComponentDataWithEntity<AttackComponent, InputComponent, CharacterComponent>
+            IJobForEachWithEntity<AttackComponent, InputComponent, CharacterComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -50,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

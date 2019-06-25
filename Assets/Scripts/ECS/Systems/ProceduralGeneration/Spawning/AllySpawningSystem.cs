@@ -12,11 +12,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
 {
     public class AllySpawningSystem : ComponentSystem
     {
-        private ComponentGroup _spawnGroup;
+        private EntityQuery _spawnGroup;
 
         protected override void OnCreateManager()
         {
-            this._spawnGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._spawnGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

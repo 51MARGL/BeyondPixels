@@ -12,12 +12,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
     {
         private struct SpellStateComponent : IComponentData { }
 
-        private ComponentGroup _addedGroup;
-        private ComponentGroup _removedGroup;
+        private EntityQuery _addedGroup;
+        private EntityQuery _removedGroup;
 
         protected override void OnCreateManager()
         {
-            this._addedGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._addedGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(SpellCastingComponent)
@@ -26,7 +26,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     typeof(SpellStateComponent)
                 }
             });
-            this._removedGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._removedGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(SpellStateComponent)

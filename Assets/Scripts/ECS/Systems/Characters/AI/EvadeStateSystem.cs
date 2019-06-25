@@ -12,11 +12,11 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     [UpdateBefore(typeof(FollowStateSystem))]
     public class EvadeStateSystem : ComponentSystem
     {
-        private ComponentGroup _evadeGroup;
+        private EntityQuery _evadeGroup;
 
         protected override void OnCreateManager()
         {
-            this._evadeGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._evadeGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

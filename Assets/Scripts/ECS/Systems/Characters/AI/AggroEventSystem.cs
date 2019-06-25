@@ -8,11 +8,11 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class AggroEventSystem : ComponentSystem
     {
-        private ComponentGroup _targetGroup;
+        private EntityQuery _targetGroup;
 
         protected override void OnCreateManager()
         {
-            this._targetGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._targetGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

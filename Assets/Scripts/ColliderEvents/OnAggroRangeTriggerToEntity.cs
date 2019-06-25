@@ -21,7 +21,7 @@ namespace BeyondPixels.ColliderEvents
                     return;
             }
 
-            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
             var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
             if (!entityManager.Exists(sender) || !entityManager.Exists(target))
@@ -40,7 +40,7 @@ namespace BeyondPixels.ColliderEvents
 
         protected virtual void OnTriggerExit2D(Collider2D collider)
         {
-            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
             var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
             if (!entityManager.Exists(sender) || !entityManager.Exists(target))
@@ -70,7 +70,7 @@ namespace BeyondPixels.ColliderEvents
                     return;
             }
 
-            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
             var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
             if (!entityManager.Exists(sender) || !entityManager.Exists(target))

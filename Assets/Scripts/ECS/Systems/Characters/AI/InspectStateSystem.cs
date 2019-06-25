@@ -10,11 +10,11 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class InspectStateSystem : ComponentSystem
     {
-        private ComponentGroup _inspectGroup;
+        private EntityQuery _inspectGroup;
 
         protected override void OnCreateManager()
         {
-            this._inspectGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._inspectGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

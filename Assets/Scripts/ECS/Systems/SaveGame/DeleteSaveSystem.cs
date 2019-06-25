@@ -6,11 +6,11 @@ namespace BeyondPixels.ECS.Systems.SaveGame
 {
     public class DeleteSaveSystem : ComponentSystem
     {
-        private ComponentGroup _deleteGroup;
+        private EntityQuery _deleteGroup;
 
         protected override void OnCreateManager()
         {
-            this._deleteGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._deleteGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

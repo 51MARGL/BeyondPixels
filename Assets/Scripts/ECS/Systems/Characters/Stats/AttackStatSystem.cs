@@ -8,9 +8,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class AttackStatSystem : JobComponentSystem
     {
-        //[BurstCompile]
+        [BurstCompile]
         [RequireComponentTag(typeof(AdjustStatsComponent))]
-        private struct AttackStatJob : IJobProcessComponentData<AttackStatComponent>
+        private struct AttackStatJob : IJobForEach<AttackStatComponent>
         {
             public void Execute(ref AttackStatComponent attackStatComponent)
             {

@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class LockOnTargetSystem : JobComponentSystem
     {
-        //[BurstCompile]
+        [BurstCompile]
         public struct LockOnTargetJob : IJobParallelForTransform
         {
             [ReadOnly]
@@ -45,12 +45,12 @@ namespace BeyondPixels.ECS.Systems.Spells
                 }
             }
         }
-        private ComponentGroup _spellGroup;
-        private ComponentGroup _targetGroup;
+        private EntityQuery _spellGroup;
+        private EntityQuery _targetGroup;
 
         protected override void OnCreateManager()
         {
-            this._spellGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._spellGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(SpellComponent), typeof(LockOnTargetComponent),
@@ -61,7 +61,7 @@ namespace BeyondPixels.ECS.Systems.Spells
                     typeof(DestroyComponent)
                 }
             });
-            this._targetGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._targetGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(CharacterComponent), typeof(PositionComponent)

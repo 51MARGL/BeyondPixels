@@ -20,11 +20,11 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected int LastItemsCount;
         protected Entity LastOwnerEntity;
-        protected ComponentGroup _itemsGroup;
+        protected EntityQuery _itemsGroup;
 
         protected override void OnCreateManager()
         {
-            this._itemsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._itemsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ItemComponent),

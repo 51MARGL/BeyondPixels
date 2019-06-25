@@ -104,13 +104,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         }
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _playerCastingGroup;
-        private ComponentGroup _activeSpellGroup;
+        private EntityQuery _playerCastingGroup;
+        private EntityQuery _activeSpellGroup;
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            this._playerCastingGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._playerCastingGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(InputComponent),
@@ -123,7 +123,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                      ComponentType.ReadOnly<AttackComponent>()
                 }
             });
-            this._activeSpellGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._activeSpellGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     ComponentType.ReadOnly<ActiveSpellComponent>()

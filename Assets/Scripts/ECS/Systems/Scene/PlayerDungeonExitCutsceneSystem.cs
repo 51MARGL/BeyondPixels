@@ -18,12 +18,12 @@ namespace BeyondPixels.ECS.Systems.Scenes
     {
         private struct PlayerExitCutscenePlaying : IComponentData { }
 
-        private ComponentGroup _triggerCutsceneGroup;
-        private ComponentGroup _playerDoneCutSceneGroup;
+        private EntityQuery _triggerCutsceneGroup;
+        private EntityQuery _playerDoneCutSceneGroup;
         private bool cutsceneDone;
         protected override void OnCreateManager()
         {
-            this._triggerCutsceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._triggerCutsceneGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -34,7 +34,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     typeof(DestroyComponent)
                 }
             });
-            this._playerDoneCutSceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerDoneCutSceneGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

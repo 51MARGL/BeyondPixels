@@ -7,11 +7,11 @@ namespace BeyondPixels.ECS.Systems.Items
 {
     public class UseSystem : ComponentSystem
     {
-        private ComponentGroup _itemGroup;
+        private EntityQuery _itemGroup;
 
         protected override void OnCreateManager()
         {
-            this._itemGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._itemGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

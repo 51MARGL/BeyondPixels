@@ -10,13 +10,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 {
     public class CleanUpSystem : ComponentSystem
     {
-        private ComponentGroup _boardGroup;
-        private ComponentGroup _tileGroup;
-        private ComponentGroup _tilemapGroup;
+        private EntityQuery _boardGroup;
+        private EntityQuery _tileGroup;
+        private EntityQuery _tilemapGroup;
 
         protected override void OnCreateManager()
         {
-            this._boardGroup = this.GetComponentGroup(
+            this._boardGroup = this.GetEntityQuery(
                 ComponentType.ReadOnly(typeof(FinalBoardComponent)),
                 ComponentType.ReadOnly(typeof(TilemapReadyComponent)),
                 ComponentType.ReadOnly(typeof(EnemiesSpawnedComponent)),
@@ -26,9 +26,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 ComponentType.ReadOnly(typeof(ChestSpawnedComponent)),
                 ComponentType.ReadOnly(typeof(CageSpawnedComponent))
             );
-            this._tileGroup = this.GetComponentGroup(
+            this._tileGroup = this.GetEntityQuery(
                ComponentType.ReadOnly(typeof(FinalTileComponent)));
-            this._tilemapGroup = this.GetComponentGroup(
+            this._tilemapGroup = this.GetEntityQuery(
                ComponentType.ReadOnly(typeof(DungeonTileMapComponent)));
         }
 

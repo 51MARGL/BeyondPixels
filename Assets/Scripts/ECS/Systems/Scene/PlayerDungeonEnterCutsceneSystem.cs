@@ -18,12 +18,12 @@ namespace BeyondPixels.ECS.Systems.Scenes
         private struct PlayerEnterCutsceneTriggeredComponent : IComponentData { }
         private struct PlayerEnterCutscenePlaying : IComponentData { }
 
-        private ComponentGroup _boardCameraGroup;
-        private ComponentGroup _playerDoneCutSceneGroup;
+        private EntityQuery _boardCameraGroup;
+        private EntityQuery _playerDoneCutSceneGroup;
         private bool cutsceneDone;
         protected override void OnCreateManager()
         {
-            this._boardCameraGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardCameraGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -34,7 +34,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     typeof(PlayerEnterCutsceneTriggeredComponent)
                 }
             });
-            this._playerDoneCutSceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerDoneCutSceneGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

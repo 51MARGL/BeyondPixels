@@ -10,7 +10,7 @@ namespace BeyondPixels.ECS.Systems.Level
     public class XPRewardSystem : JobComponentSystem
     {
         [RequireComponentTag(typeof(CollectXPRewardComponent))]
-        private struct XPRewardSystemJob : IJobProcessComponentDataWithEntity<XPRewardComponent, LevelComponent>
+        private struct XPRewardSystemJob : IJobForEachWithEntity<XPRewardComponent, LevelComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -43,12 +43,12 @@ namespace BeyondPixels.ECS.Systems.Level
             }
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _healthGroup;
+        private EntityQuery _healthGroup;
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            this._healthGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._healthGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

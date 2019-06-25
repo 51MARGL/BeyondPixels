@@ -11,11 +11,11 @@ namespace BeyondPixels.ECS.Systems.Objects
 {
     public class ChestInitializeSystem : ComponentSystem
     {
-        private ComponentGroup _group;
+        private EntityQuery _group;
 
         protected override void OnCreateManager()
         {
-            this._group = this.GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ChestInitializeComponent), typeof(Transform)

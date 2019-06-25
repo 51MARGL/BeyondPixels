@@ -14,11 +14,11 @@ namespace BeyondPixels.ECS.Systems.Scenes
     {
         private struct BoardCameraInitializedComponent : IComponentData { }
 
-        private ComponentGroup _boardCameraGroup;
+        private EntityQuery _boardCameraGroup;
 
         protected override void OnCreateManager()
         {
-            this._boardCameraGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardCameraGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -43,8 +43,8 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var groupCamera = GameObject.Find("TileMapVCamera").GetComponent<CinemachineVirtualCamera>();
                 lb.transform.position = float3.zero - 1;
                 rb.transform.position = new float3(finalBoardComponent.Size.x, -1, 0);
-                lt.transform.position = new float3(-1, finalBoardComponent.Size.y, 0);
-                rt.transform.position = new float3(finalBoardComponent.Size.x, finalBoardComponent.Size.y, 0);
+                lt.transform.position = new float3(-1, finalBoardComponent.Size.y + 10, 0);
+                rt.transform.position = new float3(finalBoardComponent.Size.x + 10, finalBoardComponent.Size.y + 10, 0);
 
                 mapCamTargetGroup.m_Targets = new CinemachineTargetGroup.Target[4];
                 mapCamTargetGroup.m_Targets[0].target = lb.transform;

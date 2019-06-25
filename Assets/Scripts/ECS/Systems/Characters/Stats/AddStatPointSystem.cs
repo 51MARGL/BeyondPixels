@@ -9,7 +9,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 {
     public class AddStatPointSystem : JobComponentSystem
     {
-        private struct AddStatPointJob : IJobProcessComponentDataWithEntity<AddStatPointComponent, LevelComponent, HealthStatComponent, AttackStatComponent, DefenceStatComponent, MagicStatComponent>
+        private struct AddStatPointJob : IJobForEachWithEntity<AddStatPointComponent, LevelComponent, HealthStatComponent, AttackStatComponent, DefenceStatComponent, MagicStatComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -49,7 +49,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

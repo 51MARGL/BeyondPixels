@@ -22,7 +22,7 @@ namespace BeyondPixels.UI.Buttons
 
         protected virtual void StartNewGame()
         {
-            var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             var eventEntity = entityManager.CreateEntity();
             entityManager.AddComponentData(eventEntity, new NewGameButtonPressedComponent());
         }

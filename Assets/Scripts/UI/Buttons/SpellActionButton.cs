@@ -40,7 +40,7 @@ namespace BeyondPixels.UI.Buttons
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+                var entityManager = World.Active.EntityManager;
                 var eventEntity = entityManager.CreateEntity();
                 var index = Array.IndexOf(UIManager.Instance.GameUIComponent.SpellButtonsGroup.ActionButtons, this);
                 entityManager.AddComponentData(eventEntity, new ActionButtonPressedComponent

@@ -11,7 +11,7 @@ namespace BeyondPixels.UI.Buttons
 
             this.ConfirmDialog.YesButton.OnSubmitEvent += () =>
             {
-                var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+                var entityManager = World.Active.EntityManager;
                 var eventEntity = entityManager.CreateEntity();
                 entityManager.AddComponentData(eventEntity, new QuitButtonPressedComponent());
             };

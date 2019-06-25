@@ -13,19 +13,19 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
     [UpdateBefore(typeof(DamageSystem))]
     public class HitParticleEffectSystem : ComponentSystem
     {
-        private ComponentGroup _damageGroup;
-        private ComponentGroup _characterGroup;
+        private EntityQuery _damageGroup;
+        private EntityQuery _characterGroup;
 
         protected override void OnCreateManager()
         {
-            this._damageGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._damageGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(CollisionInfo), typeof(FinalDamageComponent)
                 }
             });
-            this._characterGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._characterGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

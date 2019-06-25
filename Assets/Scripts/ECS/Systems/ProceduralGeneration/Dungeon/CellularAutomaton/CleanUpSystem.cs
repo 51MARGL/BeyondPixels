@@ -8,19 +8,19 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 {
     public class CleanUpSystem : ComponentSystem
     {
-        private ComponentGroup _boardGroup;
-        private ComponentGroup _roomGroup;
-        private ComponentGroup _tileGroup;
+        private EntityQuery _boardGroup;
+        private EntityQuery _roomGroup;
+        private EntityQuery _tileGroup;
 
         protected override void OnCreateManager()
         {
-            this._boardGroup = this.GetComponentGroup(
+            this._boardGroup = this.GetEntityQuery(
                 ComponentType.ReadOnly(typeof(BoardComponent)),
                 ComponentType.ReadOnly(typeof(BoardReadyComponent))
             );
-            this._roomGroup = this.GetComponentGroup(
+            this._roomGroup = this.GetEntityQuery(
                 ComponentType.ReadOnly(typeof(RoomComponent)));
-            this._tileGroup = this.GetComponentGroup(
+            this._tileGroup = this.GetEntityQuery(
                ComponentType.ReadOnly(typeof(TileComponent)));
         }
 

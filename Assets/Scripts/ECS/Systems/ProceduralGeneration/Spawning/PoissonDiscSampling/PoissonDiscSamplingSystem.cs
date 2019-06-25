@@ -9,7 +9,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 {
     public class PoissonDiscSamplingSystem : JobComponentSystem
     {
-        private struct GenerateSamplesJob : IJobProcessComponentDataWithEntity<PoissonDiscSamplingComponent>
+        private struct GenerateSamplesJob : IJobForEachWithEntity<PoissonDiscSamplingComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -213,7 +213,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
         }
 
-        private struct CleanUpCellsJob : IJobProcessComponentDataWithEntity<PoissonCellComponent>
+        private struct CleanUpCellsJob : IJobForEachWithEntity<PoissonCellComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -222,7 +222,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
-        private struct CleanUpRadiusesJob : IJobProcessComponentDataWithEntity<PoissonRadiusComponent>
+        private struct CleanUpRadiusesJob : IJobForEachWithEntity<PoissonRadiusComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -233,20 +233,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         }
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _cellGroup;
-        private ComponentGroup _radiusGroup;
+        private EntityQuery _cellGroup;
+        private EntityQuery _radiusGroup;
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            this._cellGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._cellGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(PoissonCellComponent)
                 }
             });
-            this._radiusGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._radiusGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

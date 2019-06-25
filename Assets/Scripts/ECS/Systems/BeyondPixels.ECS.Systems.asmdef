@@ -3,7 +3,6 @@
     "references": [
         "GUID:08f9c4e3211f44547884a0e1dde99b4f",
         "GUID:c1c05c5d66f3a2a4a8b77e84189f0116",
-        "GUID:b92ff8b696eb46a4b90382b319e963fe",
         "GUID:734d92eba21c94caba915361bd5ac177",
         "GUID:8819f35a0fc84499b990e90a4ca1911f",
         "GUID:8a2eafa29b15f444eb6d74f94a930e1d",
@@ -14,9 +13,9 @@
         "GUID:fdbb598a60bfca8489cfa6bea0fccdc5",
         "GUID:613783dc1674e844b87788ea74ede0f6",
         "GUID:4307f53044263cf4b835bd812fc161a4",
-        "GUID:8c4dd21966739024fbd72155091d199e"
+        "GUID:8c4dd21966739024fbd72155091d199e",
+        "GUID:2665a8d13d1b3f18800f46e256720795"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

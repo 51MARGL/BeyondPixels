@@ -10,7 +10,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class SpellCoolDownSystem : JobComponentSystem
     {
-        private struct SpellCoolDownJob : IJobProcessComponentDataWithEntity<ActiveSpellComponent, CoolDownComponent>
+        private struct SpellCoolDownJob : IJobForEachWithEntity<ActiveSpellComponent, CoolDownComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
@@ -29,7 +29,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

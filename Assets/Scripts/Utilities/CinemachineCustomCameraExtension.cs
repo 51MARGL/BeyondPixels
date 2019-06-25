@@ -1,5 +1,5 @@
 ﻿using Cinemachine;
-
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.Utilities
@@ -17,6 +17,8 @@ namespace BeyondPixels.Utilities
         [Tooltip("Lock the camera's X rotation to this value")]
         public float m_XRotation = -15;
 
+        //private float MaxPixelHeight = 32;
+
         protected override void PostPipelineStageCallback(
             CinemachineVirtualCameraBase vcam,
             CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
@@ -31,5 +33,13 @@ namespace BeyondPixels.Utilities
                 state.RawOrientation = rot;
             }
         }
+
+        //private float RoundToNearest(float value)
+        //{
+        //    var valueInPixels = value * this.MaxPixelHeight;
+        //    valueInPixels = math.round(valueInPixels);
+        //    var roundedUnityUnits = valueInPixels * (1 / this.MaxPixelHeight);
+        //    return roundedUnityUnits;
+        //}
     }
 }

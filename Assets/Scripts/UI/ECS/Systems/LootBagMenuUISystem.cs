@@ -13,21 +13,21 @@ namespace BeyondPixels.UI.ECS.Systems
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class LootBagMenuUISystem : ItemSorterSystem
     {
-        private ComponentGroup _bagGroup;
-        private ComponentGroup _playerGroup;
-        private ComponentGroup _lootButtonEventsGroup;
+        private EntityQuery _bagGroup;
+        private EntityQuery _playerGroup;
+        private EntityQuery _lootButtonEventsGroup;
 
         protected override void OnCreateManager()
         {
             base.OnCreateManager();
 
-            this._bagGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._bagGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(LootBagComponent), typeof(OpenLootBagComponent)
                 }
             });
-            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(PlayerComponent)
@@ -36,7 +36,7 @@ namespace BeyondPixels.UI.ECS.Systems
                     typeof(InCutsceneComponent),
                 }
             });
-            this._lootButtonEventsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._lootButtonEventsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(LootItemButtonPressedComponent)

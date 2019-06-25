@@ -9,7 +9,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
     public class LevelSystem : JobComponentSystem
     {
         [ExcludeComponent(typeof(LevelUpComponent))]
-        private struct LevelJob : IJobProcessComponentDataWithEntity<LevelComponent, XPComponent>
+        private struct LevelJob : IJobForEachWithEntity<LevelComponent, XPComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -27,7 +27,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

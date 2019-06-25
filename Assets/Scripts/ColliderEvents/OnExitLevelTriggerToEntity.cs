@@ -9,7 +9,7 @@ namespace BeyondPixels.ColliderEvents
         public override void Use()
         {
             base.Use();
-            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             var entity = this.GetComponent<GameObjectEntity>().Entity;
             entityManager.AddComponentData(entity, new PlayerExitCutsceneComponent());
 

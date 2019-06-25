@@ -11,46 +11,46 @@ namespace BeyondPixels.UI.ECS.Systems
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class MainMenuUISystem : ComponentSystem
     {
-        private ComponentGroup _cutsceneGroup;
-        private ComponentGroup _resumeGroup;
-        private ComponentGroup _newGameGroup;
-        private ComponentGroup _restartGroup;
-        private ComponentGroup _optionsGroup;
-        private ComponentGroup _quitGroup;
+        private EntityQuery _cutsceneGroup;
+        private EntityQuery _resumeGroup;
+        private EntityQuery _newGameGroup;
+        private EntityQuery _restartGroup;
+        private EntityQuery _optionsGroup;
+        private EntityQuery _quitGroup;
 
         protected override void OnCreateManager()
         {
-            this._cutsceneGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._cutsceneGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(InCutsceneComponent)
                 }
             });
-            this._resumeGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._resumeGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ResumeButtonPressedComponent)
                 }
             });
-            this._newGameGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._newGameGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(NewGameButtonPressedComponent)
                 }
             });
-            this._restartGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._restartGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(LoadLastButtonPressedComponent)
                 }
             });
-            this._optionsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._optionsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(OptionsButtonPressedComponent)
                 }
             });
-            this._quitGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._quitGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(QuitButtonPressedComponent)

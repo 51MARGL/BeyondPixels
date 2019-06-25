@@ -8,7 +8,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Items
 {
     public class PickUpSystem : JobComponentSystem
     {
-        private struct PickUpJob : IJobProcessComponentDataWithEntity<PickUpComponent>
+        private struct PickUpJob : IJobForEachWithEntity<PickUpComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -28,7 +28,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Items
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

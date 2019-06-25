@@ -8,11 +8,11 @@ namespace BeyondPixels.ECS.Systems.Objects
 {
     public class SyncDestroyedSystem : ComponentSystem
     {
-        private ComponentGroup _syncGroup;
+        private EntityQuery _syncGroup;
 
         protected override void OnCreateManager()
         {
-            this._syncGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._syncGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(SyncDestroyedComponent)

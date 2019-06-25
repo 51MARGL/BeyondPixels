@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     public class IdleStateSystem : JobComponentSystem
     {
         [ExcludeComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
-        private struct IdleStateJob : IJobProcessComponentDataWithEntity<IdleStateComponent, PositionComponent>
+        private struct IdleStateJob : IJobForEachWithEntity<IdleStateComponent, PositionComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             public float CurrentTime;
@@ -47,7 +47,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 {
     public class BoardSystem : JobComponentSystem
     {
-        //[BurstCompile]
+        [BurstCompile]
         private struct CreateRoomsAndCorridorsJob : IJobParallelFor
         {
             [ReadOnly]
@@ -50,7 +50,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct SetRoomTilesJob : IJobParallelFor
         {
             [DeallocateOnJobCompletion]
@@ -82,7 +82,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct SetCorridorTilesJob : IJobParallelFor
         {
             [DeallocateOnJobCompletion]
@@ -131,7 +131,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct CloseBordersJob : IJob
         {
             [ReadOnly]
@@ -158,7 +158,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct RemoveThinWallsJob : IJob
         {
             [ReadOnly]
@@ -291,7 +291,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct CleanUpJob : IJob
         {
             [ReadOnly]
@@ -311,11 +311,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         }
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _boardGroup;
+        private EntityQuery _boardGroup;
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

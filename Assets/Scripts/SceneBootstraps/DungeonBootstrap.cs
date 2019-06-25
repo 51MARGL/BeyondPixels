@@ -60,8 +60,8 @@ namespace BeyondPixels.SceneBootstraps
         // Use this for initialization
         private void Start()
         {
-            this.FixedGroup = World.Active.GetOrCreateManager<FixedUpdateSystemGroup>();
-            var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+            this.FixedGroup = World.Active.GetOrCreateSystem<FixedUpdateSystemGroup>();
+            var entityManager = World.Active.EntityManager;
 
             #region DungeonGeneration
             Entity board;

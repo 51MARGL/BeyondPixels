@@ -10,19 +10,19 @@ namespace BeyondPixels.ECS.Systems.Items
     [UpdateAfter(typeof(AfterStatsAdjustSystem))]
     public class ModifyStatsWithItemsSystem : ComponentSystem
     {
-        private ComponentGroup _gearGroup;
-        private ComponentGroup _ownerGroup;
+        private EntityQuery _gearGroup;
+        private EntityQuery _ownerGroup;
 
         protected override void OnCreateManager()
         {
-            this._gearGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._gearGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(ItemComponent), typeof(EquipedComponent), typeof(PickedUpComponent)
                 }
             });
-            this._ownerGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._ownerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(HealthStatComponent),typeof(AttackStatComponent),

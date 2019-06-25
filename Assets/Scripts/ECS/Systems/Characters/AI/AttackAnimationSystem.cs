@@ -12,12 +12,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     {
         private struct AttackStateInitialComponent : IComponentData { }
 
-        private ComponentGroup _attackStartGroup;
-        private ComponentGroup _attackingGroup;
+        private EntityQuery _attackStartGroup;
+        private EntityQuery _attackingGroup;
 
         protected override void OnCreateManager()
         {
-            this._attackStartGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._attackStartGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -28,7 +28,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     typeof(AttackStateInitialComponent)
                 }
             });
-            this._attackingGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._attackingGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

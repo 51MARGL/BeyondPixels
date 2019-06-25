@@ -14,7 +14,7 @@ namespace BeyondPixels.ColliderEvents
             if (collider.gameObject.CompareTag("Hitbox")
                 && collider.transform.parent.gameObject.CompareTag(this.TargetTag))
             {
-                var entityManager = World.Active.GetExistingManager<EntityManager>();
+                var entityManager = World.Active.EntityManager;
                 var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
                 var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))

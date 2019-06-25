@@ -10,7 +10,7 @@ namespace BeyondPixels.ColliderEvents
     {
         private void OnTriggerEnter2D(Collider2D collider)
         {
-            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             if (!entityManager.Exists(this.GetComponentInParent<GameObjectEntity>().Entity))
                 return;
 
@@ -33,7 +33,7 @@ namespace BeyondPixels.ColliderEvents
 
         private void OnTriggerExit2D(Collider2D collider)
         {
-            var entityManager = World.Active.GetExistingManager<EntityManager>();
+            var entityManager = World.Active.EntityManager;
             if (!entityManager.Exists(this.GetComponentInParent<GameObjectEntity>().Entity))
                 return;
 

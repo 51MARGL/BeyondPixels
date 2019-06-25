@@ -12,17 +12,17 @@ namespace BeyondPixels.UI.ECS.Systems.UI
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class EnemyUISystem : ComponentSystem
     {
-        private ComponentGroup _playerGroup;
-        private ComponentGroup _enemyGroup;
+        private EntityQuery _playerGroup;
+        private EntityQuery _enemyGroup;
         protected override void OnCreateManager()
         {
-            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(TargetComponent), typeof(PlayerComponent)
                 }
             });
-            this._enemyGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._enemyGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(EnemyUIComponent), typeof(SpriteRenderer), typeof(HealthComponent)

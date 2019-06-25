@@ -15,7 +15,7 @@ namespace BeyondPixels.ColliderEvents
         {
             if (collider.gameObject.CompareTag("Hitbox"))
             {
-                var entityManager = World.Active.GetExistingManager<EntityManager>();
+                var entityManager = World.Active.EntityManager;
                 var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(spellEntity))
                     return;
@@ -52,7 +52,7 @@ namespace BeyondPixels.ColliderEvents
                 this.totalTime += Time.deltaTime;
                 if (this.totalTime > 1f)
                 {
-                    var entityManager = World.Active.GetExistingManager<EntityManager>();
+                    var entityManager = World.Active.EntityManager;
                     var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                     if (!entityManager.Exists(spellEntity))
                         return;

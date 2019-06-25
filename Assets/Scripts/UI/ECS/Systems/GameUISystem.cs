@@ -15,32 +15,32 @@ namespace BeyondPixels.UI.ECS.Systems
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class GameUISystem : ComponentSystem
     {
-        private ComponentGroup _playerGroup;
-        private ComponentGroup _playerSpellCastingGroup;
-        private ComponentGroup _activeSpellGroup;
-        private ComponentGroup _spellButtonEventsGroup;
+        private EntityQuery _playerGroup;
+        private EntityQuery _playerSpellCastingGroup;
+        private EntityQuery _activeSpellGroup;
+        private EntityQuery _spellButtonEventsGroup;
         protected override void OnCreateManager()
         {
-            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(HealthComponent), typeof(PlayerComponent),
                     typeof(MagicStatComponent), typeof(LevelComponent), typeof(XPComponent)
                 }
             });
-            this._playerSpellCastingGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerSpellCastingGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(SpellCastingComponent)
                 }
             });
-            this._activeSpellGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._activeSpellGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ActiveSpellComponent)
                 }
             });
-            this._spellButtonEventsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._spellButtonEventsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ActionButtonPressedComponent)

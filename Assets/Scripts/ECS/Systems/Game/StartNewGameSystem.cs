@@ -13,11 +13,11 @@ namespace BeyondPixels.ECS.Systems.Game
 {
     public class StartNewGameSystem : ComponentSystem
     {
-        private ComponentGroup _startGroup;
+        private EntityQuery _startGroup;
 
         protected override void OnCreateManager()
         {
-            this._startGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._startGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

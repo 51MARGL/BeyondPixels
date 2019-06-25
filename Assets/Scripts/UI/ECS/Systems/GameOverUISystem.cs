@@ -11,25 +11,25 @@ namespace BeyondPixels.UI.ECS.Systems
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class GameOverUISystem : ComponentSystem
     {
-        private ComponentGroup _gameOverGroup;
-        private ComponentGroup _restartGroup;
-        private ComponentGroup _quitGroup;
+        private EntityQuery _gameOverGroup;
+        private EntityQuery _restartGroup;
+        private EntityQuery _quitGroup;
 
         protected override void OnCreateManager()
         {
-            this._gameOverGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._gameOverGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(GameOverComponent)
                 }
             });
-            this._restartGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._restartGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(LoadLastButtonPressedComponent)
                 }
             });
-            this._quitGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._quitGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(QuitButtonPressedComponent)

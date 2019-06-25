@@ -11,11 +11,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class CopyTransformToPosition : ComponentSystem
     {
-        private ComponentGroup _transformGroup;
+        private EntityQuery _transformGroup;
 
         protected override void OnCreateManager()
         {
-            this._transformGroup = this.GetComponentGroup(typeof(PositionComponent), typeof(UnityEngine.Transform));
+            this._transformGroup = this.GetEntityQuery(typeof(PositionComponent), typeof(UnityEngine.Transform));
         }
 
         protected override void OnUpdate()

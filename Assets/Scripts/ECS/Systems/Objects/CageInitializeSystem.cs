@@ -9,11 +9,11 @@ namespace BeyondPixels.ECS.Systems.Objects
 {
     public class CageInitializeSystem : ComponentSystem
     {
-        private ComponentGroup _group;
+        private EntityQuery _group;
 
         protected override void OnCreateManager()
         {
-            this._group = this.GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(CageInitializeComponent), typeof(Transform)

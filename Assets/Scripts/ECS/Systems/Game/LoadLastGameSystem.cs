@@ -8,11 +8,11 @@ namespace BeyondPixels.ECS.Systems.Game
 {
     public class LoadLastGameSystem : ComponentSystem
     {
-        private ComponentGroup _loadGroup;
+        private EntityQuery _loadGroup;
 
         protected override void OnCreateManager()
         {
-            this._loadGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._loadGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

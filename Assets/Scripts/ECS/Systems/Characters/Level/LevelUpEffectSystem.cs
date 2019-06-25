@@ -14,11 +14,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
     [UpdateBefore(typeof(LevelUpSystem))]
     public class LevelUpEffectSystem : ComponentSystem
     {
-        private ComponentGroup _characterGroup;
+        private EntityQuery _characterGroup;
 
         protected override void OnCreateManager()
         {
-            this._characterGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._characterGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

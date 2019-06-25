@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class DamageSystem : JobComponentSystem
     {
-        private struct DamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, FinalDamageComponent>
+        private struct DamageJob : IJobForEachWithEntity<CollisionInfo, FinalDamageComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -60,12 +60,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             }
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _healthGroup;
+        private EntityQuery _healthGroup;
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            this._healthGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._healthGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

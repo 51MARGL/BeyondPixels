@@ -11,19 +11,19 @@ namespace BeyondPixels.ECS.Systems.Objects
 {
     public class EnableDisableSystem : ComponentSystem
     {
-        private ComponentGroup _enableGroup;
-        private ComponentGroup _disableGroup;
+        private EntityQuery _enableGroup;
+        private EntityQuery _disableGroup;
 
         protected override void OnCreateManager()
         {
-            this._enableGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._enableGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(EntityEnableComponent)
                 }
             });
-            this._disableGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._disableGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

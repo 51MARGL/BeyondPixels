@@ -11,18 +11,18 @@ namespace BeyondPixels.ECS.Systems.Scenes
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class SceneLoadSystem : ComponentSystem
     {
-        private ComponentGroup _sceneSwitchGroup;
-        private ComponentGroup _saveGameGroup;
+        private EntityQuery _sceneSwitchGroup;
+        private EntityQuery _saveGameGroup;
         protected override void OnCreateManager()
         {
-            this._sceneSwitchGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._sceneSwitchGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(SceneLoadComponent)
                 }
             });
-            this._saveGameGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._saveGameGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

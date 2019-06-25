@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 {
     public class BoardSystem : JobComponentSystem
     {
-        //[BurstCompile]
+        [BurstCompile]
         private struct RandomFillBoardJob : IJobParallelFor
         {
             [NativeDisableContainerSafetyRestriction]
@@ -47,7 +47,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct CalculateNextGenerationJob : IJobParallelFor
         {
             [NativeDisableContainerSafetyRestriction]
@@ -90,7 +90,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct ProcessNextGenerationJob : IJobParallelFor
         {
             [NativeDisableContainerSafetyRestriction]
@@ -105,7 +105,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        ////[BurstCompile] 19.1 support only
+        //[BurstCompile] 19.1 support only
         private struct GetRoomsJob : IJob
         {
             [ReadOnly]
@@ -205,7 +205,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        ////[BurstCompile] 19.1 support only
+        //[BurstCompile] 19.1 support only
         private struct FindClosestRoomsConnectionsJob : IJobParallelFor
         {
             [ReadOnly]
@@ -297,7 +297,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        ////[BurstCompile] 19.1 support only
+        //[BurstCompile] 19.1 support only
         private struct FindAllRoomsConnectionsJob : IJob
         {
             [ReadOnly]
@@ -417,7 +417,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct CorridorsQueueToArrayJob : IJob
         {
             [WriteOnly]
@@ -433,7 +433,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        ////[BurstCompile] 19.1 support only
+        //[BurstCompile] 19.1 support only
         private struct CreateCorridorsJob : IJobParallelFor
         {
             [NativeDisableContainerSafetyRestriction]
@@ -526,7 +526,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct CloseBordersJob : IJob
         {
             [ReadOnly]
@@ -576,7 +576,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct RemoveThinWallsJob : IJob
         {
             [ReadOnly]
@@ -712,7 +712,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile]
+        [BurstCompile]
         private struct CleanUpJob : IJob
         {
             [ReadOnly]
@@ -731,14 +731,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         private int CurrentPhase;
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _boardGroup;
+        private EntityQuery _boardGroup;
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this.RoomList = new NativeList<RoomComponent>(Allocator.Persistent);
             this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
             this.CurrentPhase = 0;
-            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

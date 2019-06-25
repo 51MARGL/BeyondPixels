@@ -19,7 +19,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private const int SystemRequestID = 3;
 
         private struct ExitSpawnStartedComponent : IComponentData { }
-        private struct InitializeValidationGridJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
+        private struct InitializeValidationGridJob : IJobForEachWithEntity<FinalBoardComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
@@ -87,7 +87,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
         }
 
-        private struct TagBoardDoneJob : IJobProcessComponentDataWithEntity<FinalBoardComponent>
+        private struct TagBoardDoneJob : IJobForEachWithEntity<FinalBoardComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -97,7 +97,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
         }
 
-        private struct CleanSamplesJob : IJobProcessComponentDataWithEntity<SampleComponent>
+        private struct CleanSamplesJob : IJobForEachWithEntity<SampleComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -109,22 +109,22 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         }
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
-        private ComponentGroup _tilesGroup;
-        private ComponentGroup _boardSpawnInitGroup;
-        private ComponentGroup _boardSpawnReadyGroup;
-        private ComponentGroup _samplesGroup;
+        private EntityQuery _tilesGroup;
+        private EntityQuery _boardSpawnInitGroup;
+        private EntityQuery _boardSpawnReadyGroup;
+        private EntityQuery _samplesGroup;
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
-            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(FinalTileComponent)
                 }
             });
-            this._boardSpawnInitGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardSpawnInitGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -136,7 +136,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     typeof(ExitSpawnStartedComponent)
                 }
             });
-            this._boardSpawnReadyGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardSpawnReadyGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -147,7 +147,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     typeof(ExitSpawnedComponent)
                 }
             });
-            this._samplesGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._samplesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

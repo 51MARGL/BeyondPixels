@@ -8,7 +8,7 @@ namespace BeyondPixels.ECS.Systems.Objects
 {
     public class DestroySystem : JobComponentSystem
     {
-        private struct DestroyEntityJob : IJobProcessComponentDataWithEntity<DestroyComponent>
+        private struct DestroyEntityJob : IJobForEachWithEntity<DestroyComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             public void Execute(Entity entity, int index, [ReadOnly] ref DestroyComponent destroyComponent)
@@ -25,7 +25,7 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

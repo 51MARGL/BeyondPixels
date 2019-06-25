@@ -13,12 +13,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 {
     public class FollowStateSystem : ComponentSystem
     {
-        private ComponentGroup _followGroup;
-        private ComponentGroup _targetGroup;
+        private EntityQuery _followGroup;
+        private EntityQuery _targetGroup;
 
         protected override void OnCreateManager()
         {
-            this._followGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._followGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

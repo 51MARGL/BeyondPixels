@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.Spells
     public class DurationSystem : JobComponentSystem
     {
         [ExcludeComponent(typeof(DestroyComponent))]
-        private struct DurationJob : IJobProcessComponentDataWithEntity<DurationComponent, SpellComponent>
+        private struct DurationJob : IJobForEachWithEntity<DurationComponent, SpellComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             public float DeltaTime;
@@ -33,7 +33,7 @@ namespace BeyondPixels.ECS.Systems.Spells
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

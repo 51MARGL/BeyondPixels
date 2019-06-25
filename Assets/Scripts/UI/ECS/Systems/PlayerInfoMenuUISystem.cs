@@ -17,16 +17,16 @@ namespace BeyondPixels.UI.ECS.Systems
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class PlayerInfoMenuUISystem : ItemSorterSystem
     {
-        private ComponentGroup _playerGroup;
-        private ComponentGroup _equipedItemsGroup;
-        private ComponentGroup _addStatButtonEventsGroup;
-        private ComponentGroup _inventoryItemButtonEventsGroup;
+        private EntityQuery _playerGroup;
+        private EntityQuery _equipedItemsGroup;
+        private EntityQuery _addStatButtonEventsGroup;
+        private EntityQuery _inventoryItemButtonEventsGroup;
 
         protected override void OnCreateManager()
         {
             base.OnCreateManager();
 
-            this._playerGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(PlayerComponent),
@@ -37,7 +37,7 @@ namespace BeyondPixels.UI.ECS.Systems
                     typeof(InCutsceneComponent),
                 }
             });
-            this._equipedItemsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._equipedItemsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(ItemComponent),
@@ -45,13 +45,13 @@ namespace BeyondPixels.UI.ECS.Systems
                     typeof(EquipedComponent)
                 }
             });
-            this._addStatButtonEventsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._addStatButtonEventsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(AddStatButtonPressedComponent)
                 }
             });
-            this._inventoryItemButtonEventsGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._inventoryItemButtonEventsGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(InventoryItemButtonPressedComponent)
@@ -143,7 +143,7 @@ namespace BeyondPixels.UI.ECS.Systems
             statsGroup.MagicStat.AddButton.GetComponent<CanvasGroup>().alpha = addPointButtonAlpha;
         }
 
-        private void SetUpEquipedGearButtons(EquipedGearGroupWrapper gearGroup, ComponentGroup itemsGroup, Entity owner)
+        private void SetUpEquipedGearButtons(EquipedGearGroupWrapper gearGroup, EntityQuery itemsGroup, Entity owner)
         {
             for (var i = 0; i < gearGroup.GearSlots.Length; i++)
             {

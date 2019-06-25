@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
     public class AfterStatsAdjustSystem : JobComponentSystem
     {
         [RequireComponentTag(typeof(AdjustStatsComponent))]
-        private struct AfterStatsAdjustJob : IJobProcessComponentDataWithEntity<LevelComponent>
+        private struct AfterStatsAdjustJob : IJobForEachWithEntity<LevelComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
@@ -30,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
 
         protected override void OnCreateManager()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)

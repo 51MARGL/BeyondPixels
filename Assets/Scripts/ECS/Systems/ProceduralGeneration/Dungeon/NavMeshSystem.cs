@@ -10,27 +10,27 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 {
     public class NavMeshSystem : ComponentSystem
     {
-        private ComponentGroup _navMeshGroup;
-        private ComponentGroup _boardGroup;
-        private ComponentGroup _tilesGroup;
+        private EntityQuery _navMeshGroup;
+        private EntityQuery _boardGroup;
+        private EntityQuery _tilesGroup;
 
         protected override void OnCreateManager()
         {
-            this._boardGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(FinalBoardComponent)
                 }
             });
-            this._navMeshGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._navMeshGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
                     typeof(NavMeshComponent), typeof(Transform)
                 }
             });
-            this._tilesGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

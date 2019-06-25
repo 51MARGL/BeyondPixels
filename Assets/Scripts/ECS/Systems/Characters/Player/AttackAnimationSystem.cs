@@ -11,11 +11,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class AttackAnimationSystem : ComponentSystem
     {
-        private ComponentGroup _group;
+        private EntityQuery _group;
 
         protected override void OnCreateManager()
         {
-            this._group = this.GetComponentGroup(new EntityArchetypeQuery
+            this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     typeof(Animator), typeof(CharacterComponent), typeof(AttackComponent)

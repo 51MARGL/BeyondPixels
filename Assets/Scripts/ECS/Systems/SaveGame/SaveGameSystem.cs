@@ -13,11 +13,11 @@ namespace BeyondPixels.ECS.Systems.SaveGame
 {
     public class SaveGameSystem : ComponentSystem
     {
-        private ComponentGroup _saveGroup;
+        private EntityQuery _saveGroup;
 
         protected override void OnCreateManager()
         {
-            this._saveGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._saveGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

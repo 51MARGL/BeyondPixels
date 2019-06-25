@@ -9,12 +9,12 @@ namespace BeyondPixels.ECS.Systems.Level
     [UpdateBefore(typeof(DropLootSystem))]
     public class RandomizeDropLootSystem : ComponentSystem
     {
-        private ComponentGroup _dropGroup;
-        private ComponentGroup _lootGroup;
+        private EntityQuery _dropGroup;
+        private EntityQuery _lootGroup;
 
         protected override void OnCreateManager()
         {
-            this._dropGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._dropGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -22,7 +22,7 @@ namespace BeyondPixels.ECS.Systems.Level
                     typeof(CharacterComponent)
                 }
             });
-            this._lootGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._lootGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {

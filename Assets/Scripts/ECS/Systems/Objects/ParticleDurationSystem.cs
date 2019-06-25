@@ -9,11 +9,11 @@ namespace BeyondPixels.ECS.Systems.Objects
     [UpdateBefore(typeof(DestroySystem))]
     public class ParticleDurationSystem : ComponentSystem
     {
-        private ComponentGroup _particlesGroup;
+        private EntityQuery _particlesGroup;
 
         protected override void OnCreateManager()
         {
-            this._particlesGroup = this.GetComponentGroup(new EntityArchetypeQuery
+            this._particlesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
