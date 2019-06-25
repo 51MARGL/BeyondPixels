@@ -7,5 +7,6 @@ namespace BeyondPixels.ECS.Components.Scenes
     {
         public PlayableDirector PlayerDungeonEnter;
         public PlayableDirector PlayerDungeonExit;
+        public PlayableDirector PlayerTutorialEnter;
     }
 }

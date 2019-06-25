@@ -41,10 +41,10 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var lt = new GameObject("camTarget3");
                 var rt = new GameObject("camTarget4");
                 var groupCamera = GameObject.Find("TileMapVCamera").GetComponent<CinemachineVirtualCamera>();
-                lb.transform.position = float3.zero - 1;
-                rb.transform.position = new float3(finalBoardComponent.Size.x, -1, 0);
-                lt.transform.position = new float3(-1, finalBoardComponent.Size.y + 10, 0);
-                rt.transform.position = new float3(finalBoardComponent.Size.x + 10, finalBoardComponent.Size.y + 10, 0);
+                lb.transform.position = float3.zero - 5;
+                rb.transform.position = new float3(finalBoardComponent.Size.x + 5, -5, 0);
+                lt.transform.position = new float3(-1, finalBoardComponent.Size.y + 5, 0);
+                rt.transform.position = new float3(finalBoardComponent.Size.x + 5, finalBoardComponent.Size.y + 5, 0);
 
                 mapCamTargetGroup.m_Targets = new CinemachineTargetGroup.Target[4];
                 mapCamTargetGroup.m_Targets[0].target = lb.transform;

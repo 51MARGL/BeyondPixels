@@ -14,6 +14,7 @@ namespace BeyondPixels.UI
         public GameOverMenuUIComponent GameOverMenu;
         public MainMenuUIComponent MainMenu;
         public OptionsMenuUIComponent OptionsMenu;
+        public StoryMenuUIComponent StoryMenu;
 
         [SerializeField]
         protected YesNoDialogUIComponent YesNoDialog;

@@ -28,11 +28,20 @@ namespace BeyondPixels.SceneBootstraps
                 CurrentPosition = new Unity.Mathematics.float2(exit.transform.position.x, exit.transform.position.y),
                 InitialPosition = new Unity.Mathematics.float2(exit.transform.position.x, exit.transform.position.y)
             });
+
+            this.StartTutorial();
         }
 
         public void FixedUpdate()
         {
             this.FixedGroup.Update();
+        }
+
+        private void StartTutorial()
+        {
+            var entityManager = World.Active.EntityManager;
+            var cutsceneEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(cutsceneEntity, new PlayerEnterTutorialComponent());
         }
     }
 }
