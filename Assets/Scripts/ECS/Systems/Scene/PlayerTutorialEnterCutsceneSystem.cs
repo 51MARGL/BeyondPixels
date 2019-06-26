@@ -76,6 +76,9 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 {
                     this.PostUpdateCommands.RemoveComponent<InCutsceneComponent>(playerEntity);
                     this.PostUpdateCommands.RemoveComponent<PlayerEnterCutscenePlaying>(playerEntity);
+
+                    var trigger = GameObject.Find("EntryMessageTrigger");
+                    trigger.GetComponent<BoxCollider2D>().enabled = true;
                 }
             });
         }

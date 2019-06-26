@@ -292,6 +292,36 @@ PrefabInstance:
       objectReference: {fileID: 215447246}
     - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
         type: 3}
+      propertyPath: m_SceneBindings.Array.data[11].value
+      value: 
+      objectReference: {fileID: 100182543}
+    - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
+        type: 3}
+      propertyPath: m_SceneBindings.Array.data[12].value
+      value: 
+      objectReference: {fileID: 700698078}
+    - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
+        type: 3}
+      propertyPath: m_SceneBindings.Array.data[13].value
+      value: 
+      objectReference: {fileID: 100182542}
+    - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
+        type: 3}
+      propertyPath: m_SceneBindings.Array.data[14].value
+      value: 
+      objectReference: {fileID: 641076510}
+    - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
+        type: 3}
+      propertyPath: m_SceneBindings.Array.data[15].value
+      value: 
+      objectReference: {fileID: 872949067}
+    - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
+        type: 3}
+      propertyPath: m_SceneBindings.Array.data[16].value
+      value: 
+      objectReference: {fileID: 872949070}
+    - target: {fileID: 1937484679266385612, guid: 162e8b5f1f24466489b773d81322a454,
+        type: 3}
       propertyPath: m_ExposedReferences.m_References.Array.data[0].second
       value: 
       objectReference: {fileID: 885451388}
@@ -880,6 +910,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1732345717, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1485594333, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
       propertyPath: m_havePropertiesChanged
       value: 1
@@ -911,6 +945,10 @@ PrefabInstance:
     - target: {fileID: 1485594332, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 209496789, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -63.805054
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
@@ -1083,6 +1121,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TileMapCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 1058751178188175789, guid: 0546739264a7e0c438341fb1a1a08252,
+        type: 3}
+      propertyPath: far clip plane
+      value: 10000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0546739264a7e0c438341fb1a1a08252, type: 3}
@@ -1533,6 +1576,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayerVCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465252197906620828, guid: 01048d769dcf677438cbc9c822ce1c69,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8461676774943256122, guid: 01048d769dcf677438cbc9c822ce1c69,
         type: 3}

@@ -80,7 +80,6 @@ namespace BeyondPixels.UI.ECS.Systems
                 var mainMenu = UIManager.Instance.MainMenu;
                 if (!mainMenu.IsVisible)
                 {
-                    UIManager.Instance.CloseAllMenus();
                     mainMenu.Show();
                 }
                 else

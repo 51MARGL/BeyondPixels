@@ -44,7 +44,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     navMeshAgent.nextPosition = curr;
                     navMeshAgent.SetDestination(dest);
 
-                    if (navMeshAgent.path.status == NavMeshPathStatus.PathComplete)
+                    if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
+                        movementComponent.Direction = float2.zero;
+                    else
                         movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
                 }
                 else

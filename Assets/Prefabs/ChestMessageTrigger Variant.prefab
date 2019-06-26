@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4646007837144564567
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 111066418952423304, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_Name
+      value: ChestMessageTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 11.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 12.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423302, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423305, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423305, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 2.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: _sentences.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: _tips.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: _sentences.Array.data[0]
+      value: 'Huh? Chest? Here?
+
+        Looks like one of ours supply crates. How
+        did it get here?'
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: _sentences.Array.data[1]
+      value: I wonder if there is anything left in it.
+      objectReference: {fileID: 0}
+    - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
+        type: 3}
+      propertyPath: _tips.Array.data[0]
+      value: 'Tip: You can open chests while near them by pressing {Use}'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8, type: 3}

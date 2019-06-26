@@ -11,10 +11,12 @@ namespace BeyondPixels.UI.ECS.Components
         public bool InGameMenu;
         public SubmitButton ResumeButton;
         public SubmitButton LoadLastButton;
+        private float PrevTimeScale = 1f;
 
         public override void Show()
         {
             base.Show();
+            this.PrevTimeScale = Time.timeScale;
             Time.timeScale = 0f;
             this.ResumeButton.gameObject.SetActive(this.InGameMenu);
             this.LoadLastButton.gameObject.SetActive(SaveGameManager.SaveExists);
@@ -23,7 +25,7 @@ namespace BeyondPixels.UI.ECS.Components
         public override void Hide()
         {
             base.Hide();
-            Time.timeScale = 1f;
+            Time.timeScale = this.PrevTimeScale;
         }
     }
 }

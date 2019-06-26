@@ -50,11 +50,13 @@ namespace BeyondPixels.ECS.Systems.Objects
                     XPAmount = chestInitializeComponent.XPAmount
                 });
 
+                int currLevel = playerLvlComponent.CurrentLevel == 1 ? 1 :
+                                    random.NextInt(playerLvlComponent.CurrentLevel,
+                                                   playerLvlComponent.CurrentLevel + 3);
+
                 var lvlComponent = new LevelComponent
                 {
-                    CurrentLevel =
-                        math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
-                                                   playerLvlComponent.CurrentLevel + 3))
+                    CurrentLevel = currLevel
                 };
                 this.PostUpdateCommands.AddComponent(entity, lvlComponent);
 

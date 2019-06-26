@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2144797732750568712
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4752275978758948063, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_Name
+      value: PlayerInfoMessageTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948063, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 12.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 12.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948062, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 3.84
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _sentences.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _tips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _tips.Array.data[0]
+      value: 'Tip: Hover over bag and click LMB to loot it.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _tips.Array.data[1]
+      value: 'Tip: You can open inventory by pressing {Inventory}. There You will
+        also find level progression and equipped gear.'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3bab2e54513fc1946b7122ae136259bf, type: 3}

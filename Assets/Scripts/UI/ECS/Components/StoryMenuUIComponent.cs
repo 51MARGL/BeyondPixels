@@ -4,6 +4,7 @@ using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.Menus;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BeyondPixels.UI.ECS.Components
 {
@@ -14,6 +15,7 @@ namespace BeyondPixels.UI.ECS.Components
         public Coroutine PrintCoroutine;
         public string CurrentSentence;
         public StoryTellingComponent StoryTellingComponent;
+        public Image Background;
 
         public override void Show()
         {
@@ -55,6 +57,12 @@ namespace BeyondPixels.UI.ECS.Components
             if (this.StoryTellingComponent.Sentences.Count > 0)
             {
                 this.CurrentSentence = this.StoryTellingComponent.Sentences.Dequeue();
+
+                if (this.CurrentSentence.Contains("Tip:"))
+                    this.Background.color = new Color(0.3f, 0.3f, 0.3f);
+                else
+                    this.Background.color = Color.black;
+
                 var chars = this.CurrentSentence.ToCharArray();
 
                 this.Text.text = "";

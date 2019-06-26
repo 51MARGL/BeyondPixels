@@ -49,9 +49,6 @@ namespace BeyondPixels.UI.ECS.Components
         {
             base.Show();
 
-            UIManager.Instance.MainMenu.Hide();
-            Time.timeScale = 0f;
-
             this.RefreshControls();
         }
 
@@ -60,7 +57,6 @@ namespace BeyondPixels.UI.ECS.Components
             base.Hide();
 
             SettingsManager.Instance.SaveSettings();
-            UIManager.Instance.MainMenu.Show();
         }
 
         public void SetResolution(int index)
