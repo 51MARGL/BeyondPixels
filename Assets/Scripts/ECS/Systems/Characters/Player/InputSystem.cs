@@ -41,13 +41,14 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
+            if (Time.timeScale == 0f)
+                return inputDeps;
+
             var direction = float2.zero;
             var attackPressed = 0;
             var mouseClicked = 0;
             var actionButtonPressed = 0;
             var selectTargetButtonPressed = 0;
-            if (Time.timeScale == 0f)
-                return inputDeps;
 
             if (Input.GetKey(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Left)))
                 direction += new float2(-1, 0);

@@ -63,10 +63,10 @@ MonoBehaviour:
   Cage: {fileID: 2003967439130067419, guid: d46809b8a834cbf4e995527f247e814a, type: 3}
   Ally: {fileID: 8369842100041373969, guid: 41734307ec10e774c811075cde00b7de, type: 3}
   EnemyPrefabs:
-  - SpawnRadius: 5
+  - SpawnRadius: 7
     Prefab: {fileID: 1125304382384988, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}
-  - SpawnRadius: 6
+  - SpawnRadius: 8
     Prefab: {fileID: 5052851933621197252, guid: e510273cf265b2847ba3016f90012046,
       type: 3}
-  - SpawnRadius: 10
+  - SpawnRadius: 13
     Prefab: {fileID: 310711406105402089, guid: c402636d0ea6df84490f5cb75078f516, type: 3}

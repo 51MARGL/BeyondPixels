@@ -73,10 +73,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sentences:
-  - Finally, I've found entrance to the dungeons. Everyone was creeping out about
-    them.
+  - Finally, I found entrance to the dungeons. Everyone was creeping out about them.
   - I got lucky, that Dark Temple gave me this task. Now i can prove my loyalty.
-  - Let's see what those old dungeons really hide.
+  - Let's see what these old dungeons really hide.
   _tips:
   - 'Tip: You can move by pressing {Up} {Left} {Down} {Right}'
   - 'Tip: Use minimap in top right corner for better orientation'

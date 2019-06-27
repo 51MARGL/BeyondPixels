@@ -3,7 +3,7 @@ using BeyondPixels.ECS.Components.Scenes;
 
 using Unity.Collections;
 using Unity.Entities;
-
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace BeyondPixels.ECS.Systems.Scenes
@@ -38,7 +38,13 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
             this.Entities.With(this._sceneSwitchGroup).ForEach((Entity entity, ref SceneLoadComponent sceneLoadComponent) =>
             {
-                SceneManager.LoadScene(sceneLoadComponent.SceneIndex, LoadSceneMode.Single);
+                var index = sceneLoadComponent.SceneIndex;                
+                SceneFadeManager.Instance.OnFadeOutEvent += () =>
+                {
+                    SceneManager.LoadScene(index, LoadSceneMode.Single);
+                };
+                SceneFadeManager.Instance.Animator.SetTrigger("FadeOut");
+                Time.timeScale = 1f;
             });
             if (this._sceneSwitchGroup.CalculateLength() > 0)
             {

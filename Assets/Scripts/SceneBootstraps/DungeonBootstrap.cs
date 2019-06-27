@@ -138,9 +138,9 @@ namespace BeyondPixels.SceneBootstraps
                     });
                     break;
             }
+            #endregion
 
             UIManager.Instance.MainMenu.InGameMenu = true;
-            #endregion
         }
 
         public void FixedUpdate()

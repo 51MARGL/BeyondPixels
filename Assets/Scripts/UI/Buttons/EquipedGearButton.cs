@@ -49,25 +49,25 @@ namespace BeyondPixels.UI.Buttons
             if (entityManager.HasComponent<AttackStatModifierComponent>(ItemEntity))
             {
                 var statComponent = entityManager.GetComponentData<AttackStatModifierComponent>(ItemEntity);
-                sb.Append($"Attack: +{statComponent.Value * itemComponent.Level}");
+                sb.Append($"Attack: {statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
             if (entityManager.HasComponent<DefenceStatModifierComponent>(ItemEntity))
             {
                 var statComponent = entityManager.GetComponentData<DefenceStatModifierComponent>(ItemEntity);
-                sb.Append($"Defence: +{statComponent.Value * itemComponent.Level}");
+                sb.Append($"Defence: {statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
             if (entityManager.HasComponent<HealthStatModifierComponent>(ItemEntity))
             {
                 var statComponent = entityManager.GetComponentData<HealthStatModifierComponent>(ItemEntity);
-                sb.Append($"Health: +{statComponent.Value * itemComponent.Level}");
+                sb.Append($"Health: {statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
             if (entityManager.HasComponent<MagickStatModifierComponent>(ItemEntity))
             {
                 var statComponent = entityManager.GetComponentData<MagickStatModifierComponent>(ItemEntity);
-                sb.Append($"Magic: +{statComponent.Value * itemComponent.Level}");
+                sb.Append($"Magic: {statComponent.Value * itemComponent.Level}");
                 sb.Append(Environment.NewLine);
             }
             sb.Append(Environment.NewLine);

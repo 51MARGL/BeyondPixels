@@ -85,9 +85,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
                 #region statsInit
                 var lvlComponent = statsInitializeComponent.LevelComponent;
-                lvlComponent.CurrentLevel =
-                    math.max(0, random.NextInt(playerLvlComponent.CurrentLevel,
-                                               playerLvlComponent.CurrentLevel + 3));
+                lvlComponent.CurrentLevel = playerLvlComponent.CurrentLevel == 1 ? 1 :
+                                                random.NextInt(playerLvlComponent.CurrentLevel,
+                                                               playerLvlComponent.CurrentLevel + 3);
 
                 var healthStatComponent = statsInitializeComponent.HealthStatComponent;
                 var attackStatComponent = statsInitializeComponent.AttackStatComponent;

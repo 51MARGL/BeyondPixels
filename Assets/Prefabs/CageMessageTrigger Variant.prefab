@@ -86,7 +86,7 @@ PrefabInstance:
     - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
         type: 3}
       propertyPath: _sentences.Array.data[2]
-      value: I should free out that pure animal.
+      value: I should free out that poor animal.
       objectReference: {fileID: 0}
     - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
         type: 3}

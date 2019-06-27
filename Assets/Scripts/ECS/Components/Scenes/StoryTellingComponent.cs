@@ -12,11 +12,11 @@ namespace BeyondPixels.ECS.Components.Scenes
 
         [TextArea(1, 10)]
         [SerializeField]
-        private string[] _sentences;
+        private string[] _sentences = new string[0];
 
         [TextArea(1, 10)]
         [SerializeField]
-        private string[] _tips;
+        private string[] _tips = new string[0];
 
         public void Start()
         {

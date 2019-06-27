@@ -98,7 +98,7 @@ PrefabInstance:
     - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
         type: 3}
       propertyPath: _sentences.Array.data[0]
-      value: So that is what causes all these problems. Ghousts!
+      value: So that is what causes all these problems. Ghosts!
       objectReference: {fileID: 0}
     - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
         type: 3}

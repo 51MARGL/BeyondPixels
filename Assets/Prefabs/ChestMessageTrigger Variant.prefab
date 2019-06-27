@@ -98,7 +98,7 @@ PrefabInstance:
     - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
         type: 3}
       propertyPath: _sentences.Array.data[1]
-      value: I wonder if there is anything left in it.
+      value: I wonder, if there is anything left in it.
       objectReference: {fileID: 0}
     - target: {fileID: 111066418952423300, guid: d36f4e44bee81ab4aa5e98b5eb6cc0d8,
         type: 3}
