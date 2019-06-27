@@ -208,9 +208,9 @@ namespace BeyondPixels.ECS.Systems.Items
             ShuffleStatsArray(randomStatModifiersArray, ref random);
             for (int i = 0; i < randomStatModifiersArray.Length; i++)
             {
-                if (random.NextInt(0, 100) > chance)
+                if (random.NextInt(0, 100) < chance)
                 {
-                    chance += 20;
+                    chance -= 13;
                     switch (randomStatModifiersArray[i])
                     {
                         case WeaponStatsModifiers.Attack:

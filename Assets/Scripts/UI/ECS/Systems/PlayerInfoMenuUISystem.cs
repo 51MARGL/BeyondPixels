@@ -21,10 +21,13 @@ namespace BeyondPixels.UI.ECS.Systems
         private EntityQuery _equipedItemsGroup;
         private EntityQuery _addStatButtonEventsGroup;
         private EntityQuery _inventoryItemButtonEventsGroup;
+        private bool _inventoryInitialized;
 
         protected override void OnCreateManager()
         {
             base.OnCreateManager();
+
+            this._inventoryInitialized = false;
 
             this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -84,8 +87,10 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
 
                 #region playerInfoMenu
-                if (infoMenuComponent.IsVisible)
+                if (infoMenuComponent.IsVisible || !this._inventoryInitialized)
                 {
+                    this._inventoryInitialized = true;
+
                     infoMenuComponent.LevelGroup.Level.text = levelComponent.CurrentLevel.ToString();
                     infoMenuComponent.LevelGroup.SkillPoints.text = levelComponent.SkillPoints.ToString();
 

@@ -109,7 +109,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _tips.Array.data[1]
       value: 'Tip: To cast spell select target by clicking LMB on enemy or by pressing
-        {PickTarget}. Then press any of {Action1},{Action2},{Action2} to cast the
+        {PickTarget}. Then press any of {Action1},{Action2},{Action3} to cast the
         spell.'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
