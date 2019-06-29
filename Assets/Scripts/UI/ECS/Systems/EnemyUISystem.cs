@@ -14,7 +14,7 @@ namespace BeyondPixels.UI.ECS.Systems.UI
     {
         private EntityQuery _playerGroup;
         private EntityQuery _enemyGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {

@@ -48,7 +48,7 @@ namespace BeyondPixels.ECS.Systems.Spells
         private EntityQuery _spellGroup;
         private EntityQuery _targetGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._spellGroup = this.GetEntityQuery(new EntityQueryDesc
             {

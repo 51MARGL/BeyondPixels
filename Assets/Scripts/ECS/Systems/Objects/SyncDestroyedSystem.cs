@@ -10,7 +10,7 @@ namespace BeyondPixels.ECS.Systems.Objects
     {
         private EntityQuery _syncGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._syncGroup = this.GetEntityQuery(new EntityQueryDesc
             {

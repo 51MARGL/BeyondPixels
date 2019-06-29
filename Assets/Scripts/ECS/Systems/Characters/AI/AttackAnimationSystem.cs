@@ -15,7 +15,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
         private EntityQuery _attackStartGroup;
         private EntityQuery _attackingGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._attackStartGroup = this.GetEntityQuery(new EntityQueryDesc
             {

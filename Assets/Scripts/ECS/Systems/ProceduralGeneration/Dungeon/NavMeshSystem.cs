@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
         private EntityQuery _boardGroup;
         private EntityQuery _tilesGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {

@@ -19,7 +19,8 @@ namespace BeyondPixels.ECS.Components.Game
         Action1 = 8,
         Action2 = 9,
         Action3 = 10,
-        PickTarget = 11
+        PickTarget = 11,
+        Quest = 12
     }
 
     public class SettingsManager : MonoBehaviour
@@ -138,7 +139,8 @@ namespace BeyondPixels.ECS.Components.Game
                     { KeyBindName.Action2, KeyCode.Alpha2 },
                     { KeyBindName.Action3, KeyCode.Alpha3 },
                     { KeyBindName.Inventory, KeyCode.I },
-                    { KeyBindName.PickTarget, KeyCode.Tab }
+                    { KeyBindName.PickTarget, KeyCode.Tab },
+                    { KeyBindName.Quest, KeyCode.Q }
                 };
                 this.Fullscreen = Screen.fullScreen;
                 this.CurrentResolution = Screen.currentResolution;

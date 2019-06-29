@@ -11,7 +11,7 @@ namespace BeyondPixels.ECS.Systems.Objects
     {
         private EntityQuery _particlesGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._particlesGroup = this.GetEntityQuery(new EntityQueryDesc
             {

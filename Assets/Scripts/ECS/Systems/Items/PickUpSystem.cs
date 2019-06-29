@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
-namespace BeyondPixels.ECS.Systems.Characters.Items
+namespace BeyondPixels.ECS.Systems.Items
 {
     public class PickUpSystem : JobComponentSystem
     {
@@ -26,7 +26,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Items
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }

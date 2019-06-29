@@ -77,7 +77,7 @@ namespace BeyondPixels.ECS.Systems.Common
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _group;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._group = this.GetEntityQuery(typeof(CharacterComponent), typeof(PositionComponent));

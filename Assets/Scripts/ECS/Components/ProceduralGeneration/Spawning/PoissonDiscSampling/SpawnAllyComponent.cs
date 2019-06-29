@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-namespace BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling
+namespace BeyondPixels.ECS.Components.ProceduralGeneration.Spawning
 {
     public struct SpawnAllyComponent : IComponentData
     {

@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Items
         private EntityQuery _gearGroup;
         private EntityQuery _ownerGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._gearGroup = this.GetEntityQuery(new EntityQueryDesc
             {

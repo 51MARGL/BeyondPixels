@@ -94,7 +94,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private EntityQuery _samplesGroup;
         private EntityQuery _tileMapGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc

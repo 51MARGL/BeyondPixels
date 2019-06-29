@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
         private EntityQuery _corridorGroup;
         private EntityQuery _tileGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._boardGroup = this.GetEntityQuery(
                 ComponentType.ReadOnly(typeof(BoardComponent)),

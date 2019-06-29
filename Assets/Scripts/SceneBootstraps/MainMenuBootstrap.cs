@@ -12,7 +12,7 @@ namespace BeyondPixels.SceneBootstraps
             var settings = SettingsManager.Instance;
             UIManager.Instance.MainMenu.InGameMenu = false;
             UIManager.Instance.MainMenu.Show();
-            Time.timeScale = 1f;
+            Time.timeScale = 1f;            
         }
     }
 }

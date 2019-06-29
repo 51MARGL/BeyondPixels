@@ -16,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         private EntityQuery _boardCameraGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._boardCameraGroup = this.GetEntityQuery(new EntityQueryDesc
             {

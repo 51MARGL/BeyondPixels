@@ -17,7 +17,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
     {
         private EntityQuery _group;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -39,14 +39,17 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     return;
 
                 var spell = SpellBookManagerComponent.Instance.SpellBook.Spells[spellCastingComponent.SpellIndex];
-                var targetPosition = EntityManager.GetComponentObject<Transform>(targetComponent.Target).position;
-                var direction = targetPosition - transform.position;
-                var scale = math.abs(transform.localScale.x);
+                if (spell.TargetRequired)
+                {
+                    var targetPosition = EntityManager.GetComponentObject<Transform>(targetComponent.Target).position;
+                    var direction = targetPosition - transform.position;
+                    var scale = math.abs(transform.localScale.x);
 
-                if (direction.x < 0f)
-                    transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
-                else if (direction.x > 0f)
-                    transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
+                    if (direction.x < 0f)
+                        transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
+                    else if (direction.x > 0f)
+                        transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
+                }
             });
         }
     }

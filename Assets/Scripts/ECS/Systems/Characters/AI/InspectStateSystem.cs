@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     {
         private EntityQuery _inspectGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._inspectGroup = this.GetEntityQuery(new EntityQueryDesc
             {

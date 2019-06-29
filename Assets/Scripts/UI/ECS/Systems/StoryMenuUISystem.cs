@@ -4,13 +4,12 @@ using Unity.Entities;
 
 namespace BeyondPixels.UI.ECS.Systems
 {
-    [AlwaysUpdateSystem]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class StoryMenuUISystem : ComponentSystem
     {
         private EntityQuery _storyGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._storyGroup = this.GetEntityQuery(new EntityQueryDesc
             {

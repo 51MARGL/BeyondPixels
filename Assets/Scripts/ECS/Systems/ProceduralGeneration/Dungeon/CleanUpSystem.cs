@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
         private EntityQuery _tileGroup;
         private EntityQuery _tilemapGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._boardGroup = this.GetEntityQuery(
                 ComponentType.ReadOnly(typeof(FinalBoardComponent)),

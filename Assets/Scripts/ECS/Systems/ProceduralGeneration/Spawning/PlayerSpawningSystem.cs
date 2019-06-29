@@ -30,7 +30,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
         private EntityQuery _boardGroup;
         private EntityQuery _boardReadyGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc
             {

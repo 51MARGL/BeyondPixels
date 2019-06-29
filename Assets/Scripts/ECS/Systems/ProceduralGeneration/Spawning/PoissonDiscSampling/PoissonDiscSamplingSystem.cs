@@ -236,7 +236,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private EntityQuery _cellGroup;
         private EntityQuery _radiusGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._cellGroup = this.GetEntityQuery(new EntityQueryDesc

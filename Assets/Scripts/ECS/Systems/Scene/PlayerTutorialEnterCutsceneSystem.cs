@@ -21,7 +21,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
         private EntityQuery _playerDoneCutSceneGroup;
         private bool cutsceneDone;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._startGroup = this.GetEntityQuery(new EntityQueryDesc
             {

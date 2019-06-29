@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.Objects
         private EntityQuery _enableGroup;
         private EntityQuery _disableGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._enableGroup = this.GetEntityQuery(new EntityQueryDesc
             {

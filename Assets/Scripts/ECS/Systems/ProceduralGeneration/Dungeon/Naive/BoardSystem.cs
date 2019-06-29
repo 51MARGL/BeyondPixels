@@ -312,7 +312,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _boardGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._boardGroup = this.GetEntityQuery(new EntityQueryDesc

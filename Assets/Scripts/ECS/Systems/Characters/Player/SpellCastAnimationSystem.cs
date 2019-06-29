@@ -15,7 +15,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         private EntityQuery _addedGroup;
         private EntityQuery _removedGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._addedGroup = this.GetEntityQuery(new EntityQueryDesc
             {

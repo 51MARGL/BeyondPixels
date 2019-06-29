@@ -8,7 +8,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
     {
         private EntityQuery _deleteGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._deleteGroup = this.GetEntityQuery(new EntityQueryDesc
             {

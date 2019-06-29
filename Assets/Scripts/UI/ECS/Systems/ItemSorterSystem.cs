@@ -22,7 +22,7 @@ namespace BeyondPixels.UI.ECS.Systems
         protected Entity LastOwnerEntity;
         protected EntityQuery _itemsGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._itemsGroup = this.GetEntityQuery(new EntityQueryDesc
             {

@@ -9,6 +9,7 @@ namespace BeyondPixels.SceneBootstraps
         public static PrefabManager Instance { get; private set; }
 
         public GameObject PlayerPrefab;
+        public GameObject QuestPrefab;
         public GameObject LevelUpEffectPrefab;
         public GameObject BloodSplashPrefab;
         public GameObject[] BloodDecalsPrefabs;

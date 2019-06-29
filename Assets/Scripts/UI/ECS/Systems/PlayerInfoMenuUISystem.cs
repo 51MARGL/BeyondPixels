@@ -23,9 +23,9 @@ namespace BeyondPixels.UI.ECS.Systems
         private EntityQuery _inventoryItemButtonEventsGroup;
         private bool _inventoryInitialized;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
-            base.OnCreateManager();
+            base.OnCreate();
 
             this._inventoryInitialized = false;
 
@@ -82,6 +82,7 @@ namespace BeyondPixels.UI.ECS.Systems
                     }
                     else
                     {
+                        UIManager.Instance.QuestMenu.Hide();
                         UIManager.Instance.LootBagMenuUIComponent.Hide();
                         infoMenuComponent.Show();
                     }

@@ -23,7 +23,7 @@ namespace BeyondPixels.ECS.Systems.Objects
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }

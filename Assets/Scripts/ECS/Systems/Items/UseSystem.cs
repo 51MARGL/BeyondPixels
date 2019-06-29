@@ -9,7 +9,7 @@ namespace BeyondPixels.ECS.Systems.Items
     {
         private EntityQuery _itemGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._itemGroup = this.GetEntityQuery(new EntityQueryDesc
             {

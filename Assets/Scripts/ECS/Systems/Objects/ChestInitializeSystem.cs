@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Objects
     {
         private EntityQuery _group;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -40,6 +40,7 @@ namespace BeyondPixels.ECS.Systems.Objects
                 ChestInitializeComponent chestInitializeComponent,
                 Transform transform) =>
             {
+                this.PostUpdateCommands.AddComponent(entity, new ChestComponent());
                 this.PostUpdateCommands.AddComponent(entity, new PositionComponent
                 {
                     CurrentPosition = new float2(transform.position.x, transform.position.y),

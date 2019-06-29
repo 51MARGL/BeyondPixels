@@ -19,7 +19,7 @@ namespace BeyondPixels.UI.ECS.Systems
         private EntityQuery _playerSpellCastingGroup;
         private EntityQuery _activeSpellGroup;
         private EntityQuery _spellButtonEventsGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {

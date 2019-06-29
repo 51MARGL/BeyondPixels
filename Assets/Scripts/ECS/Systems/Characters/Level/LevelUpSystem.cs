@@ -8,7 +8,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
     {
         private EntityQuery _characterGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._characterGroup = this.GetEntityQuery(new EntityQueryDesc
             {

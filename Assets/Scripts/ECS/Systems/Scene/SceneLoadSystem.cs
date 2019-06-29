@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
     {
         private EntityQuery _sceneSwitchGroup;
         private EntityQuery _saveGameGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._sceneSwitchGroup = this.GetEntityQuery(new EntityQueryDesc
             {

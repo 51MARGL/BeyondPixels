@@ -732,7 +732,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _boardGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this.RoomList = new NativeList<RoomComponent>(Allocator.Persistent);
@@ -917,7 +917,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             return cleanUpJobHandle;
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             this.RoomList.Dispose();
             this.CorridorsQueue.Dispose();

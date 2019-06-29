@@ -1,12 +1,13 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
-
+using BeyondPixels.ECS.Systems.Objects;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Level
 {
+    [UpdateBefore(typeof(DestroySystem))]
     public class XPRewardSystem : JobComponentSystem
     {
         [RequireComponentTag(typeof(CollectXPRewardComponent))]
@@ -45,7 +46,7 @@ namespace BeyondPixels.ECS.Systems.Level
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _healthGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._healthGroup = this.GetEntityQuery(new EntityQueryDesc

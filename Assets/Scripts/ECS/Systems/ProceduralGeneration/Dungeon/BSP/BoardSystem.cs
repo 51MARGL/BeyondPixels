@@ -368,7 +368,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _boardGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
@@ -493,7 +493,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             return cleanUpJobHandle;
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             this.CorridorsQueue.Dispose();
         }

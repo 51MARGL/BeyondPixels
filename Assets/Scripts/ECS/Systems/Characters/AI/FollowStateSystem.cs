@@ -16,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
         private EntityQuery _followGroup;
         private EntityQuery _targetGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._followGroup = this.GetEntityQuery(new EntityQueryDesc
             {

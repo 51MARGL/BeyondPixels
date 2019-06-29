@@ -15,7 +15,7 @@ namespace BeyondPixels.UI.ECS.Systems
         private EntityQuery _restartGroup;
         private EntityQuery _quitGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._gameOverGroup = this.GetEntityQuery(new EntityQueryDesc
             {

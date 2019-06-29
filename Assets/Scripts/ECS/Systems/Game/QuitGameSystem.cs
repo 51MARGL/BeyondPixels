@@ -8,7 +8,7 @@ namespace BeyondPixels.ECS.Systems.Game
     {
         private EntityQuery _quitGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._quitGroup = this.GetEntityQuery(new EntityQueryDesc
             {

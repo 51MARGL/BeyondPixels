@@ -15,6 +15,7 @@ namespace BeyondPixels.UI
         public MainMenuUIComponent MainMenu;
         public OptionsMenuUIComponent OptionsMenu;
         public StoryMenuUIComponent StoryMenu;
+        public QuestMenuUIComponent QuestMenu;
 
         [SerializeField]
         protected YesNoDialogUIComponent YesNoDialog;
@@ -29,6 +30,7 @@ namespace BeyondPixels.UI
         {
             this.PlayerInfoMenuUIComponent.Hide();
             this.LootBagMenuUIComponent.Hide();
+            this.QuestMenu.Hide();
             this.OptionsMenu.Hide();
             this.MainMenu.Hide();
 

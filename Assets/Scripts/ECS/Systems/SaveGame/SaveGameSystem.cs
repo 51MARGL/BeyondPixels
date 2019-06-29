@@ -15,7 +15,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
     {
         private EntityQuery _saveGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._saveGroup = this.GetEntityQuery(new EntityQueryDesc
             {

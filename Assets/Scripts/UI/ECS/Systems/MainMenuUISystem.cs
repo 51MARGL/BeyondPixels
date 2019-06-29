@@ -18,7 +18,7 @@ namespace BeyondPixels.UI.ECS.Systems
         private EntityQuery _optionsGroup;
         private EntityQuery _quitGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._cutsceneGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -74,6 +74,12 @@ namespace BeyondPixels.UI.ECS.Systems
                 if (UIManager.Instance.MainMenu.IgnoreEsc)
                 {
                     UIManager.Instance.MainMenu.IgnoreEsc = false;
+                    return;
+                }
+
+                if (UIManager.Instance.QuestMenu.IsVisible)
+                {
+                    UIManager.Instance.QuestMenu.Hide();
                     return;
                 }
 

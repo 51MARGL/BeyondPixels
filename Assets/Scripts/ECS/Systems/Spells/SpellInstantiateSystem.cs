@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.Spells
     public class SpellInstantiateSystem : ComponentSystem
     {
         private EntityQuery _spellToCastGroup;
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._spellToCastGroup = this.GetEntityQuery(new EntityQueryDesc
             {

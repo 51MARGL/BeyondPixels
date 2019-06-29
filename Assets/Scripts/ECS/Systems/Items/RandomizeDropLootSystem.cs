@@ -4,7 +4,7 @@ using BeyondPixels.ECS.Components.Objects;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace BeyondPixels.ECS.Systems.Level
+namespace BeyondPixels.ECS.Systems.Items
 {
     [UpdateBefore(typeof(DropLootSystem))]
     public class RandomizeDropLootSystem : ComponentSystem
@@ -12,7 +12,7 @@ namespace BeyondPixels.ECS.Systems.Level
         private EntityQuery _dropGroup;
         private EntityQuery _lootGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._dropGroup = this.GetEntityQuery(new EntityQueryDesc
             {

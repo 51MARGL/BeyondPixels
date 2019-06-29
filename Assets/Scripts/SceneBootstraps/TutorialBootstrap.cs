@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Game;
+using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.UI;
 using BeyondPixels.Utilities;
@@ -19,16 +20,6 @@ namespace BeyondPixels.SceneBootstraps
             var settings = SettingsManager.Instance;
             UIManager.Instance.MainMenu.InGameMenu = true;
 
-            var exit = GameObject.Find("LevelExit");
-            var entity = exit.GetComponent<GameObjectEntity>().Entity;
-            var entityManager = World.Active.EntityManager;
-            entityManager.AddComponentData(entity, new LevelExitComponent());
-            entityManager.AddComponentData(entity, new PositionComponent
-            {
-                CurrentPosition = new Unity.Mathematics.float2(exit.transform.position.x, exit.transform.position.y),
-                InitialPosition = new Unity.Mathematics.float2(exit.transform.position.x, exit.transform.position.y)
-            });
-
             this.StartTutorial();
         }
 
@@ -39,9 +30,24 @@ namespace BeyondPixels.SceneBootstraps
 
         private void StartTutorial()
         {
+            var exit = GameObject.Find("LevelExit");
+            var entity = exit.GetComponent<GameObjectEntity>().Entity;
             var entityManager = World.Active.EntityManager;
+            entityManager.AddComponentData(entity, new LevelExitComponent());
+            entityManager.AddComponentData(entity, new PositionComponent
+            {
+                CurrentPosition = new Unity.Mathematics.float2(exit.transform.position.x, exit.transform.position.y),
+                InitialPosition = new Unity.Mathematics.float2(exit.transform.position.x, exit.transform.position.y)
+            });
+
             var cutsceneEntity = entityManager.CreateEntity();
             entityManager.AddComponentData(cutsceneEntity, new PlayerEnterTutorialComponent());
+
+            for (int i = 0; i < 3; i++)
+            {
+                var quest = entityManager.CreateEntity();
+                entityManager.AddComponentData(quest, new GenerateQuestComponent());
+            }
         }
     }
 }

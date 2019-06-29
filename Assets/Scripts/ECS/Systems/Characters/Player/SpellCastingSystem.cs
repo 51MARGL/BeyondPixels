@@ -107,7 +107,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         private EntityQuery _playerCastingGroup;
         private EntityQuery _activeSpellGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._playerCastingGroup = this.GetEntityQuery(new EntityQueryDesc

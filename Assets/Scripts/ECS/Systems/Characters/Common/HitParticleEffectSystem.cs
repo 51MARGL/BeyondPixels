@@ -16,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         private EntityQuery _damageGroup;
         private EntityQuery _characterGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._damageGroup = this.GetEntityQuery(new EntityQueryDesc
             {

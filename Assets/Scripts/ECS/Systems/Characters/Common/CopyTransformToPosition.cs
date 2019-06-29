@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
     {
         private EntityQuery _transformGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._transformGroup = this.GetEntityQuery(typeof(PositionComponent), typeof(UnityEngine.Transform));
         }

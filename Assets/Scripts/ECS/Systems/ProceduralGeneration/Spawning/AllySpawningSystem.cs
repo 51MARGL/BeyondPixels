@@ -1,5 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.SceneBootstraps;
 
 using Unity.Collections;
@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
     {
         private EntityQuery _spawnGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this._spawnGroup = this.GetEntityQuery(new EntityQueryDesc
             {

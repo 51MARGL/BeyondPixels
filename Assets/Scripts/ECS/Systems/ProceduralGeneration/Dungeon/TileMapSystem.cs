@@ -22,7 +22,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
         private EntityQuery _boardGroup;
         private EntityQuery _tilesGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
             this.TilesList = new NativeList<FinalTileComponent>(Allocator.Persistent);
             this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
@@ -231,7 +231,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             TileMapSystem.TileMapDrawing = false;
         }
 
-        protected override void OnDestroyManager()
+        protected override void OnDestroy()
         {
             this.TilesList.Dispose();
         }

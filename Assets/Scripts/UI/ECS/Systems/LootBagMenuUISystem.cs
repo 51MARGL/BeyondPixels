@@ -17,9 +17,9 @@ namespace BeyondPixels.UI.ECS.Systems
         private EntityQuery _playerGroup;
         private EntityQuery _lootButtonEventsGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
-            base.OnCreateManager();
+            base.OnCreate();
 
             this._bagGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -54,6 +54,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 if (openLootBagComponent.IsOpened == 0
                     && !lootMenuComponent.IsVisible)
                 {
+                    UIManager.Instance.QuestMenu.Hide();
                     UIManager.Instance.PlayerInfoMenuUIComponent.Hide();
                     lootMenuComponent.Show();
                     openLootBagComponent.IsOpened = 1;
