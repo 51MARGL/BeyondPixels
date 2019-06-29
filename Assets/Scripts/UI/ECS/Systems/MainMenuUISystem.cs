@@ -77,6 +77,18 @@ namespace BeyondPixels.UI.ECS.Systems
                     return;
                 }
 
+                if (UIManager.Instance.LootBagMenuUIComponent.IsVisible)
+                {
+                    UIManager.Instance.LootBagMenuUIComponent.Hide();
+                    return;
+                }
+
+                if (UIManager.Instance.PlayerInfoMenuUIComponent.IsVisible)
+                {
+                    UIManager.Instance.PlayerInfoMenuUIComponent.Hide();
+                    return;
+                }
+
                 var mainMenu = UIManager.Instance.MainMenu;
                 if (!mainMenu.IsVisible)
                 {

@@ -69,7 +69,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                 }
 
                                 var magicStatComponent = magicStatComponents[i];
-                                var castTime = math.max(1f, spellPrefab.CastTime -
+                                var castTime = math.max(0.1f, spellPrefab.CastTime -
                                                             (spellPrefab.CastTime / 100f * magicStatComponent.CurrentValue));
 
                                 if (spellCastingComponents[i].StartedAt + castTime > this.CurrentTime)

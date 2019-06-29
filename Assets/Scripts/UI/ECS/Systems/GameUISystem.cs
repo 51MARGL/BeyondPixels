@@ -91,7 +91,7 @@ namespace BeyondPixels.UI.ECS.Systems
                     var spellCastingComponent = this.EntityManager.GetComponentData<SpellCastingComponent>(playerEntity);
                     var spellIndex = spellCastingComponent.SpellIndex;
                     var spell = spellBook.Spells[spellIndex];
-                    var castTime = math.max(1f, spell.CastTime -
+                    var castTime = math.max(0.1f, spell.CastTime -
                                 (spell.CastTime / 100f * magicStatComponent.CurrentValue));
 
                     var timePassed = (castTime - (Time.time - spellCastingComponent.StartedAt));

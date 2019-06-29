@@ -73,7 +73,8 @@ namespace BeyondPixels.UI.ECS.Systems
             {
 
                 var infoMenuComponent = UIManager.Instance.PlayerInfoMenuUIComponent;
-                if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Inventory)))
+                if (Input.GetKeyDown(SettingsManager.Instance.GetKeyBindValue(KeyBindName.Inventory))
+                    && Time.timeScale > 0)
                 {
                     if (infoMenuComponent.IsVisible)
                     {
@@ -81,7 +82,7 @@ namespace BeyondPixels.UI.ECS.Systems
                     }
                     else
                     {
-                        UIManager.Instance.CloseAllMenus();
+                        UIManager.Instance.LootBagMenuUIComponent.Hide();
                         infoMenuComponent.Show();
                     }
                 }

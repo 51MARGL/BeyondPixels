@@ -54,7 +54,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 if (openLootBagComponent.IsOpened == 0
                     && !lootMenuComponent.IsVisible)
                 {
-                    UIManager.Instance.CloseAllMenus();
+                    UIManager.Instance.PlayerInfoMenuUIComponent.Hide();
                     lootMenuComponent.Show();
                     openLootBagComponent.IsOpened = 1;
                 }
