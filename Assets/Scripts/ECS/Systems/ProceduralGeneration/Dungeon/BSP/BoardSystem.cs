@@ -325,7 +325,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 {
                     var random = new Random((uint)this.RandomSeed);
 
-                    var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 150));
+                    var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
                     var board = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
@@ -398,7 +398,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
-                    var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                    var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
                     if (this.CurrentPhase == 0)
                     {
                         this.Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);

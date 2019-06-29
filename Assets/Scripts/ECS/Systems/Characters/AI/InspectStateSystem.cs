@@ -36,7 +36,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                                 ref PositionComponent positionComponent,
                                                 ref InspectStateComponent inspectStateComponent) =>
             {
-                var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
                 var currentTime = Time.time;
                 if (currentTime - inspectStateComponent.StartedAt < random.NextInt(10, 30) / 10f)
                 {

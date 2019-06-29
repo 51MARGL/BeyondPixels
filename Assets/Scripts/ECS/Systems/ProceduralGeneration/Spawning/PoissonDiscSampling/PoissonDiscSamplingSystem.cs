@@ -257,7 +257,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+            var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
             var barrier = this._endFrameBarrier.CreateCommandBuffer();
 
             var generateSamplesJobHandle = new GenerateSamplesJob

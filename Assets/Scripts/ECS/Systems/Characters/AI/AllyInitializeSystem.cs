@@ -28,7 +28,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
         }
         protected override void OnUpdate()
         {
-            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+            var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
             var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
 
             if (!this.EntityManager.HasComponent<LevelComponent>(playerEntity))

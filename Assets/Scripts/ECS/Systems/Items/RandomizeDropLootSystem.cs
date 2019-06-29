@@ -42,7 +42,7 @@ namespace BeyondPixels.ECS.Systems.Level
                 return;
 
             var dropChunks = this._dropGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+            var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
 
             for (var c = 0; c < dropChunks.Length; c++)
             {

@@ -29,7 +29,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
         {
             var entities = this._spawnGroup.ToEntityArray(Allocator.TempJob);
             var spawnComponents = this._spawnGroup.ToComponentDataArray<SpawnAllyComponent>(Allocator.TempJob);
-            var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+            var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
             var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
             var playerLvlComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity);
 

@@ -103,7 +103,7 @@ namespace BeyondPixels.UI.Buttons
                 {
                     if (eqDefenceValue > 0)
                     {
-                        sb.Append($"Attack: 0 (-{eqDefenceValue})");
+                        sb.Append($"Defence: 0 (-{eqDefenceValue})");
                         sb.Append(Environment.NewLine);
                     }
                 }
@@ -123,7 +123,7 @@ namespace BeyondPixels.UI.Buttons
                 {
                     if (eqHealthValue > 0)
                     {
-                        sb.Append($"Attack: 0 (-{eqHealthValue})");
+                        sb.Append($"Health: 0 (-{eqHealthValue})");
                         sb.Append(Environment.NewLine);
                     }
                 }
@@ -143,7 +143,7 @@ namespace BeyondPixels.UI.Buttons
                 {
                     if (eqMagicValue > 0)
                     {
-                        sb.Append($"Attack: 0 (-{eqMagicValue})");
+                        sb.Append($"Magic: 0 (-{eqMagicValue})");
                         sb.Append(Environment.NewLine);
                     }
                 }

@@ -77,7 +77,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 PlayerPosition = float3.zero;
 
                 var boardSize = finalBoardComponent.Size;
-                var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
                 var tiles = this._tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob);
                 var bottom = random.NextBool();
                 var left = random.NextBool();

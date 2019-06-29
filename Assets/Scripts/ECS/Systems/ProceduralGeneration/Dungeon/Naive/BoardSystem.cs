@@ -263,7 +263,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 {
                     var random = new Random((uint)this.RandomSeed);
 
-                    var randomSize = new int2(random.NextInt(100, 200), random.NextInt(50, 150));
+                    var randomSize = new int2(random.NextInt(75, 125), random.NextInt(50, 125));
                     var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(5, 11);
                     var board = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(board, new BoardComponent
@@ -351,7 +351,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         tiles[j] = TileType.Wall;
 
                     // setup fist room and corridors to all 4 directions
-                    var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmssff").GetHashCode());
+                    var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
                     rooms[0] = CreateRoom(board, ref random);
                     corridors[0] = CreateCorridor(rooms[0], board, true, ref random, 0);
                     corridors[1] = CreateCorridor(rooms[0], board, true, ref random, 1);
