@@ -10,6 +10,7 @@ namespace BeyondPixels.UI.ECS.Systems
     public class QuestMenuUISystem : ComponentSystem
     {
         private EntityQuery _activeGroup;
+        private EntityQuery _doneGroup;
         private EntityQuery _playerGroup;
 
         protected override void OnCreate()
@@ -19,6 +20,14 @@ namespace BeyondPixels.UI.ECS.Systems
                 All = new ComponentType[] {
                     typeof(QuestComponent),
                     typeof(QuestTextComponent)
+                }
+            });
+
+            this._doneGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] {
+                    typeof(QuestComponent),
+                    typeof(QuestDoneComponent)
                 }
             });
 
@@ -57,12 +66,23 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
             }
 
+            if (_doneGroup.CalculateLength() > 0)
+                UIManager.Instance.GameUIComponent.QuestDoneMark.SetActive(true);
+            else
+                UIManager.Instance.GameUIComponent.QuestDoneMark.SetActive(false);
+
             if (UIManager.Instance.QuestMenu.IsVisible)
             {
+                if (_activeGroup.CalculateLength() == 0)
+                {
+                    UIManager.Instance.QuestMenu.Hide();
+                    return;
+                }
+
                 var index = 0;
                 this.Entities.With(this._activeGroup).ForEach((Entity questEntity, 
                     QuestTextComponent questTextComponent, ref QuestComponent questComponent) =>
-                {
+                {                    
                     var row = UIManager.Instance.QuestMenu.QuestRows[index];
                     row.gameObject.SetActive(true);
                     row.QuestEntity = questEntity;

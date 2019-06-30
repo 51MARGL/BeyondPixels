@@ -5,6 +5,7 @@ using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
+using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Components.SaveGame;
 
 using Unity.Entities;
@@ -66,6 +67,30 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                                                   this.EntityManager.GetComponentData<MagickStatModifierComponent>(itemEntity) :
                                                   new MagickStatModifierComponent(),
                             });
+                    });
+
+                    playerData.QuestDataList = new List<QuestData>();
+                    this.Entities.WithAll<QuestComponent, QuestTextComponent>().ForEach((Entity questEntity,
+                        ref QuestComponent questComponent, QuestTextComponent questTextComponent) =>
+                    {
+                        playerData.QuestDataList.Add(new QuestData
+                        {
+                            QuestText = questTextComponent.QuestText,
+                            QuestComponent = questComponent,
+                            LevelComponent = this.EntityManager.GetComponentData<LevelComponent>(questEntity),
+                            XPRewardComponent = this.EntityManager.GetComponentData<XPRewardComponent>(questEntity),
+                            IsDone = EntityManager.HasComponent<QuestDoneComponent>(questEntity),
+                            IsInvestigateQuest = EntityManager.HasComponent<InvestigateQuestComponent>(questEntity),
+                            IsDefeatQuest = EntityManager.HasComponent<DefeatQuestComponent>(questEntity),
+                            IsLevelUpQuest = EntityManager.HasComponent<LevelUpQuestComponent>(questEntity),
+                            IsLootQuest = EntityManager.HasComponent<LootQuestComponent>(questEntity),
+                            IsReleaseQuest = EntityManager.HasComponent<ReleaseQuestComponent>(questEntity),
+                            IsSpendQuest = EntityManager.HasComponent<SpendSkillPointQuestComponent>(questEntity),
+                            IsPickUpQuest = this.EntityManager.HasComponent<PickUpQuestComponent>(questEntity),
+                            PickUpQuestComponent = this.EntityManager.HasComponent<PickUpQuestComponent>(questEntity) ?
+                                                    this.EntityManager.GetComponentData<PickUpQuestComponent>(questEntity) :
+                                                    new PickUpQuestComponent()                            
+                        });
                     });
                 });
                 if (playerData != null)

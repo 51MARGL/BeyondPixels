@@ -147,7 +147,6 @@ namespace BeyondPixels.ECS.Systems.Quest
                 }
 
                 var quest = this.CreateQuestEntity(ref questText, allowedArray);
-                UnityEngine.Debug.Log(questText);
                 quest.GetComponent<QuestTextComponent>().QuestText = questText;
 
                 this.PostUpdateCommands.DestroyEntity(entities[i]);
@@ -203,7 +202,7 @@ namespace BeyondPixels.ECS.Systems.Quest
                 template += "s";
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
-                XPAmount = 25 * prTarget
+                XPAmount = 7 * prTarget
             });
 
             var target = Regex.Match(template, @"\[[^\[\]]+\]").Value;
@@ -240,7 +239,7 @@ namespace BeyondPixels.ECS.Systems.Quest
                 template += "s";
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
-                XPAmount = 15 * prTarget
+                XPAmount = 7 * prTarget
             });
 
             var target = Regex.Match(template, @"\[[^\[\]]+\]").Value;
@@ -255,7 +254,7 @@ namespace BeyondPixels.ECS.Systems.Quest
                 template += "s";
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
-                XPAmount = 10 * prTarget
+                XPAmount = 5 * prTarget
             });
 
             var target = Regex.Match(template, @"\[[^\[\]]+\]").Value;
@@ -270,7 +269,7 @@ namespace BeyondPixels.ECS.Systems.Quest
                 template += "s";
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
-                XPAmount = 50 * prTarget
+                XPAmount = 10 * prTarget
             });
 
             var target = Regex.Match(template, @"\[[^\[\]]+\]").Value;
@@ -285,7 +284,7 @@ namespace BeyondPixels.ECS.Systems.Quest
                 template += "s";
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
-                XPAmount = 50 * prTarget
+                XPAmount = 5 * prTarget
             });
 
             var target = Regex.Match(template, @"\[[^\[\]]+\]").Value;

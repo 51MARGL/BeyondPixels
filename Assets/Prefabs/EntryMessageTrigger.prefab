@@ -79,6 +79,7 @@ MonoBehaviour:
   _tips:
   - 'Tip: You can move by pressing {Up} {Left} {Down} {Right}'
   - 'Tip: Use minimap in top right corner for better orientation'
+  - 'Tip: You can view current objectives by pressing {Quest}'
 --- !u!114 &111066418952423303
 MonoBehaviour:
   m_ObjectHideFlags: 0

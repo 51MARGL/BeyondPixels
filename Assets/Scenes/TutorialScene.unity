@@ -55813,7 +55813,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[0].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -55989,7 +55989,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[1].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -56058,7 +56058,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[2].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -56127,7 +56127,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[3].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -56201,7 +56201,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[4].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -56270,7 +56270,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[5].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -56339,7 +56339,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[6].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -56408,7 +56408,7 @@ PrefabInstance:
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
       propertyPath: m_AnimatedTiles.Array.data[7].second.m_AnimationTimeOffset
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8195094282116877262, guid: 3c6ba44e23ce61349b5d405e1ee69ac1,
         type: 3}
@@ -62995,6 +62995,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 264085147, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
+      propertyPath: m_MinHeight
+      value: 50
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d81d3e30d7cd4e9469da3e8c898b8a78, type: 3}
 --- !u!1 &1518764210
@@ -63550,7 +63554,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4450399802746792, guid: 6008bca52bc12264f877c59e79aae336, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4450399802746792, guid: 6008bca52bc12264f877c59e79aae336, type: 3}
       propertyPath: m_LocalRotation.x

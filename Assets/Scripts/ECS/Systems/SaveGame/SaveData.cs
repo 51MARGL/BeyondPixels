@@ -4,6 +4,7 @@ using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
+using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Components.SaveGame;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
@@ -20,8 +21,9 @@ namespace BeyondPixels.ECS.Systems.SaveGame
         public MagicStatComponent MagicStatComponent;
 
         public List<ItemData> ItemDataList;
-
+        public List<QuestData> QuestDataList;
     }
+
     [Serializable]
     public class ItemData
     {
@@ -33,4 +35,21 @@ namespace BeyondPixels.ECS.Systems.SaveGame
         public MagickStatModifierComponent MagicModifier;
     }
 
+    [Serializable]
+    public class QuestData
+    {
+        public string QuestText;
+        public QuestComponent QuestComponent;
+        public PickUpQuestComponent PickUpQuestComponent;
+        public XPRewardComponent XPRewardComponent;
+        public LevelComponent LevelComponent;
+        public bool IsDone;
+        public bool IsDefeatQuest;
+        public bool IsInvestigateQuest;
+        public bool IsLevelUpQuest;
+        public bool IsLootQuest;
+        public bool IsPickUpQuest;
+        public bool IsReleaseQuest;
+        public bool IsSpendQuest;
+    }
 }

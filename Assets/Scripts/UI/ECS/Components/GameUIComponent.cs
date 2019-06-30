@@ -15,6 +15,7 @@ namespace BeyondPixels.UI.ECS.Components
         public LevelGroupWrapper LevelGroup;
         public SpellCastBarGroupWrapper SpellCastBarGroup;
         public SpellButtonsGroupWrapper SpellButtonsGroup;
+        public GameObject QuestDoneMark;
 
         [Serializable]
         public class HealthGroupWrapper
