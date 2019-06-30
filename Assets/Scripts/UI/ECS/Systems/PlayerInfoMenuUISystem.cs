@@ -64,6 +64,9 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected override void OnUpdate()
         {
+            if (this._playerGroup.CalculateLength() == 0)
+                this._inventoryInitialized = false;
+
             this.Entities.With(this._playerGroup).ForEach((Entity playerEntity,
                 ref HealthStatComponent healthstatComponent,
                 ref AttackStatComponent attackStatComponent,

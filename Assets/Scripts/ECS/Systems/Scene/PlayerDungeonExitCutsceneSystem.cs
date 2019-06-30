@@ -62,8 +62,8 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
 
                 var movementComponent = this.EntityManager.GetComponentData<MovementComponent>(playerEntity);
-                if (math.abs(playerPosition.x - desiredPosition.x) > 0.05f
-                    || math.abs(playerPosition.y - desiredPosition.y) > 0.05f)
+                if (math.abs(playerPosition.x - desiredPosition.x) > 0.1f
+                    || math.abs(playerPosition.y - desiredPosition.y) > 0.1f)
                 {
                     movementComponent.Direction = desiredPosition - playerPosition;
                     this.PostUpdateCommands.SetComponent(playerEntity, movementComponent);
