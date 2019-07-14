@@ -50,11 +50,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             public NodeComponent NodeComponent;
             public static int MinRoomSize;
 
-            public bool IsLeaf
-            {
-                get => this.LeftChild == null && this.RightChild == null;
-            }
-
             public BSPNode(NodeComponent nodeComponent)
             {
                 this.NodeComponent = nodeComponent;
@@ -68,8 +63,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public void SplitNode(ref Random random)
             {
-                if (!this.IsLeaf)
-                    return;
                 if (this.NodeComponent.RectBounds.z / 2 < MinRoomSize
                     && this.NodeComponent.RectBounds.w / 2 < MinRoomSize)
                 {
@@ -82,7 +75,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 bool splitHorizontal;
                 if (rectBounds.w / (float)rectBounds.z > 1)
                     splitHorizontal = false;
-                else if (rectBounds.z / (float)rectBounds.w > 1)
+                else if (rectBounds.z / (float)rectBounds.w >= 1)
                     splitHorizontal = true;
                 else
                     splitHorizontal = random.NextBool();

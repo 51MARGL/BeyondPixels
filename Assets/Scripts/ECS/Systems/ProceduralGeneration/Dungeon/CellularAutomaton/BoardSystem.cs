@@ -105,7 +105,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile] 19.1 support only
+        [BurstCompile]
         private struct GetRoomsJob : IJob
         {
             [ReadOnly]
@@ -146,12 +146,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var currentIndex = 0;
 
-                var queue = new NativeQueue<TileComponent>(Allocator.Temp);
-                queue.Enqueue(startTile);
+                var queue = new NativeList<TileComponent>(Allocator.Temp);
+                queue.Add(startTile);
 
-                while (queue.Count > 0)
+                while (queue.Length > 0)
                 {
-                    var tile = queue.Dequeue();
+                    var tile = queue[queue.Length - 1];
+                    queue.RemoveAtSwapBack(queue.Length - 1);
                     this.RoomTiles[roomTilesIndex + currentIndex] = tile;
                     currentIndex++;
 
@@ -165,7 +166,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                                 && flags[currIndex] == 0 && this.Tiles[currIndex].CurrentGenState == TileType.Floor)
                             {
                                 flags[currIndex] = 1;
-                                queue.Enqueue(this.Tiles[currIndex]);
+                                queue.Add(this.Tiles[currIndex]);
                             }
                         }
                 }
@@ -173,6 +174,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
+        [BurstCompile]
         private struct RearangeRoomsJob : IJob
         {
             [ReadOnly]
@@ -205,7 +207,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile] 19.1 support only
+        [BurstCompile]
         private struct FindClosestRoomsConnectionsJob : IJobParallelFor
         {
             [ReadOnly]
@@ -297,7 +299,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile] 19.1 support only
+        [BurstCompile]
         private struct FindAllRoomsConnectionsJob : IJob
         {
             [ReadOnly]
@@ -433,7 +435,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        //[BurstCompile] 19.1 support only
+        [BurstCompile]
         private struct CreateCorridorsJob : IJobParallelFor
         {
             [NativeDisableContainerSafetyRestriction]

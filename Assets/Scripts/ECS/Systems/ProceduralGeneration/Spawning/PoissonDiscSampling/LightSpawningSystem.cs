@@ -32,7 +32,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 {
                     GridSize = boardSize,
                     SamplesLimit = 30,
-                    Radius = 10,
+                    Radius = 15,
                     RequestID = SystemRequestID
                 });
                 for (var y = 0; y < boardSize.y; y++)

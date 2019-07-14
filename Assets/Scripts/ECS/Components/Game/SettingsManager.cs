@@ -107,7 +107,7 @@ namespace BeyondPixels.ECS.Components.Game
 
             var resolutions = Screen.resolutions
                 .Distinct()
-                .Where(x => x.width >= 800)
+                .Where(x => x.width >= 800 && x.refreshRate >= 59)
                 .OrderByDescending(x => x.width)
                 .ThenBy(x => x.refreshRate)
                 .ToArray();

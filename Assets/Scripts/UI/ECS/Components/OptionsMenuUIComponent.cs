@@ -48,7 +48,7 @@ namespace BeyondPixels.UI.ECS.Components
         public override void Show()
         {
             base.Show();
-
+            SettingsManager.Instance.LoadSettings();
             this.RefreshControls();
         }
 

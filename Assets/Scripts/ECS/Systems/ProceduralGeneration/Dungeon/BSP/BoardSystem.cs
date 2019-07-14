@@ -12,14 +12,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 {
     public class BoardSystem : JobComponentSystem
     {
+        [BurstCompile]
         private struct CreateRoomsJob : IJobParallelFor
         {
             public NativeArray<NodeComponent> TreeArray;
 
             [ReadOnly]
             public int RandomSeed;
-            [ReadOnly]
-            public int MinRoomSize;
             [ReadOnly]
             public BoardComponent Board;
 
@@ -30,17 +29,25 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
                 var random = new Random((uint)(this.RandomSeed + index));
                 var node = this.TreeArray[index];
-                var roomX = math.clamp(node.RectBounds.x + random.NextInt(0, node.RectBounds.w / 3), 2, this.Board.Size.x - 2);
-                var roomY = math.clamp(node.RectBounds.y + random.NextInt(0, node.RectBounds.z / 3), 2, this.Board.Size.y - 2);
-                var roomWidth = node.RectBounds.w - (roomX - node.RectBounds.x) - 2;
-                var roomHeight = node.RectBounds.z - (roomY - node.RectBounds.y) - 2;
-                roomWidth -= random.NextInt(0, roomWidth);
-                roomHeight -= random.NextInt(0, roomHeight);
+                var randomMarginX = random.NextInt(2, 11);
+                var randomMarginY = random.NextInt(2, 11);
+                var roomX = randomMarginX;
+                var roomY = randomMarginY;
+                var roomWidth = node.RectBounds.w - roomX - randomMarginX;
+                var roomHeight = node.RectBounds.z - roomY - randomMarginY;
+
+                if (roomWidth < 3 || roomHeight < 3)
+                {
+                    roomX = 2;
+                    roomY = 2;
+                    roomWidth = node.RectBounds.w - 4;
+                    roomHeight = node.RectBounds.z - 4;
+                }
 
                 node.Room = new RoomComponent
                 {
-                    X = roomX,
-                    Y = roomY,
+                    X = roomX + node.RectBounds.x,
+                    Y = roomY + node.RectBounds.y,
                     Size = new int2(roomWidth, roomHeight)
                 };
                 this.TreeArray[index] = node;
@@ -59,43 +66,49 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             [ReadOnly]
             public int RandomSeed;
             [ReadOnly]
-            public int Level;
+            public int StartIndex;
 
             public void Execute(int index)
             {
-                var startIndex = (int)math.pow(2, this.Level - 1) - 1;
-                if (this.TreeArray[startIndex + index].IsNull == 1
-                    || this.TreeArray[startIndex + index + 1].IsNull == 1
-                    || startIndex + index % 2 == 0)
+                var nodeIndex = this.StartIndex + index;
+                if (this.TreeArray[nodeIndex].IsNull == 1
+                    || this.TreeArray[nodeIndex + 1].IsNull == 1
+                    || nodeIndex % 2 == 0)
                     return;
 
                 var random = new Random((uint)(this.RandomSeed + index));
-                var leftRoom = this.GetRoom(startIndex + index);
-                var rightRoom = this.GetRoom(startIndex + index + 1);
+                var leftRoomIndex = this.GetRoomIndex(nodeIndex, this.TreeArray.Length);
+                var rightRoomIndex = this.GetRoomIndex(nodeIndex + 1, this.TreeArray.Length);
+
+                var leftRoom = this.TreeArray[leftRoomIndex].Room;
+                var rightRoom = this.TreeArray[rightRoomIndex].Room;
 
                 this.Corridors.Enqueue(new CorridorComponent
                 {
-                    Start = new int2(random.NextInt(leftRoom.X + 1, leftRoom.X + leftRoom.Size.x),
-                                     random.NextInt(leftRoom.Y + 1, leftRoom.Y + leftRoom.Size.y)),
-                    End = new int2(random.NextInt(rightRoom.X + 1, rightRoom.X + rightRoom.Size.x),
-                                   random.NextInt(rightRoom.Y + 1, rightRoom.Y + rightRoom.Size.y)),
+                    Start = new int2(random.NextInt(leftRoom.X + 2, leftRoom.X + leftRoom.Size.x - 1),
+                                     random.NextInt(leftRoom.Y + 2, leftRoom.Y + leftRoom.Size.y - 1)),
+                    End = new int2(random.NextInt(rightRoom.X + 2, rightRoom.X + rightRoom.Size.x - 1),
+                                   random.NextInt(rightRoom.Y + 2, rightRoom.Y + rightRoom.Size.y - 1)),
                 });
             }
 
-            public RoomComponent GetRoom(int index)
+            public int GetRoomIndex(int index, int currentBest)
             {
                 var node = this.TreeArray[index];
                 if (node.IsLeaf == 1)
-                    return node.Room;
-
-                var room = new RoomComponent();
+                {
+                    if (index < currentBest)
+                        return index;
+                    else
+                        return currentBest;
+                }
                 if (this.TreeArray[2 * index + 1].IsNull == 0)
-                    return this.GetRoom(2 * index + 1);
+                    currentBest = this.GetRoomIndex(2 * index + 1, currentBest);
 
                 if (this.TreeArray[2 * index + 2].IsNull == 0)
-                    return this.GetRoom(2 * index + 2);
+                    currentBest = this.GetRoomIndex(2 * index + 2, currentBest);
 
-                return room;
+                return currentBest;
             }
         }
 
@@ -165,16 +178,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             private void ConnectHorizontal(int x1, int x2, int y)
             {
                 var dx = x2 - x1;
-                for (var x = 0; x <= dx; x++)
+                for (var x = 0; x < dx; x++)
                 {
                     this.Tiles[y * this.TileStride + x1 + x] = TileType.Floor;
                     this.Tiles[(y - 1) * this.TileStride + x1 + x] = TileType.Floor;
                 }
             }
+
             private void ConnectVertical(int y1, int y2, int x)
             {
                 var dy = y2 - y1;
-                for (var y = 0; y <= dy; y++)
+                for (var y = 0; y < dy; y++)
                 {
                     this.Tiles[(y1 + y) * this.TileStride + x] = TileType.Floor;
                     this.Tiles[(y1 + y) * this.TileStride + x - 1] = TileType.Floor;
@@ -412,21 +426,21 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         {
                             TreeArray = TreeArray,
                             RandomSeed = random.NextInt(),
-                            Board = board,
-                            MinRoomSize = board.MinRoomSize
+                            Board = board
                         }.Schedule(this.TreeArray.Length, 1, inputDeps);
 
                         var lastLevelJobHandle = createRoomsJobHandle;
                         var concurrentQueue = this.CorridorsQueue.ToConcurrent();
                         for (var level = bspTree.Height; level > 0; level--)
                         {
+                            var nodesAmount = (int)math.pow(2, level - 1) - 1;
                             lastLevelJobHandle = new FindCorridorsForLevelJob
                             {
                                 TreeArray = TreeArray,
                                 RandomSeed = random.NextInt(),
-                                Level = level,
+                                StartIndex = nodesAmount,
                                 Corridors = concurrentQueue
-                            }.Schedule((int)math.pow(2, level - 1) - 1, 1, lastLevelJobHandle);
+                            }.Schedule(nodesAmount, 1, lastLevelJobHandle);
                         }
                         inputDeps = lastLevelJobHandle;
                     }

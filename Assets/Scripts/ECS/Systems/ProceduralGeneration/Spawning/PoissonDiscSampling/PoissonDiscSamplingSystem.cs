@@ -203,7 +203,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                             if (sampleIndex > -1)
                             {
                                 var distance = math.distance(candidatePosition, samples[sampleIndex].Position);
-                                if (distance < samples[sampleIndex].Radius || distance < candidate.Radius)
+                                if (distance < samples[sampleIndex].Radius + candidate.Radius)
                                     return false;
                             }
                         }

@@ -37,16 +37,130 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 var random = new Random((uint)(this.RandomSeed * (index + 1)));
 
                 this.Rooms[batch.FirstRoomIndex] =
-                    CreateRoom(this.Board, this.Corridors[batch.FirstCorridorIndex], ref random);
+                    this.CreateRoom(this.Board, this.Corridors[batch.FirstCorridorIndex], ref random);
                 this.Corridors[3 + batch.FirstRoomIndex] =
-                    CreateCorridor(this.Rooms[batch.FirstRoomIndex], this.Board, false, ref random);
+                    this.CreateCorridor(this.Rooms[batch.FirstRoomIndex], this.Board, ref random);
 
                 for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
                 {
-                    this.Rooms[i] = CreateRoom(this.Board, this.Corridors[j - 1], ref random);
+                    this.Rooms[i] = this.CreateRoom(this.Board, this.Corridors[j - 1], ref random);
                     if (j < this.Corridors.Length)
-                        this.Corridors[j] = CreateCorridor(this.Rooms[i], this.Board, false, ref random);
+                        this.Corridors[j] = this.CreateCorridor(this.Rooms[i], this.Board, ref random);
                 }
+            }
+
+            private RoomComponent CreateRoom(BoardComponent board, CorridorComponent corridor, ref Unity.Mathematics.Random random)
+            {
+                var roomWidth = random.NextInt(3, board.MaxRoomSize);
+                var roomHeight = random.NextInt(3, board.MaxRoomSize);
+
+                var roomX = 0;
+                var roomY = 0;
+
+                switch (corridor.Direction)
+                {
+                    case Direction.Up:
+                        roomHeight = math.clamp(roomHeight, 0, board.Size.y - 2 - corridor.EndY);
+                        roomY = corridor.EndY;
+                        roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
+                        roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
+                        break;
+                    case Direction.Left:
+                        roomWidth = math.clamp(roomWidth, 0, board.Size.x - 2 - corridor.EndX);
+                        roomX = corridor.EndX;
+                        roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
+                        roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
+                        break;
+                    case Direction.Down:
+                        roomHeight = math.clamp(roomHeight, 0, corridor.EndY);
+                        roomY = corridor.EndY - roomHeight + 1;
+                        roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
+                        roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
+                        break;
+                    case Direction.Right:
+                        roomWidth = math.clamp(roomWidth, 0, corridor.EndX);
+                        roomX = corridor.EndX - roomWidth + 1;
+                        roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
+                        roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
+                        break;
+                }
+
+                return new RoomComponent
+                {
+                    X = math.clamp(roomX, 2, board.Size.x - 2),
+                    Y = math.clamp(roomY, 2, board.Size.y - 2),
+                    Size = new int2(roomWidth, roomHeight),
+                    EnteringCorridor = corridor.Direction
+                };
+            }
+
+            private CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, ref Unity.Mathematics.Random random)
+            {
+                var direction = (Direction)random.NextInt(0, 4);
+                var oppositeDirection = (Direction)(((int)room.EnteringCorridor + 2) % 4);
+
+                if (random.NextInt(0, 100) > 75) //25% chance to go further from center
+                {
+                    var centerX = (int)math.round(board.Size.x / 2f);
+                    var centerY = (int)math.round(board.Size.y / 2f);
+                    if (room.X > centerX && room.Y > centerY)
+                        direction = random.NextBool() ? Direction.Right : random.NextBool() ? Direction.Up : Direction.Down;
+                    else if (room.X < centerX && room.Y > centerY)
+                        direction = random.NextBool() ? Direction.Left : random.NextBool() ? Direction.Up : Direction.Down;
+                    else if (room.X > centerX && room.Y < centerY)
+                        direction = random.NextBool() ? Direction.Right : random.NextBool() ? Direction.Up : Direction.Down;
+                    else
+                        direction = random.NextBool() ? Direction.Left : random.NextBool() ? Direction.Up : Direction.Down;
+                }
+
+                if (direction == oppositeDirection)
+                {
+                    var directionInt = (int)direction;
+                    directionInt++;
+                    directionInt = directionInt % 4;
+                    direction = (Direction)directionInt;
+
+                }
+
+                var corridorLength = random.NextInt(board.MinCorridorLength, board.MaxCorridorLength);
+                var corridorX = 0;
+                var corridorY = 0;
+
+                var maxLength = board.MaxCorridorLength;
+
+                switch (direction)
+                {
+                    case Direction.Up:
+                        corridorX = random.NextInt(room.X, room.X + room.Size.x);
+                        corridorY = room.Y + room.Size.y - 2;
+                        maxLength = board.Size.y - 2 - corridorY;
+                        break;
+                    case Direction.Left:
+                        corridorX = room.X + room.Size.x - 2;
+                        corridorY = random.NextInt(room.Y, room.Y + room.Size.y);
+                        maxLength = board.Size.x - 2 - corridorX;
+                        break;
+                    case Direction.Down:
+                        corridorX = random.NextInt(room.X, room.X + room.Size.x + 1);
+                        corridorY = room.Y;
+                        maxLength = corridorY - 2;
+                        break;
+                    case Direction.Right:
+                        corridorX = room.X;
+                        corridorY = random.NextInt(room.Y, room.Y + room.Size.y + 1);
+                        maxLength = corridorX - 2;
+                        break;
+                }
+
+                corridorLength = math.clamp(corridorLength, 0, maxLength);
+
+                return new CorridorComponent
+                {
+                    StartX = corridorX,
+                    StartY = corridorY,
+                    Length = corridorLength,
+                    Direction = direction
+                };
             }
         }
 
@@ -353,10 +467,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     // setup fist room and corridors to all 4 directions
                     var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
                     rooms[0] = CreateRoom(board, ref random);
-                    corridors[0] = CreateCorridor(rooms[0], board, true, ref random, 0);
-                    corridors[1] = CreateCorridor(rooms[0], board, true, ref random, 1);
-                    corridors[2] = CreateCorridor(rooms[0], board, true, ref random, 2);
-                    corridors[3] = CreateCorridor(rooms[0], board, true, ref random, 3);
+                    corridors[0] = this.CreateCorridor(rooms[0], board, ref random, 0);
+                    corridors[1] = this.CreateCorridor(rooms[0], board, ref random, 1);
+                    corridors[2] = this.CreateCorridor(rooms[0], board, ref random, 2);
+                    corridors[3] = this.CreateCorridor(rooms[0], board, ref random, 3);
 
                     var batch = new NativeArray<BatchData>(4, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                     for (int j = 0, k = batch.Length + 1; j < batch.Length; j++, k--)
@@ -444,80 +558,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             };
         }
 
-        private static RoomComponent CreateRoom(BoardComponent board, CorridorComponent corridor, ref Unity.Mathematics.Random random)
+        private CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, ref Unity.Mathematics.Random random, int forceDirection)
         {
-            var roomWidth = random.NextInt(3, board.MaxRoomSize);
-            var roomHeight = random.NextInt(3, board.MaxRoomSize);
-
-            var roomX = 0;
-            var roomY = 0;
-
-            switch (corridor.Direction)
-            {
-                case Direction.Up:
-                    roomHeight = math.clamp(roomHeight, 0, board.Size.y - 2 - corridor.EndY);
-                    roomY = corridor.EndY;
-                    roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
-                    roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
-                    break;
-                case Direction.Left:
-                    roomWidth = math.clamp(roomWidth, 0, board.Size.x - 2 - corridor.EndX);
-                    roomX = corridor.EndX;
-                    roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
-                    roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
-                    break;
-                case Direction.Down:
-                    roomHeight = math.clamp(roomHeight, 0, corridor.EndY);
-                    roomY = corridor.EndY - roomHeight + 1;
-                    roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
-                    roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
-                    break;
-                case Direction.Right:
-                    roomWidth = math.clamp(roomWidth, 0, corridor.EndX);
-                    roomX = corridor.EndX - roomWidth + 1;
-                    roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
-                    roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
-                    break;
-            }
-
-            return new RoomComponent
-            {
-                X = math.clamp(roomX, 2, board.Size.x - 2),
-                Y = math.clamp(roomY, 2, board.Size.y - 2),
-                Size = new int2(roomWidth, roomHeight),
-                EnteringCorridor = corridor.Direction
-            };
-        }
-
-        private static CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, bool first, ref Unity.Mathematics.Random random, int forceDirection = -1)
-        {
-            var direction = (Direction)random.NextInt(0, 4);
-            var oppositeDirection = (Direction)(((int)room.EnteringCorridor + 2) % 4);
-
-            if (first && forceDirection != -1)
-                direction = (Direction)forceDirection;
-            else if (!first && random.NextInt(0, 100) > 75) //25% chance to go further from center
-            {
-                var centerX = (int)math.round(board.Size.x / 2f);
-                var centerY = (int)math.round(board.Size.y / 2f);
-                if (room.X > centerX && room.Y > centerY)
-                    direction = random.NextBool() ? Direction.Left : Direction.Up;
-                else if (room.X < centerX && room.Y > centerY)
-                    direction = random.NextBool() ? Direction.Right : Direction.Up;
-                else if (room.X > centerX && room.Y < centerY)
-                    direction = random.NextBool() ? Direction.Left : Direction.Down;
-                else
-                    direction = random.NextBool() ? Direction.Right : Direction.Down;
-            }
-
-            if (!first && direction == oppositeDirection)
-            {
-                var directionInt = (int)direction;
-                directionInt++;
-                directionInt = directionInt % 4;
-                direction = (Direction)directionInt;
-
-            }
+            var direction = (Direction)forceDirection;
 
             var corridorLength = random.NextInt(board.MinCorridorLength, board.MaxCorridorLength);
             var corridorX = 0;
