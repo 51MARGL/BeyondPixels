@@ -269,43 +269,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             }
                 }
             }
-        }
-
-        private struct InstantiateTilesJob : IJobParallelFor
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [ReadOnly]
-            public NativeArray<TileType> Tiles;
-
-            [ReadOnly]
-            public int TileStride;
-
-            public void Execute(int index)
-            {
-                if (this.IsBoardValid())
-                    for (var x = 0; x < this.TileStride; x++)
-                    {
-                        var entity = this.CommandBuffer.CreateEntity(index);
-                        this.CommandBuffer.AddComponent(index, entity, new FinalTileComponent
-                        {
-                            TileType = this.Tiles[(index * this.TileStride) + x],
-                            Position = new int2(x, index)
-                        });
-                    }
-            }
-
-            private bool IsBoardValid()
-            {
-                var freeTilesCount = 0;
-                for (var i = 0; i < this.Tiles.Length; i++)
-                    if (this.Tiles[i] == TileType.Floor)
-                        freeTilesCount++;
-
-                if (freeTilesCount < 50)
-                    return false;
-                return true;
-            }
-        }
+        }       
 
         private struct TagBoardDoneJob : IJob
         {
@@ -328,6 +292,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             {
                 if (this.IsBoardValid())
                 {
+                    for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                        for (var x = 0; x < this.BoardComponent.Size.x; x++)
+                        {
+                            var entity = this.CommandBuffer.CreateEntity();
+                            this.CommandBuffer.AddComponent(entity, new FinalTileComponent
+                            {
+                                TileType = this.Tiles[(y * this.BoardComponent.Size.x) + x],
+                                Position = new int2(x, y)
+                            });
+                        }
+
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
                     var finalBoardComponent = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
@@ -474,13 +449,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             Tiles = Tiles
                         }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, createCorridorsJobHandle));
 
-                        var instantiateTilesJobHandle = new InstantiateTilesJob
-                        {
-                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                            Tiles = Tiles,
-                            TileStride = board.Size.x
-                        }.Schedule(board.Size.y, 1, removeThinWallsJobHandle);
-
                         inputDeps = new TagBoardDoneJob
                         {
                             CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
@@ -489,7 +457,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             TreeArray = TreeArray,
                             Tiles = Tiles,
                             RandomSeed = random.NextInt()
-                        }.Schedule(instantiateTilesJobHandle);
+                        }.Schedule(removeThinWallsJobHandle);
                         this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
                     }
                     else if (this.CurrentPhase == 2)

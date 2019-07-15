@@ -314,41 +314,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        private struct InstantiateTilesJob : IJobParallelFor
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [ReadOnly]
-            public NativeArray<TileType> Tiles;
-
-            [ReadOnly]
-            public int TileStride;
-
-            public void Execute(int index)
-            {
-                if (this.IsBoardValid())
-                    for (var x = 0; x < this.TileStride; x++)
-                    {
-                        var entity = this.CommandBuffer.CreateEntity(index);
-                        this.CommandBuffer.AddComponent(index, entity, new FinalTileComponent
-                        {
-                            TileType = this.Tiles[(index * this.TileStride) + x],
-                            Position = new int2(x, index)
-                        });
-                    }
-            }
-            private bool IsBoardValid()
-            {
-                var freeTilesCount = 0;
-                for (var i = 0; i < this.Tiles.Length; i++)
-                    if (this.Tiles[i] == TileType.Floor)
-                        freeTilesCount++;
-
-                if (freeTilesCount < 50)
-                    return false;
-                return true;
-            }
-        }
-
         private struct TagBoardDoneJob : IJob
         {
             public EntityCommandBuffer CommandBuffer;
@@ -361,24 +326,38 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             public NativeArray<TileType> Tiles;
             [ReadOnly]
             public int RandomSeed;
+            [ReadOnly]
+            public int TileStride;
 
             public void Execute()
             {
                 if (this.IsBoardValid())
                 {
+                    var mapBounds = this.GetBounds();
+                    for (var y = 0; y < mapBounds.z; y++)
+                        for (var x = 0; x < mapBounds.w; x++)
+                        {
+                            var entity = this.CommandBuffer.CreateEntity();
+                            this.CommandBuffer.AddComponent(entity, new FinalTileComponent
+                            {
+                                TileType = this.Tiles[((y + mapBounds.y) * this.TileStride) + (x + mapBounds.x)],
+                                Position = new int2(x, y)
+                            });
+                        }
+
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
                     var finalBoardComponent = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
                     {
-                        Size = this.BoardComponent.Size
+                        Size = new int2(mapBounds.w, mapBounds.z)
                     });
                 }
                 else
                 {
                     var random = new Random((uint)this.RandomSeed);
 
-                    var randomSize = new int2(random.NextInt(75, 125), random.NextInt(50, 125));
-                    var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(5, 11);
+                    var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
+                    var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(4, 9);
                     var board = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
@@ -390,6 +369,33 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     });
                     this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }
+            }
+
+            private int4 GetBounds()
+            {
+                var bounds = new int4(this.BoardComponent.Size.x, this.BoardComponent.Size.y, 0, 0);
+
+                for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                    for (var x = 0; x < this.TileStride; x++)
+                    {
+                        if (this.Tiles[y * this.TileStride + x] == TileType.Floor)
+                        {
+                            if (y > bounds.z)
+                                bounds.z = y;
+                            if (y < bounds.y)
+                                bounds.y = y;
+                            if (x > bounds.w)
+                                bounds.w = x;
+                            if (x < bounds.x)
+                                bounds.x = x;
+                        }
+                    }
+
+                bounds.x = math.clamp(bounds.x - 2, 0, this.BoardComponent.Size.x);
+                bounds.y = math.clamp(bounds.y - 2, 0, this.BoardComponent.Size.y);
+                bounds.z = math.clamp(bounds.z - bounds.y + 3, 0, this.BoardComponent.Size.y - bounds.y);
+                bounds.w = math.clamp(bounds.w - bounds.x + 3, 0, this.BoardComponent.Size.x - bounds.x);
+                return bounds;
             }
 
             private bool IsBoardValid()
@@ -516,21 +522,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         Tiles = tiles
                     }.Schedule(removeThinWallsJobHandle);
 
-                    var instantiateTilesJobHandle = new InstantiateTilesJob
-                    {
-                        CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                        Tiles = tiles,
-                        TileStride = board.Size.x
-                    }.Schedule(board.Size.y, 1, closeBordersJobHandle);
-
                     inputDeps = new TagBoardDoneJob
                     {
                         CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
                         BoardEntity = boardEntity,
                         Tiles = tiles,
                         BoardComponent = board,
+                        TileStride = board.Size.x,
                         RandomSeed = random.NextInt()
-                    }.Schedule(instantiateTilesJobHandle);
+                    }.Schedule(closeBordersJobHandle);
                     this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
                 }
             }

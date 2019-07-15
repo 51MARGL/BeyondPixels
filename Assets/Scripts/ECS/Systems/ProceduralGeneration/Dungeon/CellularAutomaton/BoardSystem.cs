@@ -620,46 +620,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             }
         }
 
-        private struct InstantiateTilesJob : IJobParallelFor
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [ReadOnly]
-            public NativeArray<TileComponent> Tiles;
-
-            [DeallocateOnJobCompletion]
-            [ReadOnly]
-            public NativeArray<TileComponent> RoomTiles;
-
-            [ReadOnly]
-            public int TileStride;
-
-            public void Execute(int index)
-            {
-                if (this.IsBoardValid())
-                    for (var x = 0; x < this.TileStride; x++)
-                    {
-                        var entity = this.CommandBuffer.CreateEntity(index);
-                        this.CommandBuffer.AddComponent(index, entity, new FinalTileComponent
-                        {
-                            TileType = this.Tiles[(index * this.TileStride) + x].CurrentGenState,
-                            Position = new int2(x, index)
-                        });
-                    }
-            }
-
-            private bool IsBoardValid()
-            {
-                var freeTilesCount = 0;
-                for (var i = 0; i < this.Tiles.Length; i++)
-                    if (this.Tiles[i].CurrentGenState == TileType.Floor)
-                        freeTilesCount++;
-
-                if (freeTilesCount < 50)
-                    return false;
-                return true;
-            }
-        }
-
         private struct TagBoardDoneJob : IJob
         {
             public EntityCommandBuffer CommandBuffer;
@@ -670,6 +630,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             [DeallocateOnJobCompletion]
             [ReadOnly]
             public NativeArray<TileComponent> Tiles;
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<TileComponent> RoomTiles;
             [ReadOnly]
             public int RandomSeed;
 
@@ -677,6 +640,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 if (this.IsBoardValid())
                 {
+                    for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                        for (var x = 0; x < this.BoardComponent.Size.x; x++)
+                        {
+                            var entity = this.CommandBuffer.CreateEntity();
+                            this.CommandBuffer.AddComponent(entity, new FinalTileComponent
+                            {
+                                TileType = this.Tiles[(y * this.BoardComponent.Size.x) + x].CurrentGenState,
+                                Position = new int2(x, y)
+                            });
+                        }
+
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
                     var finalBoardComponent = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
@@ -885,22 +859,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             Tiles = Tiles
                         }.Schedule(removeThinWallsJobHandle);
 
-                        var instantiateTilesJobHandle = new InstantiateTilesJob
-                        {
-                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                            Tiles = Tiles,
-                            TileStride = board.Size.x,
-                            RoomTiles = RoomTiles
-                        }.Schedule(board.Size.y, 1, closeBordersJobHandle);
-
                         inputDeps = new TagBoardDoneJob
                         {
                             CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
                             BoardEntity = boardEntity,
                             BoardComponent = board,
                             Tiles = Tiles,
+                            RoomTiles = RoomTiles,
                             RandomSeed = random.NextInt()
-                        }.Schedule(instantiateTilesJobHandle);
+                        }.Schedule(closeBordersJobHandle);
                         this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
                     }
                     else if (this.CurrentPhase == 3)

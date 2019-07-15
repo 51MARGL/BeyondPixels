@@ -72,8 +72,8 @@ namespace BeyondPixels.SceneBootstraps
                     var randomAlg = random.NextInt(0, 100);
                     if (randomAlg < 33)
                     {
-                        var randomSize = new int2(random.NextInt(75, 125), random.NextInt(50, 125));
-                        var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(7, 13);
+                        var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
+                        var roomCount = (int)math.log2(randomSize.x * randomSize.y / 100) * random.NextInt(4, 9);
                         board = entityManager.CreateEntity();
                         entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.Naive.BoardComponent
                         {
