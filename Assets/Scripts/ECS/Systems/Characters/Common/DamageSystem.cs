@@ -2,7 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
-
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -12,10 +12,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class DamageSystem : JobComponentSystem
     {
+        [BurstCompile]
         private struct DamageJob : IJobForEachWithEntity<CollisionInfo, FinalDamageComponent>
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-
             [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<ArchetypeChunk> Chunks;
@@ -49,16 +48,25 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                                 else if (healthComponent.CurrentValue > healthComponent.MaxValue)
                                     healthComponent.CurrentValue = healthComponent.MaxValue;
 
-                                this.CommandBuffer.SetComponent(index, entities[i], healthComponent);
-
-                                this.CommandBuffer.DestroyEntity(index, entity);
+                                healthComponents[i] = healthComponent;
                                 return;
                             }
                 }
-
-                this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
+
+        private struct CleanUpJob : IJobForEachWithEntity<CollisionInfo, FinalDamageComponent>
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+            public void Execute(Entity entity,
+                                int index,
+                                [ReadOnly] ref CollisionInfo collisionInfo,
+                                [ReadOnly] ref FinalDamageComponent damageComponent)
+            {
+                CommandBuffer.DestroyEntity(index, entity);
+            }
+        }
+
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _healthGroup;
 
@@ -80,16 +88,20 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var handle = new DamageJob
+            var damageHandle = new DamageJob
             {
-                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 Chunks = this._healthGroup.CreateArchetypeChunkArray(Allocator.TempJob),
                 EntityType = this.GetArchetypeChunkEntityType(),
                 HealthComponentType = this.GetArchetypeChunkComponentType<HealthComponent>(),
                 InCutsceneComponentType = this.GetArchetypeChunkComponentType<InCutsceneComponent>()
             }.Schedule(this, inputDeps);
-            this._endFrameBarrier.AddJobHandleForProducer(handle);
-            return handle;
+
+            var cleanUphandle = new CleanUpJob
+            {
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+            }.Schedule(this, damageHandle);
+            this._endFrameBarrier.AddJobHandleForProducer(cleanUphandle);
+            return cleanUphandle;
         }
     }
 }

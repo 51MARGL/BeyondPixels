@@ -36,7 +36,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 var poissonDiscEntity = this.CommandBuffer.CreateEntity(index);
                 var boardSize = finalBoardComponent.Size;
-                var radius = 20;
+                var radius = 16;
                 this.CommandBuffer.AddComponent(index, poissonDiscEntity, new PoissonDiscSamplingComponent
                 {
                     GridSize = boardSize,

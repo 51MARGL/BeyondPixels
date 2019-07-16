@@ -1,5 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -9,9 +9,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 {
     public class PoissonDiscSamplingSystem : JobComponentSystem
     {
-        private struct GenerateSamplesJob : IJobForEachWithEntity<PoissonDiscSamplingComponent>
+        [BurstCompile]
+        private struct GenerateSamplesJob : IJobForEach<PoissonDiscSamplingComponent>
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
+            [WriteOnly]
+            public NativeQueue<SampleComponent>.Concurrent ResultQueue;
 
             [ReadOnly]
             [DeallocateOnJobCompletion]
@@ -22,7 +24,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             [ReadOnly]
             public int RandomSeed;
 
-            public void Execute(Entity entity, int index, [ReadOnly] ref PoissonDiscSamplingComponent poissonDiscSamplingComponent)
+            public void Execute([ReadOnly] ref PoissonDiscSamplingComponent poissonDiscSamplingComponent)
             {
                 var gridSize = poissonDiscSamplingComponent.GridSize;
                 var requestCells = this.GetCellsByRequestID(poissonDiscSamplingComponent.RequestID, gridSize);
@@ -88,7 +90,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                         for (var i = 0; i < poissonDiscSamplingComponent.SamplesLimit; i++)
                         {
-                            var randomAngle = (float)(random.NextInt() * math.PI * 2);
+                            var randomAngle = random.NextInt() * math.PI * 2;
                             var randomDirection = new float2(math.sin(randomAngle), math.cos(randomAngle));
                             var radius = maxRadius;
                             var stepRadius = radius;
@@ -123,12 +125,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 }
 
                 for (var i = 0; i < finalSamplesList.Length; i++)
-                {
-                    var sampleEntity = this.CommandBuffer.CreateEntity(index);
-                    this.CommandBuffer.AddComponent(index, sampleEntity, finalSamplesList[i]);
-                }
+                    this.ResultQueue.Enqueue(finalSamplesList[i]);
 
-                this.CommandBuffer.DestroyEntity(index, entity);
             }
 
             private void AddToFinal(int2 gridSize, ref NativeArray<PoissonCellComponent> requestCells, NativeList<PoissonCellComponent> validCellList, ref NativeList<SampleComponent> finalSamplesList, SampleComponent candidate)
@@ -213,6 +211,33 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
         }
 
+        private struct CreateResponseJob : IJob
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+
+            public NativeQueue<SampleComponent> SamplesQueue;
+
+            public void Execute()
+            {
+                var index = 0;
+                while (this.SamplesQueue.Count > 0)
+                    if (this.SamplesQueue.TryDequeue(out var sample))
+                    {
+                        var sampleEntity = this.CommandBuffer.CreateEntity(index);
+                        this.CommandBuffer.AddComponent(index, sampleEntity, sample);
+                    }
+            }
+        }
+
+        private struct CleanUpRequestsJob : IJobForEachWithEntity<PoissonDiscSamplingComponent>
+        {
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+
+            public void Execute(Entity entity, int index, [ReadOnly] ref PoissonDiscSamplingComponent poissonCellComponent)
+            {
+                this.CommandBuffer.DestroyEntity(index, entity);
+            }
+        }
         private struct CleanUpCellsJob : IJobForEachWithEntity<PoissonCellComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -232,6 +257,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             }
         }
 
+        private NativeQueue<SampleComponent> SamplesQueue;
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _cellGroup;
         private EntityQuery _radiusGroup;
@@ -253,20 +279,32 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     typeof(PoissonRadiusComponent)
                 }
             });
+
+            this.SamplesQueue = new NativeQueue<SampleComponent>(Allocator.Persistent);
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
-            var barrier = this._endFrameBarrier.CreateCommandBuffer();
 
             var generateSamplesJobHandle = new GenerateSamplesJob
             {
-                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                ResultQueue = this.SamplesQueue.ToConcurrent(),
                 Cells = this._cellGroup.ToComponentDataArray<PoissonCellComponent>(Allocator.TempJob),
                 Radiuses = this._radiusGroup.ToComponentDataArray<PoissonRadiusComponent>(Allocator.TempJob),
                 RandomSeed = random.NextInt()
             }.Schedule(this, inputDeps);
+
+            var createResponseJobHandle = new CreateResponseJob
+            {
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+                SamplesQueue = SamplesQueue
+            }.Schedule(generateSamplesJobHandle);
+
+            var cleanUpRequestsJobHandle = new CleanUpRequestsJob
+            {
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+            }.Schedule(this, generateSamplesJobHandle);
 
             var cleanUpCellsJobHandle = new CleanUpCellsJob
             {
@@ -276,9 +314,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             var cleanUpRadiusesJobHandle = new CleanUpRadiusesJob
             {
                 CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-            }.Schedule(this, cleanUpCellsJobHandle);
-            this._endFrameBarrier.AddJobHandleForProducer(cleanUpRadiusesJobHandle);
-            return cleanUpRadiusesJobHandle;
+            }.Schedule(this, generateSamplesJobHandle);
+
+            var deps = JobHandle.CombineDependencies(createResponseJobHandle, cleanUpRequestsJobHandle,
+                            JobHandle.CombineDependencies(cleanUpCellsJobHandle, cleanUpRadiusesJobHandle));
+            this._endFrameBarrier.AddJobHandleForProducer(deps);
+
+            return deps;
+        }
+
+        protected override void OnDestroy()
+        {
+            this.SamplesQueue.Dispose();
         }
     }
 }
