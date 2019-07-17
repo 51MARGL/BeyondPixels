@@ -157,8 +157,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 return this.SetupValidationGrid(inputDeps);
 
             if (this._boardSpawnReadyGroup.CalculateLength() > 0
-                && this._loadGameGroup.CalculateLength() == 0
-                && PlayerSpawningSystem.PlayerInstantiated)
+                && this._loadGameGroup.CalculateLength() == 0)
             {
                 if (this._samplesGroup.CalculateLength() > 0)
                 {

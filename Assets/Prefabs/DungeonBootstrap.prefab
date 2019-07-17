@@ -51,7 +51,7 @@ MonoBehaviour:
       RoomCount: 30
       MaxRoomSize: 10
       MaxCorridorLength: 15
-      MinCorridorLength: 5
+      MinCorridorLength: 8
     CellularAutomaton:
       BoardWidth: 75
       BoardHeight: 75

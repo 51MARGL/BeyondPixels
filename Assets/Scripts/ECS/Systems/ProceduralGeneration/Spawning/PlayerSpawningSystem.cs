@@ -1,20 +1,8 @@
 ﻿using System;
-
-using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Characters.Stats;
-using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
-using BeyondPixels.ECS.Components.SaveGame;
-using BeyondPixels.ECS.Components.Spells;
-using BeyondPixels.ECS.Systems.Items;
-using BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon;
 using BeyondPixels.SceneBootstraps;
-
-using Cinemachine;
 
 using Unity.Collections;
 using Unity.Entities;
@@ -66,14 +54,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             });
         }
 
-        public static bool PlayerInstantiated = false;
         public static float3 PlayerPosition = float3.zero;
+        private bool playerInstantiated = false;
 
         protected override void OnUpdate()
         {
             this.Entities.With(this._boardGroup).ForEach((Entity entity, ref FinalBoardComponent finalBoardComponent) =>
             {
-                PlayerInstantiated = false;
+                this.playerInstantiated = false;
                 PlayerPosition = float3.zero;
 
                 var boardSize = finalBoardComponent.Size;
@@ -123,10 +111,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                     this.PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
                 tiles.Dispose();
             });
-            if (this._boardReadyGroup.CalculateLength() > 0 && !PlayerInstantiated && !TileMapSystem.TileMapDrawing)
+            if (this._boardReadyGroup.CalculateLength() > 0 && !this.playerInstantiated)
             {
                 this.SpawnPlayer(PlayerPosition);
-                PlayerInstantiated = true;
+                this.playerInstantiated = true;
             }
         }
 

@@ -119,7 +119,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 All = new ComponentType[]
                 {
-                    typeof(FinalBoardComponent), typeof(LightSpawnStartedComponent)
+                    typeof(FinalBoardComponent), typeof(LightSpawnStartedComponent),
+                    typeof(TilemapReadyComponent)
                 },
                 None = new ComponentType[]
                 {
@@ -150,7 +151,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             if (this._boardSpawnReadyGroup.CalculateLength() > 0)
             {
-                if (!TileMapSystem.TileMapDrawing && this._samplesGroup.CalculateLength() > 0)
+                if (this._samplesGroup.CalculateLength() > 0)
                 {
                     var tileMapComponent = this._tileMapGroup.ToComponentArray<DungeonTileMapComponent>()[0];
                     var tileMapTransform = this._tileMapGroup.ToComponentArray<Transform>()[0];
