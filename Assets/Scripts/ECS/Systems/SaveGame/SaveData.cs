@@ -32,7 +32,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
         public AttackStatModifierComponent AttackModifier;
         public DefenceStatModifierComponent DefenceModifier;
         public HealthStatModifierComponent HealthModifier;
-        public MagickStatModifierComponent MagicModifier;
+        public MagicStatModifierComponent MagicModifier;
     }
 
     [Serializable]

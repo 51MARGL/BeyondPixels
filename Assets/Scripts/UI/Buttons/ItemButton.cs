@@ -61,9 +61,9 @@ namespace BeyondPixels.UI.Buttons
                         var eqStatComponent = entityManager.GetComponentData<HealthStatModifierComponent>(equippedEntity);
                         eqHealthValue = eqStatComponent.Value * eqItemComponent.Level;
                     }
-                    if (entityManager.HasComponent<MagickStatModifierComponent>(equippedEntity))
+                    if (entityManager.HasComponent<MagicStatModifierComponent>(equippedEntity))
                     {
-                        var eqStatComponent = entityManager.GetComponentData<MagickStatModifierComponent>(equippedEntity);
+                        var eqStatComponent = entityManager.GetComponentData<MagicStatModifierComponent>(equippedEntity);
                         eqMagicValue = eqStatComponent.Value * eqItemComponent.Level;
                     }
                 }
@@ -128,9 +128,9 @@ namespace BeyondPixels.UI.Buttons
                     }
                 }
 
-                if (entityManager.HasComponent<MagickStatModifierComponent>(this.ItemEntity))
+                if (entityManager.HasComponent<MagicStatModifierComponent>(this.ItemEntity))
                 {
-                    var statComponent = entityManager.GetComponentData<MagickStatModifierComponent>(this.ItemEntity);
+                    var statComponent = entityManager.GetComponentData<MagicStatModifierComponent>(this.ItemEntity);
                     var totalValue = statComponent.Value * itemComponent.Level;
                     sb.Append($"Magic: {totalValue}");
 

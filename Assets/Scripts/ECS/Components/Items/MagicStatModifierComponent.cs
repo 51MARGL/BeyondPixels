@@ -5,7 +5,7 @@ using Unity.Entities;
 namespace BeyondPixels.ECS.Components.Items
 {
     [Serializable]
-    public struct MagickStatModifierComponent : IComponentData
+    public struct MagicStatModifierComponent : IComponentData
     {
         public int Value;
     }

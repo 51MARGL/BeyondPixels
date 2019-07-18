@@ -4,87 +4,18 @@ using BeyondPixels.ECS.Components.Spells;
 
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Player
 {
-    public class SpellValidateSystem : JobComponentSystem
+    public class SpellValidateSystem : ComponentSystem
     {
-        private struct SpellValidateJob : IJobChunk
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> ActiveSpellChunks;
-            [ReadOnly]
-            public ArchetypeChunkEntityType EntityType;
-            [ReadOnly]
-            public ArchetypeChunkComponentType<TargetComponent> TargetComponentType;
-            public ArchetypeChunkComponentType<InputComponent> InputComponentType;
-            [ReadOnly]
-            public ArchetypeChunkComponentType<ActiveSpellComponent> ActiveSpellComponentType;
-
-            [ReadOnly]
-            public float CurrentTime;
-
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
-            {
-                var entities = chunk.GetNativeArray(this.EntityType);
-                var inputComponents = chunk.GetNativeArray(this.InputComponentType);
-                for (var i = 0; i < chunk.Count; i++)
-                {
-                    for (var sChunkIndex = 0; sChunkIndex < this.ActiveSpellChunks.Length; sChunkIndex++)
-                    {
-                        if (inputComponents[i].ActionButtonPressed == 0)
-                            return;
-
-                        var inputComponent = inputComponents[i];
-                        var spellChunk = this.ActiveSpellChunks[sChunkIndex];
-                        var spellEntities = spellChunk.GetNativeArray(this.EntityType);
-                        var spellComponents = spellChunk.GetNativeArray(this.ActiveSpellComponentType);
-
-                        for (var sI = 0; sI < spellChunk.Count; sI++)
-                        {
-                            if (spellComponents[sI].Owner == entities[i]
-                                && inputComponent.ActionButtonPressed == spellComponents[sI].ActionIndex)
-                            {
-                                var spellPrefab = SpellBookManagerComponent.Instance.SpellBook.Spells[spellComponents[sI].SpellIndex];
-                                if (spellPrefab.TargetRequired && !chunk.Has(this.TargetComponentType))
-                                {
-                                    inputComponent.ActionButtonPressed = 0;
-                                    inputComponents[i] = inputComponent;
-                                    return;
-                                }
-
-                                this.CommandBuffer.AddComponent(chunkIndex, entities[i], new SpellCastingComponent
-                                {
-                                    SpellIndex = spellComponents[sI].SpellIndex,
-                                    ActiveSpell = spellEntities[sI],
-                                    StartedAt = CurrentTime
-                                });
-
-                                inputComponent.ActionButtonPressed = 0;
-                                inputComponents[i] = inputComponent;
-                                return;
-                            }
-                        }
-                        inputComponent.ActionButtonPressed = 0;
-                        inputComponents[i] = inputComponent;
-                    }
-                }
-            }
-        }
-
-        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _playerCastGroup;
         private EntityQuery _activeSpellGroup;
 
         protected override void OnCreate()
         {
-            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._playerCastGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
@@ -109,20 +40,44 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             });
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            var validateSpellJobHandle = new SpellValidateJob
+            this.Entities.With(this._playerCastGroup).ForEach((Entity playerEntity, ref InputComponent inputComponent) =>
             {
-                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-                ActiveSpellChunks = this._activeSpellGroup.CreateArchetypeChunkArray(Allocator.TempJob),
-                EntityType = this.GetArchetypeChunkEntityType(),
-                InputComponentType = this.GetArchetypeChunkComponentType<InputComponent>(),
-                TargetComponentType = this.GetArchetypeChunkComponentType<TargetComponent>(true),
-                ActiveSpellComponentType = this.GetArchetypeChunkComponentType<ActiveSpellComponent>(true),
-                CurrentTime = Time.time
-            }.Schedule(this._playerCastGroup, inputDeps);
-            this._endFrameBarrier.AddJobHandleForProducer(validateSpellJobHandle);
-            return validateSpellJobHandle;
+                if (inputComponent.ActionButtonPressed == 0)
+                    return;
+
+                var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob);
+                var spellComponents = this._activeSpellGroup.ToComponentDataArray<ActiveSpellComponent>(Allocator.TempJob);
+
+                for (var sI = 0; sI < spellEntities.Length; sI++)
+                {
+                    if (spellComponents[sI].Owner == playerEntity
+                        && inputComponent.ActionButtonPressed == spellComponents[sI].ActionIndex)
+                    {
+                        var spellPrefab = SpellBookManagerComponent.Instance.SpellBook.Spells[spellComponents[sI].SpellIndex];
+                        if (spellPrefab.TargetRequired
+                            && !this.EntityManager.HasComponent<TargetComponent>(playerEntity))
+                        {
+                            inputComponent.ActionButtonPressed = 0;
+                            break;
+                        }
+
+                        this.PostUpdateCommands.AddComponent(playerEntity, new SpellCastingComponent
+                        {
+                            SpellIndex = spellComponents[sI].SpellIndex,
+                            ActiveSpell = spellEntities[sI],
+                            StartedAt = Time.time
+                        });
+
+                        inputComponent.ActionButtonPressed = 0;
+                        break;
+                    }
+                }
+                inputComponent.ActionButtonPressed = 0;
+                spellEntities.Dispose();
+                spellComponents.Dispose();
+            });
         }
     }
 }

@@ -89,7 +89,7 @@ namespace BeyondPixels.SceneBootstraps
                     else if (randomAlg < 66)
                     {
                         var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
-                        var randomFillPercent = random.NextInt(55, 70);
+                        var randomFillPercent = random.NextInt(60, 70);
                         board = entityManager.CreateEntity();
                         entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
                         {

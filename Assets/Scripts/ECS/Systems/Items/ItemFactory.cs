@@ -93,7 +93,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 IconIndex = iconIndex,
                 Level = level
             });
-            commandBuffer.AddComponent(itemEntity, new MagickStatModifierComponent 
+            commandBuffer.AddComponent(itemEntity, new MagicStatModifierComponent 
             {
                 Value = random.NextInt(1, 6)
             });
@@ -226,7 +226,7 @@ namespace BeyondPixels.ECS.Systems.Items
                             });
                             break;
                         case WeaponStatsModifiers.Magick:
-                            commandBuffer.AddComponent(itemEntity, new MagickStatModifierComponent
+                            commandBuffer.AddComponent(itemEntity, new MagicStatModifierComponent
                             {
                                 Value = random.NextInt(1, 4)
                             });

@@ -41,7 +41,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                                 ref WeaponComponent weaponComponent,
                                                 ref PositionComponent positionComponent) =>
             {
-                if (!EntityManager.Exists(followStateComponent.Target))
+                if (!EntityManager.Exists(followStateComponent.Target)
+                    || EntityManager.HasComponent<InCutsceneComponent>(followStateComponent.Target))
                 {
                     this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
                     return;

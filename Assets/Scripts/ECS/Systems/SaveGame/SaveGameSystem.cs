@@ -63,9 +63,9 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                                 HealthModifier = this.EntityManager.HasComponent<HealthStatModifierComponent>(itemEntity) ?
                                                   this.EntityManager.GetComponentData<HealthStatModifierComponent>(itemEntity) :
                                                   new HealthStatModifierComponent(),
-                                MagicModifier = this.EntityManager.HasComponent<MagickStatModifierComponent>(itemEntity) ?
-                                                  this.EntityManager.GetComponentData<MagickStatModifierComponent>(itemEntity) :
-                                                  new MagickStatModifierComponent(),
+                                MagicModifier = this.EntityManager.HasComponent<MagicStatModifierComponent>(itemEntity) ?
+                                                  this.EntityManager.GetComponentData<MagicStatModifierComponent>(itemEntity) :
+                                                  new MagicStatModifierComponent(),
                             });
                     });
 
