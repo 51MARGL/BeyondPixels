@@ -18,34 +18,36 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             [ReadOnly]
             public BoardComponent Board;
 
-            [NativeDisableParallelForRestriction]
-            public NativeArray<RoomComponent> Rooms;
+            [WriteOnly]
+            public NativeQueue<RoomComponent>.Concurrent Rooms;
 
-            [NativeDisableParallelForRestriction]
-            public NativeArray<CorridorComponent> Corridors;
+            [WriteOnly]
+            public NativeQueue<CorridorComponent>.Concurrent Corridors;
 
             [DeallocateOnJobCompletion]
             [ReadOnly]
-            public NativeArray<BatchData> Data;
+            public NativeArray<CorridorComponent> FirstCorridors;
+
+            [ReadOnly]
+            public int RoomCount;
 
             [ReadOnly]
             public int RandomSeed;
 
             public void Execute(int index)
             {
-                var batch = this.Data[index];
                 var random = new Random((uint)(this.RandomSeed * (index + 1)));
 
-                this.Rooms[batch.FirstRoomIndex] =
-                    this.CreateRoom(this.Board, this.Corridors[batch.FirstCorridorIndex], ref random);
-                this.Corridors[3 + batch.FirstRoomIndex] =
-                    this.CreateCorridor(this.Rooms[batch.FirstRoomIndex], this.Board, ref random);
+                var firstCorridor = this.FirstCorridors[index];
+                var room = this.CreateRoom(this.Board, firstCorridor, ref random);
+                this.Rooms.Enqueue(room);
 
-                for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
+                for (var i = 0; i < this.RoomCount; i++)
                 {
-                    this.Rooms[i] = this.CreateRoom(this.Board, this.Corridors[j - 1], ref random);
-                    if (j < this.Corridors.Length)
-                        this.Corridors[j] = this.CreateCorridor(this.Rooms[i], this.Board, ref random);
+                    var corridor = this.CreateCorridor(room, this.Board, ref random);
+                    room = this.CreateRoom(this.Board, corridor, ref random);
+                    this.Rooms.Enqueue(room);
+                    this.Corridors.Enqueue(corridor);
                 }
             }
 
@@ -161,6 +163,38 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     Length = corridorLength,
                     Direction = direction
                 };
+            }
+        }
+
+        [BurstCompile]
+        private struct RoomsQueueToArrayJob : IJob
+        {
+            [WriteOnly]
+            public NativeArray<RoomComponent> RoomsArray;
+            public NativeQueue<RoomComponent> RoomsQueue;
+
+            public void Execute()
+            {
+                var index = 0;
+                while (this.RoomsQueue.Count > 0)
+                    if (this.RoomsQueue.TryDequeue(out var corridor))
+                        this.RoomsArray[index++] = corridor;
+            }
+        }
+
+        [BurstCompile]
+        private struct CorridorsQueueToArrayJob : IJob
+        {
+            [WriteOnly]
+            public NativeArray<CorridorComponent> CorridorsArray;
+            public NativeQueue<CorridorComponent> CorridorsQueue;
+
+            public void Execute()
+            {
+                var index = 0;
+                while (this.CorridorsQueue.Count > 0)
+                    if (this.CorridorsQueue.TryDequeue(out var corridor))
+                        this.CorridorsArray[index++] = corridor;
             }
         }
 
@@ -346,10 +380,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         }
 
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
-                    var finalBoardComponent = this.CommandBuffer.CreateEntity();
-                    this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    var finalBoardEntity = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardEntity, new FinalBoardComponent
                     {
-                        Size = new int2(mapBounds.w, mapBounds.z)
+                        Size = new int2(mapBounds.w, mapBounds.z),
+                        RandomSeed = this.BoardComponent.RandomSeed
                     });
                 }
                 else
@@ -423,17 +458,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        private struct BatchData
-        {
-            public int FirstRoomIndex;
-            public int LastRoomIndex;
-            public int FirstCorridorIndex;
-        }
-
+        private NativeQueue<CorridorComponent> CorridorsQueue;
+        private NativeQueue<RoomComponent> RoomsQueue;
+        private NativeArray<TileType> Tiles;
+        private int CurrentPhase;
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _boardGroup;
+
         protected override void OnCreate()
         {
+            this.CurrentPhase = 0;
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -460,80 +494,102 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
+                    var random = new Random(board.RandomSeed);
 
-                    var roomCount = board.RoomCount;
+                    if (this.CurrentPhase == 0)
+                    {
+                        var roomCount = board.RoomCount;
 
-                    var tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                    var rooms = new NativeArray<RoomComponent>(roomCount, Allocator.TempJob);
-                    var corridors = new NativeArray<CorridorComponent>(roomCount + 2, Allocator.TempJob);
+                        this.Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        this.RoomsQueue = new NativeQueue<RoomComponent>(Allocator.TempJob);
+                        this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
+                        var firstCorridors = new NativeArray<CorridorComponent>(4, Allocator.TempJob);
+                        for (var j = 0; j < this.Tiles.Length; j++)
+                            this.Tiles[j] = TileType.Wall;
 
-                    for (var j = 0; j < tiles.Length; j++)
-                        tiles[j] = TileType.Wall;
-
-                    // setup fist room and corridors to all 4 directions
-                    var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
-                    rooms[0] = CreateRoom(board, ref random);
-                    corridors[0] = this.CreateCorridor(rooms[0], board, ref random, 0);
-                    corridors[1] = this.CreateCorridor(rooms[0], board, ref random, 1);
-                    corridors[2] = this.CreateCorridor(rooms[0], board, ref random, 2);
-                    corridors[3] = this.CreateCorridor(rooms[0], board, ref random, 3);
-
-                    var batch = new NativeArray<BatchData>(4, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                    for (int j = 0, k = batch.Length + 1; j < batch.Length; j++, k--)
-                        batch[j] = new BatchData
+                        // setup fist room and corridors to all 4 directions
+                        var firstRoom = CreateRoom(board, ref random);
+                        this.RoomsQueue.Enqueue(firstRoom);
+                        for (var c = 0; c < 4; c++)
                         {
-                            FirstRoomIndex = k > batch.Length ? 1 : rooms.Length / k,
-                            LastRoomIndex = rooms.Length / (k - 1),
-                            FirstCorridorIndex = j
-                        };
+                            firstCorridors[c] = this.CreateCorridor(firstRoom, board, ref random, c);
+                            this.CorridorsQueue.Enqueue(firstCorridors[c]);
+                        }
 
-                    var CreateRoomsAndCorridorsJobHandle = new CreateRoomsAndCorridorsJob
+                        inputDeps = new CreateRoomsAndCorridorsJob
+                        {
+                            Board = board,
+                            Rooms = this.RoomsQueue.ToConcurrent(),
+                            Corridors = this.CorridorsQueue.ToConcurrent(),
+                            FirstCorridors = firstCorridors,
+                            RoomCount = roomCount / 4,
+                            RandomSeed = random.NextInt()
+                        }.Schedule(4, 1, inputDeps);
+                    }
+                    else if (this.CurrentPhase == 1)
                     {
-                        Board = board,
-                        Rooms = rooms,
-                        Corridors = corridors,
-                        Data = batch,
-                        RandomSeed = random.NextInt()
-                    }.Schedule(batch.Length, 1, inputDeps);
+                        var roomsCount = this.RoomsQueue.Count;
+                        var corridorsCount = this.CorridorsQueue.Count;
+                        var roomsArray = new NativeArray<RoomComponent>(roomsCount, Allocator.TempJob);
+                        var corridorsArray = new NativeArray<CorridorComponent>(corridorsCount, Allocator.TempJob);
 
-                    var setRoomTilesJobHandle = new SetRoomTilesJob
-                    {
-                        Roms = rooms,
-                        Tiles = tiles,
-                        TileStride = board.Size.x
-                    }.Schedule(rooms.Length, 1, CreateRoomsAndCorridorsJobHandle);
+                        var roomsQueueToArrayJobHandle = new RoomsQueueToArrayJob
+                        {
+                            RoomsQueue = this.RoomsQueue,
+                            RoomsArray = roomsArray
+                        }.Schedule(inputDeps);
 
-                    var setCorridorTilesJobHandle = new SetCorridorTilesJob
-                    {
-                        Corridors = corridors,
-                        Tiles = tiles,
-                        TileStride = board.Size.x
-                    }.Schedule(corridors.Length, 1, CreateRoomsAndCorridorsJobHandle);
+                        var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
+                        {
+                            CorridorsQueue = this.CorridorsQueue,
+                            CorridorsArray = corridorsArray
+                        }.Schedule(inputDeps);
 
-                    var removeThinWallsJobHandle = new RemoveThinWallsJob
-                    {
-                        Board = board,
-                        Tiles = tiles
-                    }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
+                        var setRoomTilesJobHandle = new SetRoomTilesJob
+                        {
+                            Roms = roomsArray,
+                            Tiles = Tiles,
+                            TileStride = board.Size.x
+                        }.Schedule(roomsCount, 1, roomsQueueToArrayJobHandle);
 
-                    var closeBordersJobHandle = new CloseBordersJob
-                    {
-                        Board = board,
-                        Tiles = tiles
-                    }.Schedule(removeThinWallsJobHandle);
+                        var setCorridorTilesJobHandle = new SetCorridorTilesJob
+                        {
+                            Corridors = corridorsArray,
+                            Tiles = Tiles,
+                            TileStride = board.Size.x
+                        }.Schedule(corridorsCount, 1, corridorsQueueToArrayJobHandle);
 
-                    inputDeps = new TagBoardDoneJob
+                        var removeThinWallsJobHandle = new RemoveThinWallsJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
+
+                        inputDeps = new CloseBordersJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(removeThinWallsJobHandle);
+                    }
+                    else if (this.CurrentPhase == 2)
                     {
-                        CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
-                        BoardEntity = boardEntity,
-                        Tiles = tiles,
-                        BoardComponent = board,
-                        TileStride = board.Size.x,
-                        RandomSeed = random.NextInt()
-                    }.Schedule(closeBordersJobHandle);
-                    this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                        this.CorridorsQueue.Dispose();
+                        this.RoomsQueue.Dispose();
+
+                        inputDeps = new TagBoardDoneJob
+                        {
+                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
+                            BoardEntity = boardEntity,
+                            Tiles = Tiles,
+                            BoardComponent = board,
+                            TileStride = board.Size.x,
+                            RandomSeed = random.NextInt()
+                        }.Schedule(inputDeps);
+                        this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                    }
                 }
             }
+            this.CurrentPhase = (this.CurrentPhase + 1) % 3;
             var cleanUpJobHandle = new CleanUpJob
             {
                 Chunks = boardChunks

@@ -269,7 +269,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             }
                 }
             }
-        }       
+        }
 
         private struct TagBoardDoneJob : IJob
         {
@@ -304,10 +304,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         }
 
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
-                    var finalBoardComponent = this.CommandBuffer.CreateEntity();
-                    this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    var finalBoardEntity = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardEntity, new FinalBoardComponent
                     {
-                        Size = this.BoardComponent.Size
+                        Size = this.BoardComponent.Size,
+                        RandomSeed = this.BoardComponent.RandomSeed
                     });
                 }
                 else
@@ -360,7 +361,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-            this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
             this.CurrentPhase = 0;
             this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -387,7 +387,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
-                    var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
+                    var random = new Random(board.RandomSeed);
                     if (this.CurrentPhase == 0)
                     {
                         this.Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
@@ -396,6 +396,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
                         var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
                         this.TreeArray = bspTree.ToNativeArray();
+                        this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
 
                         var createRoomsJobHandle = new CreateRoomsJob
                         {
@@ -426,7 +427,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
                         {
                             CorridorsArray = corridorsArray,
-                            CorridorsQueue = CorridorsQueue
+                            CorridorsQueue = this.CorridorsQueue
                         }.Schedule(inputDeps);
 
                         var createCorridorsJobHandle = new CreateCorridorsJob
@@ -443,12 +444,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             TileStride = board.Size.x
                         }.Schedule(this.TreeArray.Length, 1, inputDeps);
 
-                        var removeThinWallsJobHandle = new RemoveThinWallsJob
+                        inputDeps = new RemoveThinWallsJob
                         {
                             Board = board,
                             Tiles = Tiles
                         }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, createCorridorsJobHandle));
-
+                    }
+                    else if (this.CurrentPhase == 2)
+                    {
+                        this.CorridorsQueue.Dispose();
                         inputDeps = new TagBoardDoneJob
                         {
                             CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
@@ -457,12 +461,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                             TreeArray = TreeArray,
                             Tiles = Tiles,
                             RandomSeed = random.NextInt()
-                        }.Schedule(removeThinWallsJobHandle);
+                        }.Schedule(inputDeps);
                         this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
-                    }
-                    else if (this.CurrentPhase == 2)
-                    {
-                        this.CorridorsQueue.Clear();
                     }
                 }
             }
@@ -473,11 +473,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 Chunks = boardChunks
             }.Schedule(inputDeps);
             return cleanUpJobHandle;
-        }
-
-        protected override void OnDestroy()
-        {
-            this.CorridorsQueue.Dispose();
         }
     }
 }

@@ -652,10 +652,11 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
 
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
-                    var finalBoardComponent = this.CommandBuffer.CreateEntity();
-                    this.CommandBuffer.AddComponent(finalBoardComponent, new FinalBoardComponent
+                    var finalBoardEntity = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardEntity, new FinalBoardComponent
                     {
-                        Size = this.BoardComponent.Size
+                        Size = this.BoardComponent.Size,
+                        RandomSeed = this.BoardComponent.RandomSeed
                     });
                 }
                 else
@@ -663,7 +664,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     var random = new Random((uint)this.RandomSeed);
 
                     var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
-                    var randomFillPercent = random.NextInt(60, 75);
+                    var randomFillPercent = random.NextInt(55, 70);
                     var board = this.CommandBuffer.CreateEntity();
                     this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
@@ -711,8 +712,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         protected override void OnCreate()
         {
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-            this.RoomList = new NativeList<RoomComponent>(Allocator.Persistent);
-            this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.Persistent);
             this.CurrentPhase = 0;
             this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -739,13 +738,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 {
                     var board = boards[i];
                     var boardEntity = boardEntities[i];
-                    var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
+                    var random = new Random(board.RandomSeed);
                     if (this.CurrentPhase == 0)
                     {
                         this.Tiles = new NativeArray<TileComponent>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                         this.RoomTiles = new NativeArray<TileComponent>(this.Tiles.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                        this.RoomList.Clear();
-                        this.CorridorsQueue.Clear();
+                        this.RoomList = new NativeList<RoomComponent>(Allocator.TempJob);
 
                         var randomFillBoardJobHandle = new RandomFillBoardJob
                         {
@@ -786,6 +784,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     }
                     else if (this.CurrentPhase == 1)
                     {
+                        this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
+
                         var roomCount = this.RoomList.Length;
                         var roomsChunkSize = 10;
                         var concurrentQueue = this.CorridorsQueue.ToConcurrent();
@@ -853,11 +853,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             Tiles = Tiles
                         }.Schedule(lastGenerationJobHandle);
 
-                        var closeBordersJobHandle = new CloseBordersJob
+                        inputDeps = new CloseBordersJob
                         {
                             Board = board,
                             Tiles = Tiles
                         }.Schedule(removeThinWallsJobHandle);
+                    }
+                    else if (this.CurrentPhase == 3)
+                    {
+                        this.RoomList.Dispose();
+                        this.CorridorsQueue.Dispose();
 
                         inputDeps = new TagBoardDoneJob
                         {
@@ -867,13 +872,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             Tiles = Tiles,
                             RoomTiles = RoomTiles,
                             RandomSeed = random.NextInt()
-                        }.Schedule(closeBordersJobHandle);
+                        }.Schedule(inputDeps);
                         this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
-                    }
-                    else if (this.CurrentPhase == 3)
-                    {
-                        this.RoomList.Clear();
-                        this.CorridorsQueue.Clear();
                     }
                 }
             }
@@ -884,12 +884,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 Chunks = boardChunks
             }.Schedule(inputDeps);
             return cleanUpJobHandle;
-        }
-
-        protected override void OnDestroy()
-        {
-            this.RoomList.Dispose();
-            this.CorridorsQueue.Dispose();
         }
     }
 }

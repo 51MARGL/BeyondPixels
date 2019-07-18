@@ -7,5 +7,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP
     {
         public int2 Size;
         public int MinRoomSize;
+        public uint RandomSeed;
     }
 }

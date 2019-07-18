@@ -10,5 +10,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
         public int MaxRoomSize;
         public int MinCorridorLength;
         public int MaxCorridorLength;
+        public uint RandomSeed;
     }
 }

@@ -81,19 +81,21 @@ namespace BeyondPixels.SceneBootstraps
                             RoomCount = roomCount,
                             MaxRoomSize = this.DungeonGenerators.Naive.MaxRoomSize,
                             MaxCorridorLength = this.DungeonGenerators.Naive.MaxCorridorLength,
-                            MinCorridorLength = this.DungeonGenerators.Naive.MinCorridorLength
+                            MinCorridorLength = this.DungeonGenerators.Naive.MinCorridorLength,
+                            RandomSeed = random.NextUInt()
                         });
                     }
                     else if (randomAlg < 66)
                     {
                         var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
-                        var randomFillPercent = random.NextInt(60, 75);
+                        var randomFillPercent = random.NextInt(55, 70);
                         board = entityManager.CreateEntity();
                         entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
                         {
                             Size = new int2(this.DungeonGenerators.CellularAutomaton.BoardWidth, this.DungeonGenerators.CellularAutomaton.BoardHeight),
                             RandomFillPercent = randomFillPercent,
-                            PassRadius = this.DungeonGenerators.CellularAutomaton.PassRadius
+                            PassRadius = this.DungeonGenerators.CellularAutomaton.PassRadius,
+                            RandomSeed = random.NextUInt()
                         });
                         break;
                     }
@@ -104,7 +106,8 @@ namespace BeyondPixels.SceneBootstraps
                         entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.BSP.BoardComponent
                         {
                             Size = randomSize,
-                            MinRoomSize = random.NextInt(7, 13)
+                            MinRoomSize = random.NextInt(7, 13),
+                            RandomSeed = random.NextUInt()
                         });
                         break;
                     }
