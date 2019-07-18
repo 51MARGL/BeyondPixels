@@ -46,9 +46,9 @@ MonoBehaviour:
   DungeonGenerators:
     Switch: 0
     Naive:
-      BoardWidth: 75
-      BoardHeight: 50
-      RoomCount: 15
+      BoardWidth: 150
+      BoardHeight: 150
+      RoomCount: 50
       MaxRoomSize: 10
       MaxCorridorLength: 15
       MinCorridorLength: 8

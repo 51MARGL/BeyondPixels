@@ -65,10 +65,11 @@ namespace BeyondPixels.SceneBootstraps
 
             #region DungeonGeneration
             Entity board;
+            var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+            var randomSeed = random.NextUInt(1, uint.MaxValue);
             switch (this.DungeonGenerators.Switch)
             {
                 case Switch.Random:
-                    var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
                     var randomAlg = random.NextInt(0, 100);
                     if (randomAlg < 33)
                     {
@@ -82,7 +83,7 @@ namespace BeyondPixels.SceneBootstraps
                             MaxRoomSize = this.DungeonGenerators.Naive.MaxRoomSize,
                             MaxCorridorLength = this.DungeonGenerators.Naive.MaxCorridorLength,
                             MinCorridorLength = this.DungeonGenerators.Naive.MinCorridorLength,
-                            RandomSeed = random.NextUInt()
+                            RandomSeed = randomSeed
                         });
                     }
                     else if (randomAlg < 66)
@@ -95,7 +96,7 @@ namespace BeyondPixels.SceneBootstraps
                             Size = new int2(this.DungeonGenerators.CellularAutomaton.BoardWidth, this.DungeonGenerators.CellularAutomaton.BoardHeight),
                             RandomFillPercent = randomFillPercent,
                             PassRadius = this.DungeonGenerators.CellularAutomaton.PassRadius,
-                            RandomSeed = random.NextUInt()
+                            RandomSeed = randomSeed
                         });
                         break;
                     }
@@ -107,7 +108,7 @@ namespace BeyondPixels.SceneBootstraps
                         {
                             Size = randomSize,
                             MinRoomSize = random.NextInt(7, 13),
-                            RandomSeed = random.NextUInt()
+                            RandomSeed = randomSeed
                         });
                         break;
                     }
@@ -120,7 +121,8 @@ namespace BeyondPixels.SceneBootstraps
                         RoomCount = this.DungeonGenerators.Naive.RoomCount,
                         MaxRoomSize = this.DungeonGenerators.Naive.MaxRoomSize,
                         MaxCorridorLength = this.DungeonGenerators.Naive.MaxCorridorLength,
-                        MinCorridorLength = this.DungeonGenerators.Naive.MinCorridorLength
+                        MinCorridorLength = this.DungeonGenerators.Naive.MinCorridorLength,
+                        RandomSeed = randomSeed
                     });
                     break;
                 case Switch.CellularAutomaton:
@@ -129,7 +131,8 @@ namespace BeyondPixels.SceneBootstraps
                     {
                         Size = new int2(this.DungeonGenerators.CellularAutomaton.BoardWidth, this.DungeonGenerators.CellularAutomaton.BoardHeight),
                         RandomFillPercent = this.DungeonGenerators.CellularAutomaton.RandomFillPercent,
-                        PassRadius = this.DungeonGenerators.CellularAutomaton.PassRadius
+                        PassRadius = this.DungeonGenerators.CellularAutomaton.PassRadius,
+                        RandomSeed = randomSeed
                     });
                     break;
                 case Switch.BSP:
@@ -137,7 +140,8 @@ namespace BeyondPixels.SceneBootstraps
                     entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.BSP.BoardComponent
                     {
                         Size = new int2(this.DungeonGenerators.BSP.BoardWidth, this.DungeonGenerators.BSP.BoardHeight),
-                        MinRoomSize = this.DungeonGenerators.BSP.MinRoomSize
+                        MinRoomSize = this.DungeonGenerators.BSP.MinRoomSize,
+                        RandomSeed = randomSeed
                     });
                     break;
             }
