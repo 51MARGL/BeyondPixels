@@ -54,7 +54,7 @@ namespace BeyondPixels.ECS.Systems.Items
                         var ownerEntity = entities[i];
                         this.Entities.With(this._lootGroup).ForEach((Entity itemEntity, ref PickedUpComponent pickedUpComponent) =>
                         {
-                            if (pickedUpComponent.Owner == ownerEntity && random.NextInt(0, 100) < 75)
+                            if (pickedUpComponent.Owner == ownerEntity && random.NextInt(0, 100) < 85)
                                 this.PostUpdateCommands.AddComponent(itemEntity, new DestroyComponent());
                         });
                     }

@@ -70,10 +70,10 @@ namespace BeyondPixels.UI.Buttons
                 sb.Append(Environment.NewLine);
                 sb.Append(Environment.NewLine);
 
-                var castTime = math.max(0.1f, spell.CastTime -
-                            (spell.CastTime / 100f * magicStatComponent.CurrentValue));
-                var coolDown = math.max(1f, spell.CoolDown -
-                            (spell.CoolDown / 100f * magicStatComponent.CurrentValue));
+                var castTime = math.max(0.8f, spell.CastTime -
+                            (spell.CastTime / 500f * magicStatComponent.CurrentValue));
+                var coolDown = math.max(3f, spell.CoolDown -
+                            (spell.CoolDown / 500f * magicStatComponent.CurrentValue));
 
                 var damageOnImpact = spell.DamageOnImpact + 
                     (spell.DamageOnImpact / 100f * magicStatComponent.CurrentValue);

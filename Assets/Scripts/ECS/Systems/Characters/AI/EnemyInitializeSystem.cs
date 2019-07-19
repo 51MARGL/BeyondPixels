@@ -108,7 +108,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 #endregion
 
                 #region items
-                if (random.NextInt(0, 100) > 50)
+                if (random.NextInt(0, 100) > 25)
                 {
                     var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
                     this.PostUpdateCommands.AddComponent(weaponEntity, new PickedUpComponent
@@ -117,7 +117,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     });
                     this.PostUpdateCommands.AddComponent(weaponEntity, new EquipedComponent());
                 }
-                if (random.NextInt(0, 100) > 50)
+                if (random.NextInt(0, 100) > 25)
                 {
                     var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
                     this.PostUpdateCommands.AddComponent(spellBookEntity, new PickedUpComponent
@@ -126,7 +126,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     });
                     this.PostUpdateCommands.AddComponent(spellBookEntity, new EquipedComponent());
                 }
-                if (random.NextInt(0, 100) > 50)
+                if (random.NextInt(0, 100) > 25)
                 {
                     var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
                     this.PostUpdateCommands.AddComponent(helmetEntity, new PickedUpComponent
@@ -135,7 +135,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     });
                     this.PostUpdateCommands.AddComponent(helmetEntity, new EquipedComponent());
                 }
-                if (random.NextInt(0, 100) > 50)
+                if (random.NextInt(0, 100) > 25)
                 {
                     var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
                     this.PostUpdateCommands.AddComponent(chestEntity, new PickedUpComponent
@@ -144,7 +144,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     });
                     this.PostUpdateCommands.AddComponent(chestEntity, new EquipedComponent());
                 }
-                if (random.NextInt(0, 100) > 50)
+                if (random.NextInt(0, 100) > 25)
                 {
                     var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
                     this.PostUpdateCommands.AddComponent(bootsEntity, new PickedUpComponent
@@ -188,24 +188,17 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                            ref DefenceStatComponent defenceStatComponent,
                                            ref MagicStatComponent magicStatComponent)
         {
-            for (var i = 1; i < currentLevel; i++)
+            for (var i = 1; i < currentLevel * 2; i++)
             {
                 var randomStat = random.NextInt(0, 100);
-                switch (randomStat)
-                {
-                    case var _ when randomStat < 25:
-                        healthStatComponent.PointsSpent++;
-                        break;
-                    case var _ when randomStat < 50:
-                        attackStatComponent.PointsSpent++;
-                        break;
-                    case var _ when randomStat < 75:
-                        defenceStatComponent.PointsSpent++;
-                        break;
-                    case var _ when randomStat < 100:
-                        magicStatComponent.PointsSpent++;
-                        break;
-                }
+                if (randomStat < 25)
+                    healthStatComponent.PointsSpent++;
+                else if (randomStat < 50)
+                    attackStatComponent.PointsSpent++;
+                else if (randomStat < 75)
+                    defenceStatComponent.PointsSpent++;
+                else if (randomStat < 100)
+                    magicStatComponent.PointsSpent++;
             }
         }
     }

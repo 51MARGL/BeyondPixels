@@ -91,8 +91,8 @@ namespace BeyondPixels.UI.ECS.Systems
                     var spellCastingComponent = this.EntityManager.GetComponentData<SpellCastingComponent>(playerEntity);
                     var spellIndex = spellCastingComponent.SpellIndex;
                     var spell = spellBook.Spells[spellIndex];
-                    var castTime = math.max(0.1f, spell.CastTime -
-                                (spell.CastTime / 100f * magicStatComponent.CurrentValue));
+                    var castTime = math.max(0.8f, spell.CastTime -
+                                (spell.CastTime / 500f * magicStatComponent.CurrentValue));
 
                     var timePassed = (castTime - (Time.time - spellCastingComponent.StartedAt));
 
@@ -129,8 +129,8 @@ namespace BeyondPixels.UI.ECS.Systems
                         if (coolDownComponent.CoolDownTime > 0)
                         {
                             var magicStat = this.EntityManager.GetComponentData<MagicStatComponent>(activeSpellComponent.Owner);
-                            var coolDownTime = math.max(1f, spell.CoolDown -
-                                   (spell.CoolDown / 100f * magicStat.CurrentValue));
+                            var coolDownTime = math.max(3f, spell.CoolDown -
+                                   (spell.CoolDown / 500f * magicStat.CurrentValue));
 
                             button.CoolDownImage.enabled = true;
                             button.CoolDownText.enabled = true;

@@ -70,8 +70,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                             break;
                         }
 
-                        var castTime = math.max(0.1f, spellPrefab.CastTime -
-                                (spellPrefab.CastTime / 100f * magicStatComponent.CurrentValue));
+                        var castTime = math.max(0.8f, spellPrefab.CastTime -
+                                (spellPrefab.CastTime / 500f * magicStatComponent.CurrentValue));
 
                         if (spellCastingComponent.StartedAt + castTime > Time.time)
                             break;
@@ -88,8 +88,8 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                             break;
                         }
 
-                        var coolDown = math.max(1f, spellPrefab.CoolDown -
-                                        (spellPrefab.CoolDown / 100f * magicStatComponent.CurrentValue));
+                        var coolDown = math.max(3f, spellPrefab.CoolDown -
+                                        (spellPrefab.CoolDown / 500f * magicStatComponent.CurrentValue));
 
                         this.PostUpdateCommands.RemoveComponent<SpellCastingComponent>(playerEntity);
                         this.PostUpdateCommands.AddComponent(spellEntities[sI], new CoolDownComponent
