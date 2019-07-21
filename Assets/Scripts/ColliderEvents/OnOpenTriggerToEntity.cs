@@ -40,6 +40,7 @@ namespace BeyondPixels.ColliderEvents
             this.Canvas.enabled = false;
             this.IsInside = false;
             this.IsOpened = true;
+            Object.Destroy(this.GetComponent<BoxCollider2D>());
         }
 
         public virtual void OnAnimationEnd()
