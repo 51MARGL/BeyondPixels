@@ -188,7 +188,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                            ref DefenceStatComponent defenceStatComponent,
                                            ref MagicStatComponent magicStatComponent)
         {
-            for (var i = 1; i < currentLevel * 2; i++)
+            var points = random.NextInt(currentLevel, currentLevel * 2);
+            for (var i = 1; i < points; i++)
             {
                 var randomStat = random.NextInt(0, 100);
                 if (randomStat < 25)
