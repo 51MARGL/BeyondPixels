@@ -122,6 +122,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var flags = new NativeArray<int>(this.Tiles.Length, Allocator.Temp);
                 var roomTilesIndex = 0;
+                var roomsCounter = 0;
                 for (var y = 0; y < this.Board.Size.y; y++)
                     for (var x = 0; x < this.Board.Size.x; x++)
                     {
@@ -134,15 +135,16 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             this.Rooms.Add(new RoomComponent
                             {
                                 StartTileIndex = roomTilesIndex,
-                                TileCount = tileCount
+                                TileCount = tileCount,
+                                RoomArrayIndex = roomsCounter
                             });
-
+                            roomsCounter++;
                             roomTilesIndex += tileCount;
                         }
                     }
             }
 
-            private int AddRoomTiles(TileComponent startTile, NativeArray<int> flags, int roomTilesIndex, int TileStride)
+            private int AddRoomTiles(TileComponent startTile, NativeArray<int> flags, int roomTilesIndex, int tileStride)
             {
                 var currentIndex = 0;
 
@@ -153,63 +155,58 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 {
                     var tile = queue[queue.Length - 1];
                     queue.RemoveAtSwapBack(queue.Length - 1);
-                    this.RoomTiles[roomTilesIndex + currentIndex] = tile;
-                    currentIndex++;
 
                     for (var y = tile.Position.y - 1; y <= tile.Position.y + 1; y++)
                         for (var x = tile.Position.x - 1; x <= tile.Position.x + 1; x++)
                         {
-                            var currIndex = y * TileStride + x;
+                            var currIndex = y * tileStride + x;
 
                             if (currIndex >= 0 && currIndex < this.Tiles.Length
-                                && (y == tile.Position.y || x == tile.Position.x)
                                 && flags[currIndex] == 0 && this.Tiles[currIndex].CurrentGenState == TileType.Floor)
                             {
                                 flags[currIndex] = 1;
                                 queue.Add(this.Tiles[currIndex]);
+                                if (this.GetDeadNeighborsCount(x, y, tileStride) > 0)
+                                {
+                                    this.RoomTiles[roomTilesIndex + currentIndex] = this.Tiles[currIndex];
+                                    currentIndex++;
+                                }
                             }
                         }
                 }
                 return currentIndex;
             }
-        }
 
-        [BurstCompile]
-        private struct RearangeRoomsJob : IJob
-        {
-            [ReadOnly]
-            public BoardComponent Board;
-
-            [ReadOnly]
-            public NativeArray<TileComponent> RoomTiles;
-
-            public NativeList<RoomComponent> Rooms;
-
-            public void Execute()
+            private int GetDeadNeighborsCount(int gridX, int gridY, int tileStride)
             {
-                var widthStep = this.Board.Size.x / math.clamp(this.Board.Size.x / 50, 1, this.Board.Size.x);
-                var heightStep = this.Board.Size.y / math.clamp(this.Board.Size.y / 50, 1, this.Board.Size.y);
-                var currentIndex = 0;
-                for (var y = 0; y < this.Board.Size.y; y += heightStep)
-                {
-                    for (var x = 0; x < this.Board.Size.x; x += widthStep)
-                        for (var i = currentIndex; i < this.Rooms.Length; i++)
-                            if (this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x >= x
-                                && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x <= x + widthStep
-                                && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y >= y
-                                && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y <= y + heightStep)
-                            {
-                                var tmp = this.Rooms[currentIndex];
-                                this.Rooms[currentIndex++] = this.Rooms[i];
-                                this.Rooms[i] = tmp;
-                            }
-                }
+                var wallCount = 0;
+                for (var neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
+                    for (var neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
+                    {
+                        var currIndex = neighbourY * tileStride + neighbourX;
+                        if (currIndex >= 0 && currIndex < this.Tiles.Length)
+                        {
+                            if (neighbourX != gridX || neighbourY != gridY)
+                                wallCount +=
+                                    this.Tiles[currIndex].CurrentGenState == TileType.Floor ? 0 : 1;
+                        }
+                        else
+                            wallCount++;
+                    }
+
+                return wallCount;
             }
         }
 
         [BurstCompile]
         private struct FindClosestRoomsConnectionsJob : IJobParallelFor
         {
+            [ReadOnly]
+            public BoardComponent Board;
+
+            [ReadOnly]
+            public int SliceSize;
+
             [ReadOnly]
             public NativeArray<TileComponent> RoomTiles;
 
@@ -227,12 +224,32 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
             public void Execute(int index)
             {
-                this.MarkClosestRoomsConnections(this.ConnectedRoomsTable, index * this.RoomsChunkSize, this.RoomsChunkSize);
+                var rooms = this.GetRoomsForQuad(index);
+                this.MarkClosestRoomsConnections(rooms, this.ConnectedRoomsTable);
             }
 
-            private void MarkClosestRoomsConnections(NativeArray<int> connectedRoomsTable, int roomsStartIndex, int roomsChunkSize)
+            private NativeList<RoomComponent> GetRoomsForQuad(int offset)
             {
-                for (var i = roomsStartIndex; i < roomsStartIndex + roomsChunkSize && i < this.Rooms.Length; i++)
+                var roomsList = new NativeList<RoomComponent>(Allocator.Temp);
+                var xSlice = this.Board.Size.x / this.SliceSize;
+                var ySlice = this.Board.Size.y / this.SliceSize;
+                var y = offset / xSlice * this.SliceSize;
+                var x = (offset % ySlice) * this.SliceSize;
+                for (var i = 0; i < this.Rooms.Length; i++)
+                    if (this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x >= x
+                        && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x <= x + this.SliceSize
+                        && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y >= y
+                        && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y <= y + this.SliceSize)
+                    {
+                        roomsList.Add(this.Rooms[i]);
+                    }
+
+                return roomsList;
+            }
+
+            private void MarkClosestRoomsConnections(NativeList<RoomComponent> rooms, NativeArray<int> connectedRoomsTable)
+            {
+                for (var i = 0; i < rooms.Length; i++)
                 {
                     var bestDistance = (float)int.MaxValue;
                     var bestTileA = new TileComponent();
@@ -240,17 +257,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     var bestRoomAIndex = 0;
                     var bestRoomBIndex = 0;
 
-                    for (var j = roomsStartIndex; j < roomsStartIndex + roomsChunkSize && j < this.Rooms.Length; j++)
+                    for (var j = 0; j < rooms.Length; j++)
                     {
-                        if (connectedRoomsTable[i * this.Rooms.Length + j] == 1)
+                        if (connectedRoomsTable[rooms[i].RoomArrayIndex * this.Rooms.Length + rooms[j].RoomArrayIndex] == 1)
                             continue;
 
-                        for (var tileIndexA = 0; tileIndexA < this.Rooms[i].TileCount; tileIndexA++)
+                        for (var tileIndexA = 0; tileIndexA < rooms[i].TileCount; tileIndexA++)
                         {
-                            for (var tileIndexB = 0; tileIndexB < this.Rooms[j].TileCount; tileIndexB++)
+                            for (var tileIndexB = 0; tileIndexB < rooms[j].TileCount; tileIndexB++)
                             {
-                                var tileA = this.RoomTiles[this.Rooms[i].StartTileIndex + tileIndexA];
-                                var tileB = this.RoomTiles[this.Rooms[j].StartTileIndex + tileIndexB];
+                                var tileA = this.RoomTiles[rooms[i].StartTileIndex + tileIndexA];
+                                var tileB = this.RoomTiles[rooms[j].StartTileIndex + tileIndexB];
                                 var distance = math.distance(tileA.Position, tileB.Position);
 
                                 if (distance < bestDistance)
@@ -258,25 +275,25 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                                     bestDistance = distance;
                                     bestTileA = tileA;
                                     bestTileB = tileB;
-                                    bestRoomAIndex = i;
-                                    bestRoomBIndex = j;
+                                    bestRoomAIndex = rooms[i].RoomArrayIndex;
+                                    bestRoomBIndex = rooms[j].RoomArrayIndex;
                                 }
                             }
                         }
                     }
 
-                    this.MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB, roomsStartIndex, roomsChunkSize);
+                    this.MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB);
                 }
             }
 
-            private void MarkRoomsConnection(NativeArray<int> connectedRoomsTable, int bestRoomAIndex, int bestRoomBIndex, TileComponent bestTileA, TileComponent bestTileB, int roomsStartIndex, int roomsChunkSize)
+            private void MarkRoomsConnection(NativeArray<int> connectedRoomsTable, int bestRoomAIndex, int bestRoomBIndex, TileComponent bestTileA, TileComponent bestTileB)
             {
                 var connectedTableCopy = new NativeArray<int>(connectedRoomsTable.Length, Allocator.Temp);
                 connectedRoomsTable.CopyTo(connectedTableCopy);
-                for (var i = 0; i < roomsStartIndex + roomsChunkSize && i < this.Rooms.Length; i++)
+                for (var i = 0; i < this.Rooms.Length; i++)
                 {
                     if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + i] == 1)
-                        for (var j = 0; j < roomsStartIndex + roomsChunkSize && j < this.Rooms.Length; j++)
+                        for (var j = 0; j < this.Rooms.Length; j++)
                             if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + j] == 1)
                             {
                                 connectedRoomsTable[i * this.Rooms.Length + j] = 1;
@@ -787,28 +804,30 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
 
                         var roomCount = this.RoomList.Length;
-                        var roomsChunkSize = 10;
+                        var roomsChunkSize = 5;
                         var concurrentQueue = this.CorridorsQueue.ToConcurrent();
                         var connectedRoomsTable = new NativeArray<int>(roomCount * roomCount, Allocator.TempJob);
 
                         for (var roomIndex = 0; roomIndex < roomCount; roomIndex++)
                             connectedRoomsTable[roomIndex * roomCount + roomIndex] = 1;
 
-                        var RearangeRoomsJobhandle = new RearangeRoomsJob
-                        {
-                            Board = board,
-                            RoomTiles = RoomTiles,
-                            Rooms = RoomList
-                        }.Schedule(inputDeps);
+                        var sliceSize = 25;
 
-                        var findClosestRoomsConnectionsJobHandle = new FindClosestRoomsConnectionsJob
+                        while (board.Size.x  / sliceSize >= 1 && board.Size.y / sliceSize >= 1)
                         {
-                            RoomTiles = RoomTiles,
-                            Rooms = RoomList,
-                            Corridors = concurrentQueue,
-                            ConnectedRoomsTable = connectedRoomsTable,
-                            RoomsChunkSize = roomsChunkSize
-                        }.Schedule(roomCount / roomsChunkSize + 1, 1, RearangeRoomsJobhandle);
+                            inputDeps = new FindClosestRoomsConnectionsJob
+                            {
+                                Board = board,
+                                SliceSize = sliceSize,
+                                RoomTiles = RoomTiles,
+                                Rooms = RoomList,
+                                Corridors = concurrentQueue,
+                                ConnectedRoomsTable = connectedRoomsTable,
+                                RoomsChunkSize = roomsChunkSize
+                            }.Schedule(board.Size.x * board.Size.y / (sliceSize * sliceSize), 1, inputDeps);
+
+                            sliceSize *= 2;
+                        }
 
                         inputDeps = new FindAllRoomsConnectionsJob
                         {
@@ -816,7 +835,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             Rooms = RoomList,
                             ConnectedRoomsTable = connectedRoomsTable,
                             Corridors = concurrentQueue
-                        }.Schedule(findClosestRoomsConnectionsJobHandle);
+                        }.Schedule(inputDeps);
                     }
                     else if (this.CurrentPhase == 2)
                     {

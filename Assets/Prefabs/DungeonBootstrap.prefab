@@ -55,7 +55,7 @@ MonoBehaviour:
     CellularAutomaton:
       BoardWidth: 75
       BoardHeight: 75
-      RandomFillPercent: 55
+      RandomFillPercent: 65
       PassRadius: 1
     BSP:
       BoardWidth: 75
