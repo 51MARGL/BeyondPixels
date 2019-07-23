@@ -46,18 +46,18 @@ MonoBehaviour:
   DungeonGenerators:
     Switch: 0
     Naive:
-      BoardWidth: 100
-      BoardHeight: 75
-      RoomCount: 30
+      BoardWidth: 50
+      BoardHeight: 50
+      RoomCount: 25
       MaxRoomSize: 10
-      MaxCorridorLength: 10
-      MinCorridorLength: 5
+      MaxCorridorLength: 15
+      MinCorridorLength: 8
     CellularAutomaton:
-      BoardWidth: 100
-      BoardHeight: 75
-      RandomFillPercent: 70
+      BoardWidth: 50
+      BoardHeight: 50
+      RandomFillPercent: 65
       PassRadius: 1
     BSP:
-      BoardWidth: 0
-      BoardHeight: 0
-      MinRoomSize: 0
+      BoardWidth: 50
+      BoardHeight: 50
+      MinRoomSize: 7

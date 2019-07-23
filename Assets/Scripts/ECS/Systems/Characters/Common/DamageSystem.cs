@@ -1,67 +1,107 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
-using BeyondPixels.ECS.Systems.Objects;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class DamageSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        public class DamageBarrier : BarrierSystem { }
-
-        private struct DamageJob : IJobProcessComponentDataWithEntity<CollisionInfo, DamageComponent>
+        [BurstCompile]
+        private struct DamageJob : IJobForEachWithEntity<CollisionInfo, FinalDamageComponent>
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
             [ReadOnly]
-            public ComponentDataFromEntity<HealthComponent> HealthComponents;
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public ArchetypeChunkEntityType EntityType;
+            public ArchetypeChunkComponentType<HealthComponent> HealthComponentType;
+            [ReadOnly]
+            public ArchetypeChunkComponentType<InCutsceneComponent> InCutsceneComponentType;
 
             public void Execute(Entity entity,
                                 int index,
                                 [ReadOnly] ref CollisionInfo collisionInfo,
-                                [ReadOnly] ref DamageComponent damageComponent)
+                                [ReadOnly] ref FinalDamageComponent damageComponent)
             {
-                var healthComponent = HealthComponents[collisionInfo.Other];
-                healthComponent.CurrentValue -= damageComponent.DamageOnImpact;
-                if (healthComponent.CurrentValue < 0)
-                    healthComponent.CurrentValue = 0;
-                else if (healthComponent.CurrentValue > healthComponent.MaxValue)
-                    healthComponent.CurrentValue = healthComponent.MaxValue;
-                CommandBuffer.SetComponent(index, collisionInfo.Other, healthComponent);
-
-                CommandBuffer.DestroyEntity(index, entity);
-
-                if (healthComponent.CurrentValue <= 0)
+                for (var c = 0; c < this.Chunks.Length; c++)
                 {
-                    //healthComponent.CurrentValue = 0;
-                    CommandBuffer.AddComponent(index, collisionInfo.Other, new DestroyComponent());
-                    return;
+                    var chunk = this.Chunks[c];
+                    var entities = chunk.GetNativeArray(this.EntityType);
+                    var healthComponents = chunk.GetNativeArray(this.HealthComponentType);
+                    if (!chunk.Has(this.InCutsceneComponentType))
+                        for (var i = 0; i < chunk.Count; i++)
+                            if (entities[i] == collisionInfo.Target)
+                            {
+                                var damageAmount = damageComponent.DamageAmount;
+
+                                var healthComponent = healthComponents[i];
+
+                                healthComponent.CurrentValue -= damageAmount;
+                                if (healthComponent.CurrentValue < 0)
+                                    healthComponent.CurrentValue = 0;
+                                else if (healthComponent.CurrentValue > healthComponent.MaxValue)
+                                    healthComponent.CurrentValue = healthComponent.MaxValue;
+
+                                healthComponents[i] = healthComponent;
+                                return;
+                            }
                 }
             }
         }
-        private DamageBarrier _damageBarrier;
 
-        [Inject]
-        private ComponentDataFromEntity<HealthComponent> _healthComponents;
-
-        protected override void OnCreateManager()
+        private struct CleanUpJob : IJobForEachWithEntity<CollisionInfo, FinalDamageComponent>
         {
-            _damageBarrier = World.Active.GetOrCreateManager<DamageBarrier>();
+            public EntityCommandBuffer.Concurrent CommandBuffer;
+            public void Execute(Entity entity,
+                                int index,
+                                [ReadOnly] ref CollisionInfo collisionInfo,
+                                [ReadOnly] ref FinalDamageComponent damageComponent)
+            {
+                CommandBuffer.DestroyEntity(index, entity);
+            }
+        }
+
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private EntityQuery _healthGroup;
+
+        protected override void OnCreate()
+        {
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._healthGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    typeof(HealthComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(DestroyComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var handle = new DamageJob
+            var damageHandle = new DamageJob
             {
-                CommandBuffer = _damageBarrier.CreateCommandBuffer().ToConcurrent(),
-                HealthComponents = _healthComponents,
+                Chunks = this._healthGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = this.GetArchetypeChunkEntityType(),
+                HealthComponentType = this.GetArchetypeChunkComponentType<HealthComponent>(),
+                InCutsceneComponentType = this.GetArchetypeChunkComponentType<InCutsceneComponent>()
             }.Schedule(this, inputDeps);
-            _damageBarrier.AddJobHandleForProducer(handle);
-            return handle;
+
+            var cleanUphandle = new CleanUpJob
+            {
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+            }.Schedule(this, damageHandle);
+            this._endFrameBarrier.AddJobHandleForProducer(cleanUphandle);
+            return cleanUphandle;
         }
     }
 }

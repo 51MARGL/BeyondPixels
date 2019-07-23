@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &6395066177036790502
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4752275978758948063, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_Name
+      value: CageMessageTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.79
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 12.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948049, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _sentences.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _sentences.Array.data[0]
+      value: Now that is even more strange. Who put that chicken in a cage? And why?
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _sentences.Array.data[1]
+      value: I'm starting to understand why Black Temple were interested in those
+        dungeons.
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _sentences.Array.data[2]
+      value: I should free out that poor animal.
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752275978758948051, guid: 3bab2e54513fc1946b7122ae136259bf,
+        type: 3}
+      propertyPath: _tips.Array.data[0]
+      value: 'Tip: You can open cages while near them by pressing {Use}'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3bab2e54513fc1946b7122ae136259bf, type: 3}

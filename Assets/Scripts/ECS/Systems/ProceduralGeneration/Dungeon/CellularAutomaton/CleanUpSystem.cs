@@ -1,50 +1,50 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton;
+
 using Unity.Collections;
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomaton
 {
     public class CleanUpSystem : ComponentSystem
-    {        
-        private ComponentGroup _boardGroup;
-        private ComponentGroup _roomGroup;
-        private ComponentGroup _tileGroup;
+    {
+        private EntityQuery _boardGroup;
+        private EntityQuery _roomGroup;
+        private EntityQuery _tileGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
-            _boardGroup = GetComponentGroup(
+            this._boardGroup = this.GetEntityQuery(
                 ComponentType.ReadOnly(typeof(BoardComponent)),
-                ComponentType.ReadOnly(typeof(BoardReadyComponent)),
-                ComponentType.ReadOnly(typeof(TilemapReadyComponent))
+                ComponentType.ReadOnly(typeof(BoardReadyComponent))
             );
-            _roomGroup = GetComponentGroup(
-                ComponentType.ReadOnly(typeof(RoomComponent)));            
-            _tileGroup = GetComponentGroup(
+            this._roomGroup = this.GetEntityQuery(
+                ComponentType.ReadOnly(typeof(RoomComponent)));
+            this._tileGroup = this.GetEntityQuery(
                ComponentType.ReadOnly(typeof(TileComponent)));
         }
 
         protected override void OnUpdate()
         {
-            if (_boardGroup.CalculateLength() == 0)
+            if (this._boardGroup.CalculateLength() == 0)
                 return;
 
-            DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
-            DeleteAllEntities(this._roomGroup.CreateArchetypeChunkArray(Allocator.TempJob));
-            DeleteAllEntities(this._tileGroup.CreateArchetypeChunkArray(Allocator.TempJob));
+            this.DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
+            this.DeleteAllEntities(this._roomGroup.CreateArchetypeChunkArray(Allocator.TempJob));
+            this.DeleteAllEntities(this._tileGroup.CreateArchetypeChunkArray(Allocator.TempJob));
         }
 
         private void DeleteAllEntities(NativeArray<ArchetypeChunk> chunks)
         {
-            var entityType = GetArchetypeChunkEntityType();
+            var entityType = this.GetArchetypeChunkEntityType();
 
-            for (int chunkIndex = 0; chunkIndex < chunks.Length; chunkIndex++)
+            for (var chunkIndex = 0; chunkIndex < chunks.Length; chunkIndex++)
             {
                 var chunk = chunks[chunkIndex];
                 var entities = chunk.GetNativeArray(entityType);
 
-                for (int i = 0; i < chunk.Count; i++)
-                    PostUpdateCommands.DestroyEntity(entities[i]);
+                for (var i = 0; i < chunk.Count; i++)
+                    this.PostUpdateCommands.DestroyEntity(entities[i]);
             }
 
             chunks.Dispose();

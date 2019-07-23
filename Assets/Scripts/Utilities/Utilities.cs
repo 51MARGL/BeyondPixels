@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Unity.Entities;
+
+using UnityEngine;
 
 namespace BeyondPixels.Utilities
 {
@@ -20,4 +22,8 @@ namespace BeyondPixels.Utilities
             animator.SetLayerWeight(animator.GetLayerIndex(layerName), 1);
         }
     }
+
+    [DisableAutoCreation]
+    public class FixedUpdateSystemGroup : ComponentSystemGroup { }
+
 }

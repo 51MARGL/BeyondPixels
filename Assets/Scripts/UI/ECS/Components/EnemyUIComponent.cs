@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace BeyondPixels.UI.ECS.Components
@@ -7,7 +9,7 @@ namespace BeyondPixels.UI.ECS.Components
     {
         public Canvas Canvas;
         public Image HealthImage;
-        public Text HealthText;
+        public TextMeshProUGUI HealthText;
         public GameObject TargettingCircle;
     }
 }

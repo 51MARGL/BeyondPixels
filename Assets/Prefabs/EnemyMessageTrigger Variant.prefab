@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &5255354983680009711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8912898195277734015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8b033a3634034a41972c854b56b3ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GameObject: {fileID: 0}
+--- !u!1001 &7132671238280302150
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1823024487225372217, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_Name
+      value: EnemyMessageTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 16.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372216, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 3.91
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _sentences.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _sentences.Array.data[0]
+      value: So that is what causes all these problems. Ghosts!
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.data[0]
+      value: 'Tip: You can melle attack by pressing {Attack}.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.data[1]
+      value: 'Tip: To cast spell select target by clicking LMB on enemy or by pressing
+        {PickTarget}. Then press any of {Action1},{Action2},{Action3} to cast the
+        spell.'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6b15e54470e61974998ac189ea73ff55, type: 3}
+--- !u!1 &8912898195277734015 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1823024487225372217, guid: 6b15e54470e61974998ac189ea73ff55,
+    type: 3}
+  m_PrefabInstance: {fileID: 7132671238280302150}
+  m_PrefabAsset: {fileID: 0}

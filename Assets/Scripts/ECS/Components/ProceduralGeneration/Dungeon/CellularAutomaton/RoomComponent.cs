@@ -1,5 +1,4 @@
-﻿using Unity.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 
 namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton
 {
@@ -8,5 +7,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutom
         public int IsAccessibleFromMainRoom;
         public int StartTileIndex;
         public int TileCount;
+        public int RoomArrayIndex;
     }
 }

@@ -1,20 +1,18 @@
 ﻿using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
-using Unity.Burst;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Spells
 {
     public class DurationSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        public class DurationBarrier : BarrierSystem { }
-
-        [RequireSubtractiveComponent(typeof(DestroyComponent))]
-        private struct DurationJob : IJobProcessComponentDataWithEntity<DurationComponent, SpellComponent>
+        [ExcludeComponent(typeof(DestroyComponent))]
+        private struct DurationJob : IJobForEachWithEntity<DurationComponent, SpellComponent>
         {
             public EntityCommandBuffer.Concurrent CommandBuffer;
             public float DeltaTime;
@@ -25,27 +23,27 @@ namespace BeyondPixels.ECS.Systems.Spells
                                 [ReadOnly] ref SpellComponent spellComponent)
             {
                 if (durationComponent.Duration < 0)
-                    CommandBuffer.AddComponent(index, entity, new DestroyComponent());
+                    this.CommandBuffer.AddComponent(index, entity, new DestroyComponent());
                 else
-                    durationComponent.Duration -= DeltaTime;
+                    durationComponent.Duration -= this.DeltaTime;
             }
         }
-        [Inject]
-        private DurationBarrier _durationBarrier;
 
-        protected override void OnCreateManager()
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+
+        protected override void OnCreate()
         {
-            _durationBarrier = World.Active.GetOrCreateManager<DurationBarrier>();
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             var handle = new DurationJob
             {
-                CommandBuffer = _durationBarrier.CreateCommandBuffer().ToConcurrent(),
+                CommandBuffer = this._endFrameBarrier.CreateCommandBuffer().ToConcurrent(),
                 DeltaTime = Time.deltaTime
             }.Schedule(this, inputDeps);
-            _durationBarrier.AddJobHandleForProducer(handle);
+            this._endFrameBarrier.AddJobHandleForProducer(handle);
             return handle;
         }
     }

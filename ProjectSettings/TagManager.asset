@@ -16,6 +16,13 @@ TagManager:
   - AgroRange
   - Spell
   - PlayerSword
+  - SpellBook
+  - Light
+  - UseTrigger
+  - LootBag
+  - Ally
+  - KeyBindButton
+  - StoryTrigger
   layers:
   - Default
   - TransparentFX
@@ -26,14 +33,14 @@ TagManager:
   - 
   - 
   - World
-  - Clickable
+  - Enemy
   - Light
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - EntityEnabler
+  - MiniMap
+  - NavMesh
+  - MapTopView
+  - Ally
   - 
   - 
   - 

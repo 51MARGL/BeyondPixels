@@ -9,10 +9,4 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutom
         public TileType CurrentGenState;
         public TileType NextGenState;
     }
-
-    public enum TileType
-    {
-        Wall = 0,
-        Floor = 1
-    }
 }

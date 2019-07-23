@@ -1,72 +1,76 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
-    public class InspectStateSystem : JobComponentSystem
+    public class InspectStateSystem : ComponentSystem
     {
-        [DisableAutoCreation]
-        private class InspectStateBarrier : BarrierSystem { }
+        private EntityQuery _inspectGroup;
 
-        [RequireSubtractiveComponent(typeof(AttackStateComponent), typeof(FollowStateComponent))]
-        private struct InspectStateJob : IJobProcessComponentDataWithEntity<MovementComponent, InspectStateComponent>
+        protected override void OnCreate()
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            public Unity.Mathematics.Random Random;
-            public float CurrentTime;
-
-            public void Execute(Entity entity,
-                                int index,
-                                ref MovementComponent movementComponent,
-                                ref InspectStateComponent inspectStateComponent)
+            this._inspectGroup = this.GetEntityQuery(new EntityQueryDesc
             {
-                if (CurrentTime - inspectStateComponent.StartedAt < Random.NextInt(10, 30) / 10f)
+                All = new ComponentType[]
+                {
+                    typeof(MovementComponent), typeof(InspectStateComponent),
+                    typeof(PositionComponent), typeof(NavMeshAgent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(AttackStateComponent), typeof(FollowStateComponent)
+                }
+            });
+        }
+
+        protected override void OnUpdate()
+        {
+            this.Entities.With(this._inspectGroup).ForEach((Entity entity,
+                                                NavMeshAgent navMeshAgent,
+                                                ref MovementComponent movementComponent,
+                                                ref PositionComponent positionComponent,
+                                                ref InspectStateComponent inspectStateComponent) =>
+            {
+                var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+                var currentTime = Time.time;
+                if (currentTime - inspectStateComponent.StartedAt < random.NextInt(10, 30) / 10f)
                 {
                     if (inspectStateComponent.InspectDirection.Equals(float2.zero))
                     {
-                        inspectStateComponent.InspectDirection = 
-                            new float2(Random.NextFloat(-10, 10), Random.NextFloat(-10, 10));
+                        inspectStateComponent.InspectDirection =
+                            new float2(random.NextFloat(-20, 20), random.NextFloat(-20, 20));
+
+                        var curr = new Vector3(positionComponent.CurrentPosition.x, positionComponent.CurrentPosition.y, 0);
+                        var dest = curr +
+                            new Vector3(inspectStateComponent.InspectDirection.x, inspectStateComponent.InspectDirection.y, 0);
+
+                        movementComponent.Direction = inspectStateComponent.InspectDirection;
+                        navMeshAgent.nextPosition = curr;
+                        navMeshAgent.SetDestination(dest);
                     }
-                    movementComponent.Direction = inspectStateComponent.InspectDirection;
+
+                    if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
+                        movementComponent.Direction = float2.zero;
+                    else
+                        movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
                 }
                 else
                 {
                     movementComponent.Direction = float2.zero;
 
-                    CommandBuffer.RemoveComponent(index, entity, typeof(InspectStateComponent));
-                    CommandBuffer.AddComponent(index, entity,
+                    this.PostUpdateCommands.RemoveComponent(entity, typeof(InspectStateComponent));
+                    this.PostUpdateCommands.AddComponent(entity,
                         new IdleStateComponent
                         {
-                            StartedAt = CurrentTime
+                            StartedAt = currentTime
                         });
                 }
-            }
-        }
-
-        private InspectStateBarrier _inspectStateBarrier;
-
-        protected override void OnCreateManager()
-        {
-            _inspectStateBarrier = World.Active.GetOrCreateManager<InspectStateBarrier>();
-        }
-
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
-        {
-            var random = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1, uint.MaxValue));
-            var handle = new InspectStateJob
-            {
-                CommandBuffer = _inspectStateBarrier.CreateCommandBuffer().ToConcurrent(),
-                Random = random,
-                CurrentTime = Time.time
-            }.Schedule(this, inputDeps);
-            _inspectStateBarrier.AddJobHandleForProducer(handle);
-            return handle;
+            });
         }
     }
 }

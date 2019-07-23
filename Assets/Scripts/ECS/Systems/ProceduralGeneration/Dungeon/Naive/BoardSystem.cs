@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -11,44 +12,189 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 {
     public class BoardSystem : JobComponentSystem
     {
-        [DisableAutoCreation]
-        private class BoardSystemBarrier : BarrierSystem { }
-
         [BurstCompile]
         private struct CreateRoomsAndCorridorsJob : IJobParallelFor
         {
             [ReadOnly]
             public BoardComponent Board;
 
-            [NativeDisableParallelForRestriction]
-            public NativeArray<RoomComponent> Rooms;
+            [WriteOnly]
+            public NativeQueue<RoomComponent>.Concurrent Rooms;
 
-            [NativeDisableParallelForRestriction]
-            public NativeArray<CorridorComponent> Corridors;
+            [WriteOnly]
+            public NativeQueue<CorridorComponent>.Concurrent Corridors;
 
             [DeallocateOnJobCompletion]
             [ReadOnly]
-            public NativeArray<BatchData> Data;
+            public NativeArray<CorridorComponent> FirstCorridors;
+
+            [ReadOnly]
+            public int RoomCount;
 
             [ReadOnly]
             public int RandomSeed;
 
             public void Execute(int index)
             {
-                var batch = Data[index];
-                var random = new Random((uint)(RandomSeed * (index + 1)));
+                var random = new Random((uint)(this.RandomSeed * (index + 1)));
 
-                Rooms[batch.FirstRoomIndex] =
-                    CreateRoom(Board, Corridors[batch.FirstCorridorIndex], ref random);
-                Corridors[3 + batch.FirstRoomIndex] =
-                    CreateCorridor(Rooms[batch.FirstRoomIndex], Board, false, ref random);
+                var firstCorridor = this.FirstCorridors[index];
+                var room = this.CreateRoom(this.Board, firstCorridor, ref random);
+                this.Rooms.Enqueue(room);
 
-                for (int i = batch.FirstRoomIndex + 1, j = 4 + batch.FirstRoomIndex; i < batch.LastRoomIndex; i++, j++)
+                for (var i = 0; i < this.RoomCount; i++)
                 {
-                    Rooms[i] = CreateRoom(Board, Corridors[j - 1], ref random);
-                    if (j < Corridors.Length)
-                        Corridors[j] = CreateCorridor(Rooms[i], Board, false, ref random);
+                    var corridor = this.CreateCorridor(room, this.Board, ref random);
+                    room = this.CreateRoom(this.Board, corridor, ref random);
+                    this.Rooms.Enqueue(room);
+                    this.Corridors.Enqueue(corridor);
                 }
+            }
+
+            private RoomComponent CreateRoom(BoardComponent board, CorridorComponent corridor, ref Unity.Mathematics.Random random)
+            {
+                var roomWidth = random.NextInt(3, board.MaxRoomSize);
+                var roomHeight = random.NextInt(3, board.MaxRoomSize);
+
+                var roomX = 0;
+                var roomY = 0;
+
+                switch (corridor.Direction)
+                {
+                    case Direction.Up:
+                        roomHeight = math.clamp(roomHeight, 0, board.Size.y - 2 - corridor.EndY);
+                        roomY = corridor.EndY;
+                        roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
+                        roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
+                        break;
+                    case Direction.Left:
+                        roomWidth = math.clamp(roomWidth, 0, board.Size.x - 2 - corridor.EndX);
+                        roomX = corridor.EndX;
+                        roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
+                        roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
+                        break;
+                    case Direction.Down:
+                        roomHeight = math.clamp(roomHeight, 0, corridor.EndY);
+                        roomY = corridor.EndY - roomHeight + 1;
+                        roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
+                        roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
+                        break;
+                    case Direction.Right:
+                        roomWidth = math.clamp(roomWidth, 0, corridor.EndX);
+                        roomX = corridor.EndX - roomWidth + 1;
+                        roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
+                        roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
+                        break;
+                }
+
+                return new RoomComponent
+                {
+                    X = math.clamp(roomX, 2, board.Size.x - 2),
+                    Y = math.clamp(roomY, 2, board.Size.y - 2),
+                    Size = new int2(roomWidth, roomHeight),
+                    EnteringCorridor = corridor.Direction
+                };
+            }
+
+            private CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, ref Unity.Mathematics.Random random)
+            {
+                var direction = (Direction)random.NextInt(0, 4);
+                var oppositeDirection = (Direction)(((int)room.EnteringCorridor + 2) % 4);
+
+                if (random.NextInt(0, 100) > 75) //25% chance to go further from center
+                {
+                    var centerX = (int)math.round(board.Size.x / 2f);
+                    var centerY = (int)math.round(board.Size.y / 2f);
+                    if (room.X > centerX && room.Y > centerY)
+                        direction = random.NextBool() ? Direction.Right : random.NextBool() ? Direction.Up : Direction.Down;
+                    else if (room.X < centerX && room.Y > centerY)
+                        direction = random.NextBool() ? Direction.Left : random.NextBool() ? Direction.Up : Direction.Down;
+                    else if (room.X > centerX && room.Y < centerY)
+                        direction = random.NextBool() ? Direction.Right : random.NextBool() ? Direction.Up : Direction.Down;
+                    else
+                        direction = random.NextBool() ? Direction.Left : random.NextBool() ? Direction.Up : Direction.Down;
+                }
+
+                if (direction == oppositeDirection)
+                {
+                    var directionInt = (int)direction;
+                    directionInt++;
+                    directionInt = directionInt % 4;
+                    direction = (Direction)directionInt;
+
+                }
+
+                var corridorLength = random.NextInt(board.MinCorridorLength, board.MaxCorridorLength);
+                var corridorX = 0;
+                var corridorY = 0;
+
+                var maxLength = board.MaxCorridorLength;
+
+                switch (direction)
+                {
+                    case Direction.Up:
+                        corridorX = random.NextInt(room.X, room.X + room.Size.x);
+                        corridorY = room.Y + room.Size.y - 2;
+                        maxLength = board.Size.y - 2 - corridorY;
+                        break;
+                    case Direction.Left:
+                        corridorX = room.X + room.Size.x - 2;
+                        corridorY = random.NextInt(room.Y, room.Y + room.Size.y);
+                        maxLength = board.Size.x - 2 - corridorX;
+                        break;
+                    case Direction.Down:
+                        corridorX = random.NextInt(room.X, room.X + room.Size.x + 1);
+                        corridorY = room.Y;
+                        maxLength = corridorY - 2;
+                        break;
+                    case Direction.Right:
+                        corridorX = room.X;
+                        corridorY = random.NextInt(room.Y, room.Y + room.Size.y + 1);
+                        maxLength = corridorX - 2;
+                        break;
+                }
+
+                corridorLength = math.clamp(corridorLength, 0, maxLength);
+
+                return new CorridorComponent
+                {
+                    StartX = corridorX,
+                    StartY = corridorY,
+                    Length = corridorLength,
+                    Direction = direction
+                };
+            }
+        }
+
+        [BurstCompile]
+        private struct RoomsQueueToArrayJob : IJob
+        {
+            [WriteOnly]
+            public NativeArray<RoomComponent> RoomsArray;
+            public NativeQueue<RoomComponent> RoomsQueue;
+
+            public void Execute()
+            {
+                var index = 0;
+                while (this.RoomsQueue.Count > 0)
+                    if (this.RoomsQueue.TryDequeue(out var corridor))
+                        this.RoomsArray[index++] = corridor;
+            }
+        }
+
+        [BurstCompile]
+        private struct CorridorsQueueToArrayJob : IJob
+        {
+            [WriteOnly]
+            public NativeArray<CorridorComponent> CorridorsArray;
+            public NativeQueue<CorridorComponent> CorridorsQueue;
+
+            public void Execute()
+            {
+                var index = 0;
+                while (this.CorridorsQueue.Count > 0)
+                    if (this.CorridorsQueue.TryDequeue(out var corridor))
+                        this.CorridorsArray[index++] = corridor;
             }
         }
 
@@ -68,17 +214,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute(int index)
             {
-                var currentRoom = Roms[index];
-                for (int j = 0; j < currentRoom.Size.x; j++)
+                var currentRoom = this.Roms[index];
+                for (var j = 0; j < currentRoom.Size.x; j++)
                 {
-                    int xCoord = currentRoom.X + j;
+                    var xCoord = currentRoom.X + j;
 
                     if (currentRoom.X == 0 || currentRoom.Y == 0)
                         return;
-                    for (int k = 0; k < currentRoom.Size.y; k++)
+                    for (var k = 0; k < currentRoom.Size.y; k++)
                     {
-                        int yCoord = currentRoom.Y + k;
-                        Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
+                        var yCoord = currentRoom.Y + k;
+                        this.Tiles[(yCoord * this.TileStride) + xCoord] = TileType.Floor;
                     }
                 }
             }
@@ -100,12 +246,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute(int index)
             {
-                var currentCorridor = Corridors[index];
+                var currentCorridor = this.Corridors[index];
 
-                for (int j = 0; j < currentCorridor.Length; j++)
+                for (var j = 0; j < currentCorridor.Length; j++)
                 {
-                    int xCoord = currentCorridor.StartX;
-                    int yCoord = currentCorridor.StartY;
+                    var xCoord = currentCorridor.StartX;
+                    var yCoord = currentCorridor.StartY;
 
                     switch (currentCorridor.Direction)
                     {
@@ -123,12 +269,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                             break;
                     }
 
-                    Tiles[(yCoord * TileStride) + xCoord] = TileType.Floor;
+                    this.Tiles[(yCoord * this.TileStride) + xCoord] = TileType.Floor;
 
                     if (currentCorridor.Direction == Direction.Up || currentCorridor.Direction == Direction.Down)
-                        Tiles[(yCoord * TileStride) + xCoord - 1] = TileType.Floor;
+                        this.Tiles[(yCoord * this.TileStride) + xCoord - 1] = TileType.Floor;
                     else
-                        Tiles[((yCoord - 1) * TileStride) + xCoord] = TileType.Floor;
+                        this.Tiles[((yCoord - 1) * this.TileStride) + xCoord] = TileType.Floor;
                 }
             }
         }
@@ -142,20 +288,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute()
             {
-                var tilesStride = Board.Size.x;
-                for (int x = 0; x < Board.Size.x; x++)
+                var tilesStride = this.Board.Size.x;
+                for (var x = 0; x < this.Board.Size.x; x++)
                 {
-                    Tiles[x] = TileType.Wall;
-                    Tiles[tilesStride + x] = TileType.Wall;
-                    Tiles[((Board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
-                    Tiles[((Board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
+                    this.Tiles[x] = TileType.Wall;
+                    this.Tiles[tilesStride + x] = TileType.Wall;
+                    this.Tiles[((this.Board.Size.y - 1) * tilesStride) + x] = TileType.Wall;
+                    this.Tiles[((this.Board.Size.y - 2) * tilesStride) + x] = TileType.Wall;
                 }
-                for (int y = 0; y < Board.Size.y; y++)
+                for (var y = 0; y < this.Board.Size.y; y++)
                 {
-                    Tiles[y * tilesStride] = TileType.Wall;
-                    Tiles[y * tilesStride + 1] = TileType.Wall;
-                    Tiles[(y * tilesStride) + Board.Size.x - 1] = TileType.Wall;
-                    Tiles[(y * tilesStride) + Board.Size.x - 2] = TileType.Wall;
+                    this.Tiles[y * tilesStride] = TileType.Wall;
+                    this.Tiles[y * tilesStride + 1] = TileType.Wall;
+                    this.Tiles[(y * tilesStride) + this.Board.Size.x - 1] = TileType.Wall;
+                    this.Tiles[(y * tilesStride) + this.Board.Size.x - 2] = TileType.Wall;
                 }
             }
         }
@@ -169,7 +315,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
             public void Execute()
             {
-                RemoveThinWalls(Board, Tiles, Board.Size.x);
+                this.RemoveThinWalls(this.Board, this.Tiles, this.Board.Size.x);
             }
 
             private void RemoveThinWalls(BoardComponent board, NativeArray<TileType> tiles, int tilesStride)
@@ -202,149 +348,254 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             }
         }
 
-        private struct InstantiateTilesJob : IJobParallelFor
-        {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [DeallocateOnJobCompletion]
-            [ReadOnly]
-            public NativeArray<TileType> Tiles;
-
-            [ReadOnly]
-            public int TileStride;
-
-            //Index represents row
-            public void Execute(int index)
-            {
-                for (int x = 0; x < TileStride; x++)
-                {
-                    var entity = CommandBuffer.CreateEntity(index);
-                    CommandBuffer.AddComponent(index, entity, new TileComponent
-                    {
-                        TileType = Tiles[(index * TileStride) + x],
-                        Position = new int2(x, index)
-                    });
-                }
-            }
-        }
-
         private struct TagBoardDoneJob : IJob
         {
             public EntityCommandBuffer CommandBuffer;
             [ReadOnly]
             public Entity BoardEntity;
+            [ReadOnly]
+            public BoardComponent BoardComponent;
+            [DeallocateOnJobCompletion]
+            [ReadOnly]
+            public NativeArray<TileType> Tiles;
+            [ReadOnly]
+            public int RandomSeed;
+            [ReadOnly]
+            public int TileStride;
 
             public void Execute()
             {
-                CommandBuffer.AddComponent(BoardEntity, new BoardReadyComponent());
+                if (this.IsBoardValid())
+                {
+                    var mapBounds = this.GetBounds();
+                    for (var y = 0; y < mapBounds.z; y++)
+                        for (var x = 0; x < mapBounds.w; x++)
+                        {
+                            var entity = this.CommandBuffer.CreateEntity();
+                            this.CommandBuffer.AddComponent(entity, new FinalTileComponent
+                            {
+                                TileType = this.Tiles[((y + mapBounds.y) * this.TileStride) + (x + mapBounds.x)],
+                                Position = new int2(x, y)
+                            });
+                        }
+
+                    this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
+                    var finalBoardEntity = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(finalBoardEntity, new FinalBoardComponent
+                    {
+                        Size = new int2(mapBounds.w, mapBounds.z),
+                        RandomSeed = this.BoardComponent.RandomSeed
+                    });
+                }
+                else
+                {
+                    var random = new Random((uint)this.RandomSeed);
+
+                    var randomSize = new int2(random.NextInt(75, 150), random.NextInt(50, 150));
+                    var roomCount = (int)(randomSize.x * randomSize.y * random.NextFloat(0.0025f, 0.0035f));
+                    var board = this.CommandBuffer.CreateEntity();
+                    this.CommandBuffer.AddComponent(board, new BoardComponent
+                    {
+                        Size = randomSize,
+                        RoomCount = roomCount,
+                        MaxRoomSize = this.BoardComponent.MaxRoomSize,
+                        MaxCorridorLength = this.BoardComponent.MaxCorridorLength,
+                        MinCorridorLength = this.BoardComponent.MinCorridorLength,
+                        RandomSeed = random.NextUInt(1, uint.MaxValue)
+                    });
+                    this.CommandBuffer.DestroyEntity(this.BoardEntity);
+                }
+            }
+
+            private int4 GetBounds()
+            {
+                var bounds = new int4(this.BoardComponent.Size.x, this.BoardComponent.Size.y, 0, 0);
+
+                for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                    for (var x = 0; x < this.TileStride; x++)
+                    {
+                        if (this.Tiles[y * this.TileStride + x] == TileType.Floor)
+                        {
+                            if (y > bounds.z)
+                                bounds.z = y;
+                            if (y < bounds.y)
+                                bounds.y = y;
+                            if (x > bounds.w)
+                                bounds.w = x;
+                            if (x < bounds.x)
+                                bounds.x = x;
+                        }
+                    }
+
+                bounds.x = math.clamp(bounds.x - 2, 0, this.BoardComponent.Size.x);
+                bounds.y = math.clamp(bounds.y - 2, 0, this.BoardComponent.Size.y);
+                bounds.z = math.clamp(bounds.z - bounds.y + 3, 0, this.BoardComponent.Size.y - bounds.y);
+                bounds.w = math.clamp(bounds.w - bounds.x + 3, 0, this.BoardComponent.Size.x - bounds.x);
+                return bounds;
+            }
+
+            private bool IsBoardValid()
+            {
+                var freeTilesCount = 0;
+                for (var i = 0; i < this.Tiles.Length; i++)
+                    if (this.Tiles[i] == TileType.Floor)
+                        freeTilesCount++;
+
+                if (freeTilesCount < 50)
+                    return false;
+                return true;
             }
         }
 
-        private struct BatchData
+        [BurstCompile]
+        private struct CleanUpJob : IJob
         {
-            public int FirstRoomIndex;
-            public int LastRoomIndex;
-            public int FirstCorridorIndex;
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> Chunks;
+            public void Execute()
+            {
+
+            }
         }
 
-        private struct Data
-        {
-            public readonly int Length;
-            public ComponentDataArray<BoardComponent> BoardComponents;
-            public SubtractiveComponent<BoardReadyComponent> BoardReadyComponents;
-            public EntityArray EntityArray;
-        }
-        [Inject]
-        private Data _data;
+        private NativeQueue<CorridorComponent> CorridorsQueue;
+        private NativeQueue<RoomComponent> RoomsQueue;
+        private NativeArray<TileType> Tiles;
+        private int CurrentPhase;
+        private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
+        private EntityQuery _boardGroup;
 
-        private BoardSystemBarrier _boardSystemBarrier;
-
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
-            _boardSystemBarrier = World.Active.GetOrCreateManager<BoardSystemBarrier>();
+            this.CurrentPhase = 0;
+            this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this._boardGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    typeof(BoardComponent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(BoardReadyComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            for (int i = 0; i < _data.Length; i++)
+            var boardChunks = this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob);
+            for (var chunkIndex = 0; chunkIndex < boardChunks.Length; chunkIndex++)
             {
-                var board = _data.BoardComponents[i];
+                var chunk = boardChunks[chunkIndex];
+                var boardEntities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
+                var boards = chunk.GetNativeArray(this.GetArchetypeChunkComponentType<BoardComponent>());
+                for (var i = 0; i < chunk.Count; i++)
+                {
+                    var board = boards[i];
+                    var boardEntity = boardEntities[i];
+                    var random = new Random(board.RandomSeed);
 
-                var roomCount = board.RoomCount;
-
-                var tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                var rooms = new NativeArray<RoomComponent>(roomCount, Allocator.TempJob);
-                var corridors = new NativeArray<CorridorComponent>(roomCount + 2, Allocator.TempJob);
-
-                for (int j = 0; j < tiles.Length; j++)
-                    tiles[j] = TileType.Wall;
-
-                // setup fist room and corridors to all 4 directions
-                var random = new Random((uint)System.DateTime.Now.ToString("yyyyMMddHHmmss").GetHashCode());
-                rooms[0] = CreateRoom(board, ref random);
-                corridors[0] = CreateCorridor(rooms[0], board, true, ref random, 0);
-                corridors[1] = CreateCorridor(rooms[0], board, true, ref random, 1);
-                corridors[2] = CreateCorridor(rooms[0], board, true, ref random, 2);
-                corridors[3] = CreateCorridor(rooms[0], board, true, ref random, 3);
-
-                var batch = new NativeArray<BatchData>(4, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                for (int j = 0, k = batch.Length + 1; j < batch.Length; j++, k--)
-                    batch[j] = new BatchData
+                    if (this.CurrentPhase == 0)
                     {
-                        FirstRoomIndex = k > batch.Length ? 1 : rooms.Length / k,
-                        LastRoomIndex = rooms.Length / (k - 1),
-                        FirstCorridorIndex = j
-                    };
+                        var roomCount = board.RoomCount;
 
-                var CreateRoomsAndCorridorsJobHandle = new CreateRoomsAndCorridorsJob
-                {
-                    Board = board,
-                    Rooms = rooms,
-                    Corridors = corridors,
-                    Data = batch,
-                    RandomSeed = random.NextInt()
-                }.Schedule(batch.Length, 1, inputDeps);
+                        this.Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                        this.RoomsQueue = new NativeQueue<RoomComponent>(Allocator.TempJob);
+                        this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
+                        var firstCorridors = new NativeArray<CorridorComponent>(4, Allocator.TempJob);
+                        for (var j = 0; j < this.Tiles.Length; j++)
+                            this.Tiles[j] = TileType.Wall;
 
-                var setRoomTilesJobHandle = new SetRoomTilesJob
-                {
-                    Roms = rooms,
-                    Tiles = tiles,
-                    TileStride = board.Size.x
-                }.Schedule(rooms.Length, 1, CreateRoomsAndCorridorsJobHandle);
+                        // setup fist room and corridors to all 4 directions
+                        var firstRoom = CreateRoom(board, ref random);
+                        this.RoomsQueue.Enqueue(firstRoom);
+                        for (var c = 0; c < 4; c++)
+                        {
+                            firstCorridors[c] = this.CreateCorridor(firstRoom, board, ref random, c);
+                            this.CorridorsQueue.Enqueue(firstCorridors[c]);
+                        }
 
-                var setCorridorTilesJobHandle = new SetCorridorTilesJob
-                {
-                    Corridors = corridors,
-                    Tiles = tiles,
-                    TileStride = board.Size.x
-                }.Schedule(corridors.Length, 1, CreateRoomsAndCorridorsJobHandle);
+                        inputDeps = new CreateRoomsAndCorridorsJob
+                        {
+                            Board = board,
+                            Rooms = this.RoomsQueue.ToConcurrent(),
+                            Corridors = this.CorridorsQueue.ToConcurrent(),
+                            FirstCorridors = firstCorridors,
+                            RoomCount = roomCount / 4,
+                            RandomSeed = random.NextInt()
+                        }.Schedule(4, 1, inputDeps);
+                    }
+                    else if (this.CurrentPhase == 1)
+                    {
+                        var roomsCount = this.RoomsQueue.Count;
+                        var corridorsCount = this.CorridorsQueue.Count;
+                        var roomsArray = new NativeArray<RoomComponent>(roomsCount, Allocator.TempJob);
+                        var corridorsArray = new NativeArray<CorridorComponent>(corridorsCount, Allocator.TempJob);
 
-                var removeThinWallsJobHandle = new RemoveThinWallsJob
-                {
-                    Board = board,
-                    Tiles = tiles
-                }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
+                        var roomsQueueToArrayJobHandle = new RoomsQueueToArrayJob
+                        {
+                            RoomsQueue = this.RoomsQueue,
+                            RoomsArray = roomsArray
+                        }.Schedule(inputDeps);
 
-                var closeBordersJobHandle = new CloseBordersJob
-                {
-                    Board = board,
-                    Tiles = tiles
-                }.Schedule(removeThinWallsJobHandle);
+                        var corridorsQueueToArrayJobHandle = new CorridorsQueueToArrayJob
+                        {
+                            CorridorsQueue = this.CorridorsQueue,
+                            CorridorsArray = corridorsArray
+                        }.Schedule(inputDeps);
 
-                var instantiateTilesJobHandle = new InstantiateTilesJob
-                {
-                    CommandBuffer = _boardSystemBarrier.CreateCommandBuffer().ToConcurrent(),
-                    Tiles = tiles,
-                    TileStride = board.Size.x
-                }.Schedule(board.Size.y, 1, closeBordersJobHandle);
+                        var setRoomTilesJobHandle = new SetRoomTilesJob
+                        {
+                            Roms = roomsArray,
+                            Tiles = Tiles,
+                            TileStride = board.Size.x
+                        }.Schedule(roomsCount, 1, roomsQueueToArrayJobHandle);
 
-                inputDeps = new TagBoardDoneJob
-                {
-                    CommandBuffer = _boardSystemBarrier.CreateCommandBuffer(),
-                    BoardEntity = _data.EntityArray[i]
-                }.Schedule(instantiateTilesJobHandle);
-                _boardSystemBarrier.AddJobHandleForProducer(inputDeps);
+                        var setCorridorTilesJobHandle = new SetCorridorTilesJob
+                        {
+                            Corridors = corridorsArray,
+                            Tiles = Tiles,
+                            TileStride = board.Size.x
+                        }.Schedule(corridorsCount, 1, corridorsQueueToArrayJobHandle);
+
+                        var removeThinWallsJobHandle = new RemoveThinWallsJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(JobHandle.CombineDependencies(setRoomTilesJobHandle, setCorridorTilesJobHandle));
+
+                        inputDeps = new CloseBordersJob
+                        {
+                            Board = board,
+                            Tiles = Tiles
+                        }.Schedule(removeThinWallsJobHandle);
+                    }
+                    else if (this.CurrentPhase == 2)
+                    {
+                        this.CorridorsQueue.Dispose();
+                        this.RoomsQueue.Dispose();
+
+                        inputDeps = new TagBoardDoneJob
+                        {
+                            CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
+                            BoardEntity = boardEntity,
+                            Tiles = Tiles,
+                            BoardComponent = board,
+                            TileStride = board.Size.x,
+                            RandomSeed = random.NextInt()
+                        }.Schedule(inputDeps);
+                        this._endFrameBarrier.AddJobHandleForProducer(inputDeps);
+                    }
+                }
             }
-            return inputDeps;
+            this.CurrentPhase = (this.CurrentPhase + 1) % 3;
+            var cleanUpJobHandle = new CleanUpJob
+            {
+                Chunks = boardChunks
+            }.Schedule(inputDeps);
+            return cleanUpJobHandle;
         }
 
         private static RoomComponent CreateRoom(BoardComponent board, ref Unity.Mathematics.Random random)
@@ -364,86 +615,15 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             };
         }
 
-        private static RoomComponent CreateRoom(BoardComponent board, CorridorComponent corridor, ref Unity.Mathematics.Random random)
+        private CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, ref Unity.Mathematics.Random random, int forceDirection)
         {
-            var roomWidth = random.NextInt(3, board.MaxRoomSize);
-            var roomHeight = random.NextInt(3, board.MaxRoomSize);
-
-            var roomX = 0;
-            var roomY = 0;
-
-            switch (corridor.Direction)
-            {
-                case Direction.Up:
-                    roomHeight = math.clamp(roomHeight, 0, board.Size.y - 2 - corridor.EndY);
-                    roomY = corridor.EndY;
-                    roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
-                    roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
-                    break;
-                case Direction.Left:
-                    roomWidth = math.clamp(roomWidth, 0, board.Size.x - 2 - corridor.EndX);
-                    roomX = corridor.EndX;
-                    roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
-                    roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
-                    break;
-                case Direction.Down:
-                    roomHeight = math.clamp(roomHeight, 0, corridor.EndY);
-                    roomY = corridor.EndY - roomHeight + 1;
-                    roomX = random.NextInt(corridor.EndX - roomWidth + 1, corridor.EndX + 1);
-                    roomX = math.clamp(roomX, 2, board.Size.x - 2 - roomWidth);
-                    break;
-                case Direction.Right:
-                    roomWidth = math.clamp(roomWidth, 0, corridor.EndX);
-                    roomX = corridor.EndX - roomWidth + 1;
-                    roomY = random.NextInt(corridor.EndY - roomHeight + 1, corridor.EndY + 1);
-                    roomY = math.clamp(roomY, 2, board.Size.y - 2 - roomHeight);
-                    break;
-            }
-
-            return new RoomComponent
-            {
-                X = math.clamp(roomX, 2, board.Size.x - 2),
-                Y = math.clamp(roomY, 2, board.Size.y - 2),
-                Size = new int2(roomWidth, roomHeight),
-                EnteringCorridor = corridor.Direction
-            };
-        }
-
-        private static CorridorComponent CreateCorridor(RoomComponent room, BoardComponent board, bool first, ref Unity.Mathematics.Random random, int forceDirection = -1)
-        {
-            var direction = (Direction)random.NextInt(0, 4);
-            var oppositeDirection = (Direction)(((int)room.EnteringCorridor + 2) % 4);
-
-            if (first && forceDirection != -1)
-                direction = (Direction)forceDirection;
-            else if (!first && random.NextInt(0, 100) > 50) //50% chance to go further from center
-            {
-                var centerX = (int)math.round(board.Size.x / 2f);
-                var centerY = (int)math.round(board.Size.y / 2f);
-                if (room.X > centerX && room.Y > centerY)
-                    direction = random.NextBool() ? Direction.Left : Direction.Up;
-                else if (room.X < centerX && room.Y > centerY)
-                    direction = random.NextBool() ? Direction.Right : Direction.Up;
-                else if (room.X > centerX && room.Y < centerY)
-                    direction = random.NextBool() ? Direction.Left : Direction.Down;
-                else
-                    direction = random.NextBool() ? Direction.Right : Direction.Down;
-            }
-
-            if (!first && direction == oppositeDirection)
-            {
-                int directionInt = (int)direction;
-                directionInt++;
-                directionInt = directionInt % 4;
-                direction = (Direction)directionInt;
-
-            }
+            var direction = (Direction)forceDirection;
 
             var corridorLength = random.NextInt(board.MinCorridorLength, board.MaxCorridorLength);
             var corridorX = 0;
             var corridorY = 0;
 
-            int maxLength = board.MaxCorridorLength;
+            var maxLength = board.MaxCorridorLength;
 
             switch (direction)
             {

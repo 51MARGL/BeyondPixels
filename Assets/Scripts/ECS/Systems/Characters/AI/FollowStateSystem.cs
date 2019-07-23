@@ -1,81 +1,86 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
-using Unity.Collections;
+using BeyondPixels.ECS.Components.Characters.Player;
+using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
-    public class FollowStateSystem : JobComponentSystem
+    public class FollowStateSystem : ComponentSystem
     {
-        [DisableAutoCreation]
-        public class FollowStateBarrier : BarrierSystem { }
+        private EntityQuery _followGroup;
+        private EntityQuery _targetGroup;
 
-        [RequireSubtractiveComponent(typeof(AttackStateComponent))]
-        private struct FollowStateJob :
-            IJobProcessComponentDataWithEntity<MovementComponent, FollowStateComponent, WeaponComponent, PositionComponent>
+        protected override void OnCreate()
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
-            [ReadOnly]
-            public ComponentDataFromEntity<PositionComponent> Positions;
-            public float CurrentTime;
-
-            public void Execute(Entity entity,
-                                int index,
-                                ref MovementComponent movementComponent,
-                                ref FollowStateComponent followStateComponent,
-                                [ReadOnly] ref WeaponComponent weaponComponent,
-                                [ReadOnly] ref PositionComponent positionComponent)
+            this._followGroup = this.GetEntityQuery(new EntityQueryDesc
             {
-                if (!Positions.Exists(followStateComponent.Target))
+                All = new ComponentType[]
                 {
-                    CommandBuffer.RemoveComponent<FollowStateComponent>(index, entity);
+                    typeof(MovementComponent), typeof(FollowStateComponent),
+                    typeof(WeaponComponent), typeof(PositionComponent), typeof(NavMeshAgent)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(AttackStateComponent)
+                }
+            });
+        }
+
+        protected override void OnUpdate()
+        {
+            this.Entities.With(this._followGroup).ForEach((Entity entity,
+                                                NavMeshAgent navMeshAgent,
+                                                ref MovementComponent movementComponent,
+                                                ref FollowStateComponent followStateComponent,
+                                                ref WeaponComponent weaponComponent,
+                                                ref PositionComponent positionComponent) =>
+            {
+                if (!EntityManager.Exists(followStateComponent.Target)
+                    || EntityManager.HasComponent<InCutsceneComponent>(followStateComponent.Target))
+                {
+                    this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
                     return;
                 }
 
-                var target = followStateComponent.Target;
-                var targetPosition = Positions[target];
+                var currentPosition = positionComponent.CurrentPosition;
+                var targetPosition = this.EntityManager.GetComponentData<PositionComponent>(followStateComponent.Target).CurrentPosition;
 
-                movementComponent.Direction = targetPosition.CurrentPosition - positionComponent.CurrentPosition;
-                var distance = math.distance(targetPosition.CurrentPosition, positionComponent.CurrentPosition);
-
-                if (distance <= weaponComponent.AttackRange
-                    && CurrentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
-                {
-                    followStateComponent.LastTimeAttacked = CurrentTime;
+                var distance = math.distance(targetPosition, currentPosition);
+                if (distance <= weaponComponent.AttackRange)
                     movementComponent.Direction = float2.zero;
-                    CommandBuffer.AddComponent(index, entity,
+                else
+                {
+                    var curr = new Vector3(currentPosition.x, currentPosition.y, 0);
+                    var dest = new Vector3(targetPosition.x, targetPosition.y, 0);
+                    navMeshAgent.nextPosition = curr;
+                    navMeshAgent.SetDestination(dest);
+
+                    if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
+                        movementComponent.Direction = float2.zero;
+                    else
+                        movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                }
+
+                var currentTime = Time.time;
+                if (distance <= weaponComponent.AttackRange
+                    && currentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
+                {
+                    movementComponent.Direction = targetPosition - currentPosition; ;
+                    followStateComponent.LastTimeAttacked = currentTime;
+                    this.PostUpdateCommands.AddComponent(entity,
                         new AttackStateComponent
                         {
-                            StartedAt = CurrentTime,
-                            Target = target
+                            StartedAt = currentTime,
+                            Target = followStateComponent.Target
                         });
                 }
-            }
-        }
-
-        private FollowStateBarrier _followStateBarrier;
-
-        [Inject]
-        private ComponentDataFromEntity<PositionComponent> _positions;
-
-        protected override void OnCreateManager()
-        {
-            _followStateBarrier = World.Active.GetOrCreateManager<FollowStateBarrier>();
-        }
-
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
-        {
-            var handle = new FollowStateJob
-            {
-                CommandBuffer = _followStateBarrier.CreateCommandBuffer().ToConcurrent(),
-                Positions = _positions,
-                CurrentTime = Time.time
-            }.Schedule(this, inputDeps);
-            _followStateBarrier.AddJobHandleForProducer(handle);
-            return handle;
+            });
         }
     }
 }

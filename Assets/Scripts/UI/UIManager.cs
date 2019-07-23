@@ -1,39 +1,67 @@
-﻿using BeyondPixels.ECS.Components.Characters.Common;
-using BeyondPixels.UI.ECS.Components;
-using Unity.Entities;
+﻿using BeyondPixels.UI.ECS.Components;
 using UnityEngine;
 
 namespace BeyondPixels.UI
 {
     public class UIManager : MonoBehaviour
     {
-        private static UIManager _instance;
-        public static UIManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = FindObjectOfType<UIManager>();
+        public static UIManager Instance { get; private set; }
+        public Canvas Canvas;
+        public GameUIComponent GameUIComponent;
+        public PlayerInfoMenuUIComponent PlayerInfoMenuUIComponent;
+        public LootBagMenuUIComponent LootBagMenuUIComponent;
+        public ToolTipUIComponent ToolTip;
+        public GameOverMenuUIComponent GameOverMenu;
+        public MainMenuUIComponent MainMenu;
+        public OptionsMenuUIComponent OptionsMenu;
+        public StoryMenuUIComponent StoryMenu;
+        public QuestMenuUIComponent QuestMenu;
 
-                return _instance;
-            }
+        [SerializeField]
+        protected YesNoDialogUIComponent YesNoDialog;
+        public YesNoDialogUIComponent CurrentYesNoDialog { get; private set; }
+
+        public void Awake()
+        {
+            UIManager.Instance = this;
         }
 
-        private GameObject _player;
-        private SpellActionButton[] _spellActions;
-
-        public void Initialize(GameObject player)
+        public void CloseAllMenus()
         {
-            this._player = player;
-            this._spellActions = player.GetComponent<PlayerUIComponent>().SpellButtonsGroup.ActionButtons;
+            this.PlayerInfoMenuUIComponent.Hide();
+            this.LootBagMenuUIComponent.Hide();
+            this.QuestMenu.Hide();
+            this.OptionsMenu.Hide();
+            this.MainMenu.Hide();
 
-            var playerEntity = _player.GetComponent<GameObjectEntity>().Entity;
-            var spellBook = _player.GetComponent<SpellBookComponent>();
-            foreach (var button in this._spellActions)
-            {
-                button.SpellIcon.sprite = spellBook.Spells[button.SpellIndex].Icon;
-                button.SpellCaster = playerEntity;
-            }
+            this.HideTooltip();
+        }
+
+        public void ShowTooltip(Vector3 position, string header, string content, string buttonsDescription, bool below = false)
+        {
+            this.ToolTip.gameObject.SetActive(true);
+            this.ToolTip.transform.position = position;
+            this.ToolTip.Header.text = header;
+            this.ToolTip.Content.text = content;
+            this.ToolTip.ButtonsDescription.text = buttonsDescription;
+
+            if (below)
+                this.ToolTip.GetComponent<RectTransform>().pivot = new Vector2(-0.025f, 1);
+            else
+                this.ToolTip.GetComponent<RectTransform>().pivot = new Vector2(-0.025f, 0);
+
+        }
+
+        public void HideTooltip()
+        {
+            this.ToolTip.gameObject.SetActive(false);
+        }
+
+        public YesNoDialogUIComponent CreateYesNoDialog()
+        {
+            var dialogObj = GameObject.Instantiate(this.YesNoDialog.gameObject, this.Canvas.transform);
+            this.CurrentYesNoDialog = dialogObj.GetComponent<YesNoDialogUIComponent>();
+            return this.CurrentYesNoDialog;
         }
     }
 }

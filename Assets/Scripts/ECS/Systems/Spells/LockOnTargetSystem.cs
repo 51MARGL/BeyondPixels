@@ -1,9 +1,11 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+
 using UnityEngine;
 using UnityEngine.Jobs;
 
@@ -11,44 +13,71 @@ namespace BeyondPixels.ECS.Systems.Spells
 {
     public class LockOnTargetSystem : JobComponentSystem
     {
+        [BurstCompile]
         public struct LockOnTargetJob : IJobParallelForTransform
         {
             [ReadOnly]
-            public ComponentDataFromEntity<PositionComponent> PositionComponents;
+            [DeallocateOnJobCompletion]
+            public NativeArray<TargetRequiredComponent> TargetRequiredComponents;
+
             [ReadOnly]
-            public ComponentDataArray<TargetRequiredComponent> TargetRequiredComponents;
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> Chunks;
+            [ReadOnly]
+            public ArchetypeChunkEntityType EntityType;
+            [ReadOnly]
+            public ArchetypeChunkComponentType<PositionComponent> PositionComponentType;
 
             public void Execute(int index, TransformAccess transform)
             {
-                if (!PositionComponents.Exists(TargetRequiredComponents[index].Target))
-                    return;
-
-                var position = PositionComponents[TargetRequiredComponents[index].Target].CurrentPosition;
-                transform.position = new Vector3(position.x, position.y, 0f);
+                for (var c = 0; c < this.Chunks.Length; c++)
+                {
+                    var chunk = this.Chunks[c];
+                    var entities = chunk.GetNativeArray(this.EntityType);
+                    var positionComponents = chunk.GetNativeArray(this.PositionComponentType);
+                    for (var i = 0; i < chunk.Count; i++)
+                        if (entities[i] == this.TargetRequiredComponents[index].Target)
+                        {
+                            transform.position =
+                                new Vector3(positionComponents[i].CurrentPosition.x,
+                                            positionComponents[i].CurrentPosition.y, 0f);
+                        }
+                }
             }
         }
-        [Inject]
-        private ComponentDataFromEntity<PositionComponent> _positionComponents;
-        private ComponentGroup _group;
+        private EntityQuery _spellGroup;
+        private EntityQuery _targetGroup;
 
-        protected override void OnCreateManager()
+        protected override void OnCreate()
         {
-            _group = GetComponentGroup(
-                ComponentType.ReadOnly(typeof(SpellComponent)),
-                ComponentType.ReadOnly(typeof(LockOnTargetComponent)),
-                ComponentType.ReadOnly(typeof(TargetRequiredComponent)),
-                ComponentType.Subtractive(typeof(DestroyComponent)),
-                typeof(UnityEngine.Transform)
-            );
+            this._spellGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] {
+                    typeof(SpellComponent), typeof(LockOnTargetComponent),
+                    typeof(TargetRequiredComponent), typeof(Transform)
+                },
+                None = new ComponentType[]
+                {
+                    typeof(DestroyComponent)
+                }
+            });
+            this._targetGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] {
+                    typeof(CharacterComponent), typeof(PositionComponent)
+                }
+            });
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             return new LockOnTargetJob
             {
-                TargetRequiredComponents = _group.GetComponentDataArray<TargetRequiredComponent>(),
-                PositionComponents = _positionComponents
-            }.Schedule(_group.GetTransformAccessArray(), inputDeps);
+                TargetRequiredComponents = this._spellGroup.ToComponentDataArray<TargetRequiredComponent>(Allocator.TempJob),
+                Chunks = this._targetGroup.CreateArchetypeChunkArray(Allocator.TempJob),
+                EntityType = this.GetArchetypeChunkEntityType(),
+                PositionComponentType = this.GetArchetypeChunkComponentType<PositionComponent>()
+            }.Schedule(this._spellGroup.GetTransformAccessArray(), inputDeps);
         }
     }
 }

@@ -2,39 +2,39 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.Utilities;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
-    [UpdateAfter(typeof(MovementSystem))]
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class MovementAnimationSystem : ComponentSystem
     {
-        private struct Data
+        private EntityQuery _group;
+
+        protected override void OnCreate()
         {
-            public readonly int Length;
-            public ComponentArray<Animator> AnimatorComponents;
-            public ComponentDataArray<MovementComponent> MovementComponents;
-            public ComponentArray<Transform> TransformComponents;
-            public SubtractiveComponent<AttackComponent> AttackComponents;
-            public SubtractiveComponent<AttackStateComponent> AttackStateComponents;
-            public SubtractiveComponent<SpellCastingComponent> SpellCastingComponents;
+            this._group = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] {
+                    typeof(Animator), typeof(MovementComponent), typeof(Transform)
+                },
+                None = new ComponentType[] {
+                    typeof(AttackComponent), typeof(AttackStateComponent), typeof(SpellCastingComponent)
+                }
+            });
         }
-        [Inject]
-        private Data _data;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _data.Length; i++)
+            this.Entities.With(this._group).ForEach((Animator animatorComponent, ref MovementComponent movementComponent) =>
             {
-                var movementComponent = _data.MovementComponents[i];
-                var animatorComponent = _data.AnimatorComponents[i];
                 if (!movementComponent.Direction.Equals(float2.zero))
                 {
                     animatorComponent.ActivateLayer("RunLayer");
-
-                    //Sets the animation parameter so that model faces the correct direction
                     animatorComponent.SetFloat("velocity.x", movementComponent.Direction.x);
                     animatorComponent.SetFloat("velocity.y", movementComponent.Direction.y);
                 }
@@ -42,8 +42,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 {
                     animatorComponent.ActivateLayer("IdleLayer");
                 }
-            }
+            });
         }
     }
-
 }

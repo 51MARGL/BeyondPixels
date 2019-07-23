@@ -8,5 +8,6 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.CellularAutom
         public int2 Size;
         public int RandomFillPercent;
         public int PassRadius;
+        public uint RandomSeed;
     }
 }

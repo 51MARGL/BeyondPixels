@@ -1,58 +1,62 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.AI;
-using Unity.Burst;
+
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
-    public class AggroEventSystem : JobComponentSystem
+    public class AggroEventSystem : ComponentSystem
     {
-        [DisableAutoCreation]
-        public class AggroEventBarrier : BarrierSystem { }
+        private EntityQuery _targetGroup;
 
-        private struct AggroEventJob : IJobProcessComponentDataWithEntity<CollisionInfo, AggroRangeCollisionComponent>
+        protected override void OnCreate()
         {
-            public EntityCommandBuffer.Concurrent CommandBuffer;
+            this._targetGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    typeof(CollisionInfo), typeof(AggroRangeCollisionComponent)
+                }
+            });
+        }
 
-            public void Execute(Entity entity,
-                                int index,
-                                [ReadOnly] ref CollisionInfo collisionInfo,
-                                [ReadOnly] ref AggroRangeCollisionComponent aggroRangeCollisionComponent)
+        protected override void OnUpdate()
+        {
+            var senderTargetSet = new NativeHashMap<Entity, Entity>(this._targetGroup.CalculateLength(), Allocator.Temp);
+            this.Entities.With(this._targetGroup).ForEach((Entity eventEntity, ref CollisionInfo collisionInfo) =>
             {
                 switch (collisionInfo.EventType)
                 {
                     case EventType.TriggerEnter:
-                        CommandBuffer.AddComponent(index, collisionInfo.Sender,
-                            new FollowStateComponent
-                            {
-                                Target = collisionInfo.Other
-                            });
+                        if (!this.EntityManager.HasComponent<FollowStateComponent>(collisionInfo.Sender))
+                            senderTargetSet.TryAdd(collisionInfo.Sender, collisionInfo.Target);
                         break;
                     case EventType.TriggerExit:
-                        CommandBuffer.RemoveComponent<FollowStateComponent>(index, collisionInfo.Sender);
+                        if (this.EntityManager.HasComponent<FollowStateComponent>(collisionInfo.Sender))
+                        {
+                            var followStateComponent = this.EntityManager.GetComponentData<FollowStateComponent>(collisionInfo.Sender);
+                            if (followStateComponent.Target == collisionInfo.Target)
+                                this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(collisionInfo.Sender);
+                        }
                         break;
                 }
-                CommandBuffer.DestroyEntity(index, entity);
-            }
-        }
 
-        private AggroEventBarrier _aggroEventBarrier;
-
-        protected override void OnCreateManager()
-        {
-            _aggroEventBarrier = World.Active.GetOrCreateManager<AggroEventBarrier>();
-        }
-
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
-        {
-            var handle = new AggroEventJob
+                this.PostUpdateCommands.DestroyEntity(eventEntity);
+            });
+            if (senderTargetSet.Length > 0)
             {
-                CommandBuffer = _aggroEventBarrier.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(this, inputDeps);
-            _aggroEventBarrier.AddJobHandleForProducer(handle);
-            return handle;
+                var keys = senderTargetSet.GetKeyArray(Allocator.Temp);
+                for (var i = 0; i < keys.Length; i++)
+                {
+                    if (senderTargetSet.TryGetValue(keys[i], out var target))
+                        this.PostUpdateCommands.AddComponent(keys[i], new FollowStateComponent
+                        {
+                            Target = target
+                        });
+                }
+            }
+            senderTargetSet.Dispose();
         }
     }
 }

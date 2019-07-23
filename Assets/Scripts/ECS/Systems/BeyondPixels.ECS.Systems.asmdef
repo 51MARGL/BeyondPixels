@@ -1,25 +1,27 @@
 {
     "name": "BeyondPixels.ECS.Systems",
     "references": [
-        "BeyondPixels.ECS.Components",
-        "BeyondPixels.ColliderEvents",
-        "Unity.Burst",
-        "Unity.Entities",
-        "Unity.Entities.Hybrid",
-        "Unity.Jobs",
-        "Unity.Mathematics",
-        "Unity.Collections",
-        "BeyondPixels.Utilities",
-        "Unity.Transforms",
-        "BeyondPixels.SceneBootstap",
-        "BeyondPixels.Tilemap"
+        "GUID:08f9c4e3211f44547884a0e1dde99b4f",
+        "GUID:c1c05c5d66f3a2a4a8b77e84189f0116",
+        "GUID:734d92eba21c94caba915361bd5ac177",
+        "GUID:8819f35a0fc84499b990e90a4ca1911f",
+        "GUID:8a2eafa29b15f444eb6d74f94a930e1d",
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:67b9f54e2ccb50b4790cf9b3b4508de5",
+        "GUID:a5baed0c9693541a5bd947d336ec7659",
+        "GUID:fdbb598a60bfca8489cfa6bea0fccdc5",
+        "GUID:613783dc1674e844b87788ea74ede0f6",
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "GUID:8c4dd21966739024fbd72155091d199e",
+        "GUID:2665a8d13d1b3f18800f46e256720795"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

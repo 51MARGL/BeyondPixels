@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &2115890025046638110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8388442651362825409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee93607845556964790442dadcd0315d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1001 &7864713459888274168
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1823024487225372217, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_Name
+      value: ExitMessageTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372215, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372216, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372216, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _sentences.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _sentences.Array.data[0]
+      value: Seems like these dungeons are larger, than I expected.
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _sentences.Array.data[1]
+      value: I should deep further. Who knows what could be hidding there.
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.data[0]
+      value: 'Tip: Proceed by pressing {Use} while near doors.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.data[1]
+      value: 'Tip: When any objective is completed, exclamation mark will appear.
+        Press {Quest} and collect your reward'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1823024487225372213, guid: 6b15e54470e61974998ac189ea73ff55,
+        type: 3}
+      propertyPath: _tips.Array.data[2]
+      value: 'Tip: Don''t forget to spend your skill points. Open player menu by
+        pressing {Inventory} and add points to your stats by pressing + button.'
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6b15e54470e61974998ac189ea73ff55, type: 3}
+--- !u!1 &8388442651362825409 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1823024487225372217, guid: 6b15e54470e61974998ac189ea73ff55,
+    type: 3}
+  m_PrefabInstance: {fileID: 7864713459888274168}
+  m_PrefabAsset: {fileID: 0}
