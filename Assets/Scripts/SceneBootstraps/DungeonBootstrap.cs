@@ -93,7 +93,7 @@ namespace BeyondPixels.SceneBootstraps
                         board = entityManager.CreateEntity();
                         entityManager.AddComponentData(board, new ECS.Components.ProceduralGeneration.Dungeon.CellularAutomaton.BoardComponent
                         {
-                            Size = new int2(this.DungeonGenerators.CellularAutomaton.BoardWidth, this.DungeonGenerators.CellularAutomaton.BoardHeight),
+                            Size = randomSize,
                             RandomFillPercent = randomFillPercent,
                             PassRadius = this.DungeonGenerators.CellularAutomaton.PassRadius,
                             RandomSeed = randomSeed
