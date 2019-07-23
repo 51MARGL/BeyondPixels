@@ -687,7 +687,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     {
                         Size = randomSize,
                         RandomFillPercent = random.NextInt(60, 75),
-                        PassRadius = this.BoardComponent.PassRadius
+                        PassRadius = this.BoardComponent.PassRadius,
+                        RandomSeed = random.NextUInt(1, uint.MaxValue)
                     });
                     this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }

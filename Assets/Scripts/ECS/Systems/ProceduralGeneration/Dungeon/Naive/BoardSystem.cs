@@ -400,7 +400,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         RoomCount = roomCount,
                         MaxRoomSize = this.BoardComponent.MaxRoomSize,
                         MaxCorridorLength = this.BoardComponent.MaxCorridorLength,
-                        MinCorridorLength = this.BoardComponent.MinCorridorLength
+                        MinCorridorLength = this.BoardComponent.MinCorridorLength,
+                        RandomSeed = random.NextUInt(1, uint.MaxValue)
                     });
                     this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }

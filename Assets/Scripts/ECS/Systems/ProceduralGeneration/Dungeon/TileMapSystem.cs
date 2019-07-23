@@ -216,7 +216,6 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             tilesArray.Dispose();
             wallCollider.enabled = true;
             tilemapComponent.tileSpawnRoutine = null;
-            tilemapComponent.TilemapWallsTop.GetComponent<TilemapRenderer>().mode = TilemapRenderer.Mode.Individual;
 
             var entityManager = World.Active.EntityManager;
             entityManager.AddComponentData(boardEntity, new TilemapReadyComponent());

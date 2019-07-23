@@ -1,4 +1,6 @@
-﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using System.Diagnostics;
+using System.IO;
+using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP;
 
 using Unity.Burst;
@@ -60,7 +62,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             [WriteOnly]
             public NativeQueue<CorridorComponent>.Concurrent Corridors;
 
-            [NativeDisableContainerSafetyRestriction]
+            [ReadOnly]
             public NativeArray<NodeComponent> TreeArray;
 
             [ReadOnly]
@@ -72,13 +74,14 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             {
                 var nodeIndex = this.StartIndex + index;
                 if (this.TreeArray[nodeIndex].IsNull == 1
-                    || this.TreeArray[nodeIndex + 1].IsNull == 1
-                    || nodeIndex % 2 == 0)
+                    || this.TreeArray[nodeIndex].IsLeaf == 1
+                    || this.TreeArray[2 * nodeIndex + 1].IsNull == 1
+                    || this.TreeArray[2 * nodeIndex + 2].IsNull == 1)
                     return;
 
                 var random = new Random((uint)(this.RandomSeed + index));
-                var leftRoomIndex = this.GetRoomIndex(nodeIndex, this.TreeArray.Length);
-                var rightRoomIndex = this.GetRoomIndex(nodeIndex + 1, this.TreeArray.Length);
+                var leftRoomIndex = this.GetRoomIndex(2 * nodeIndex + 1, this.TreeArray.Length);
+                var rightRoomIndex = this.GetRoomIndex(2 * nodeIndex + 2, this.TreeArray.Length);
 
                 var leftRoom = this.TreeArray[leftRoomIndex].Room;
                 var rightRoom = this.TreeArray[rightRoomIndex].Room;
@@ -94,6 +97,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
             public int GetRoomIndex(int index, int currentBest)
             {
+                if (index >= currentBest)
+                    return currentBest;
+
                 var node = this.TreeArray[index];
                 if (node.IsLeaf == 1)
                 {
@@ -320,7 +326,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     this.CommandBuffer.AddComponent(board, new BoardComponent
                     {
                         Size = randomSize,
-                        MinRoomSize = this.BoardComponent.MinRoomSize
+                        MinRoomSize = this.BoardComponent.MinRoomSize,
+                        RandomSeed = random.NextUInt(1, uint.MaxValue)
                     });
                     this.CommandBuffer.DestroyEntity(this.BoardEntity);
                 }
@@ -397,28 +404,26 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
                         this.TreeArray = bspTree.ToNativeArray();
                         this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
+                        var concurrentQueue = this.CorridorsQueue.ToConcurrent();
 
-                        var createRoomsJobHandle = new CreateRoomsJob
+                        inputDeps = new CreateRoomsJob
                         {
                             TreeArray = TreeArray,
                             RandomSeed = random.NextInt(),
                             Board = board
                         }.Schedule(this.TreeArray.Length, 1, inputDeps);
 
-                        var lastLevelJobHandle = createRoomsJobHandle;
-                        var concurrentQueue = this.CorridorsQueue.ToConcurrent();
-                        for (var level = bspTree.Height; level > 0; level--)
+                        for (var level = bspTree.Height - 1; level >= 0; level--)
                         {
-                            var nodesAmount = (int)math.pow(2, level - 1) - 1;
-                            lastLevelJobHandle = new FindCorridorsForLevelJob
+                            var nodesAmount = (int)math.pow(2, level - 1);
+                            inputDeps = new FindCorridorsForLevelJob
                             {
                                 TreeArray = TreeArray,
                                 RandomSeed = random.NextInt(),
-                                StartIndex = nodesAmount,
-                                Corridors = concurrentQueue
-                            }.Schedule(nodesAmount, 1, lastLevelJobHandle);
+                                StartIndex = nodesAmount - 1,
+                                Corridors = concurrentQueue,
+                            }.Schedule(nodesAmount, 1, inputDeps);
                         }
-                        inputDeps = lastLevelJobHandle;
                     }
                     else if (this.CurrentPhase == 1)
                     {
@@ -453,6 +458,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     else if (this.CurrentPhase == 2)
                     {
                         this.CorridorsQueue.Dispose();
+
                         inputDeps = new TagBoardDoneJob
                         {
                             CommandBuffer = this._endFrameBarrier.CreateCommandBuffer(),
