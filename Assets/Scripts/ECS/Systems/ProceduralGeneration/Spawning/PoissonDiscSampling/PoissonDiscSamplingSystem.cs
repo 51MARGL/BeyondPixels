@@ -57,7 +57,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 };
                 currentSamplesList.Add(randomSample);
                 finalSamplesList.Add(randomSample);
-                this.RemoveFromValid(randomSample, validCellList);
+                this.RemoveFromValid(randomSample.Position, validCellList);
                 var cell = requestCells[randomSample.Position.y * gridSize.x + randomSample.Position.x];
                 cell.SampleIndex = finalSamplesList.Length;
                 requestCells[randomSample.Position.y * gridSize.x + randomSample.Position.x] = cell;
@@ -79,7 +79,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                         if (this.IsValid(candidate, gridSize, finalSamplesList, requestCells, maxRadius))
                             this.AddToFinal(gridSize, ref requestCells, validCellList, ref finalSamplesList, candidate);
                         else
-                            this.RemoveFromValid(candidate, validCellList);
+                            this.RemoveFromValid(candidate.Position, validCellList);
                     }
                     else
                     {
@@ -119,7 +119,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                         if (!candidateFound)
                         {
                             currentSamplesList.RemoveAtSwapBack(randomIndex);
-                            this.RemoveFromValid(randomSample, validCellList);
+                            this.RemoveFromValid(randomSample.Position, validCellList);
                         }
                     }
                 }
@@ -131,11 +131,22 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             private void AddToFinal(int2 gridSize, ref NativeArray<PoissonCellComponent> requestCells, NativeList<PoissonCellComponent> validCellList, ref NativeList<SampleComponent> finalSamplesList, SampleComponent candidate)
             {
+                var candidatePosition = candidate.Position;
+
                 finalSamplesList.Add(candidate);
-                this.RemoveFromValid(candidate, validCellList);
-                var cell = requestCells[candidate.Position.y * gridSize.x + candidate.Position.x];
+                this.RemoveFromValid(candidate.Position, validCellList);
+                var cell = requestCells[candidatePosition.y * gridSize.x + candidatePosition.x];
                 cell.SampleIndex = finalSamplesList.Length;
-                requestCells[candidate.Position.y * gridSize.x + candidate.Position.x] = cell;
+                requestCells[candidatePosition.y * gridSize.x + candidatePosition.x] = cell;
+
+                var startX = math.max(0, candidatePosition.x - 2 * candidate.Radius);
+                var endX = math.min(candidatePosition.x + 2 * candidate.Radius, gridSize.x);
+                var startY = math.max(0, candidatePosition.y - 2 * candidate.Radius);
+                var endY = math.min(candidatePosition.y + 2 * candidate.Radius, gridSize.y);
+
+                for (var y = startY; y < endY; y++)
+                    for (var x = startX; x < endX; x++)
+                        this.RemoveFromValid(new int2(x,y), validCellList);
             }
 
             private NativeArray<PoissonCellComponent> GetCellsByRequestID(int id, int2 gridSize)
@@ -171,10 +182,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 return validCellList;
             }
 
-            private void RemoveFromValid(SampleComponent sample, NativeList<PoissonCellComponent> validList)
+            private void RemoveFromValid(int2 position, NativeList<PoissonCellComponent> validList)
             {
                 for (var i = 0; i < validList.Length; i++)
-                    if (sample.Position.Equals(validList[i].Position))
+                    if (position.Equals(validList[i].Position))
                     {
                         validList.RemoveAtSwapBack(i);
                         return;

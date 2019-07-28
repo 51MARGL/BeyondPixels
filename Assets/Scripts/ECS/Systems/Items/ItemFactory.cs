@@ -210,7 +210,7 @@ namespace BeyondPixels.ECS.Systems.Items
             {
                 if (random.NextInt(0, 100) < chance)
                 {
-                    chance -= 13;
+                    chance -= 20;
                     switch (randomStatModifiersArray[i])
                     {
                         case WeaponStatsModifiers.Attack:
