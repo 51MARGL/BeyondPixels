@@ -1,4 +1,5 @@
-﻿using BeyondPixels.ECS.Components.SaveGame;
+﻿using System.Collections;
+using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
 
 using Unity.Collections;
@@ -41,7 +42,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var index = sceneLoadComponent.SceneIndex;                
                 SceneFadeManager.Instance.OnFadeOutEvent += () =>
                 {
-                    SceneManager.LoadScene(index, LoadSceneMode.Single);
+                    SceneFadeManager.Instance.StartCoroutine(this.LoadYourAsyncScene(index));
                 };
                 SceneFadeManager.Instance.Animator.SetTrigger("FadeOut");
                 Time.timeScale = 1f;
@@ -53,6 +54,18 @@ namespace BeyondPixels.ECS.Systems.Scenes
                     this.PostUpdateCommands.DestroyEntity(entityArray[i]);
                 entityArray.Dispose();
             }
+        }
+
+        protected IEnumerator LoadYourAsyncScene(int index)
+        {
+            var asyncLoad = SceneManager.LoadSceneAsync(index, LoadSceneMode.Single);
+            asyncLoad.allowSceneActivation = false;
+
+            while (asyncLoad.progress < 0.9f)
+                yield return null;
+
+            yield return new WaitForSeconds(1f);
+            asyncLoad.allowSceneActivation = true;
         }
     }
 }
