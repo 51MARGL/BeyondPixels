@@ -44,7 +44,7 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected override void OnUpdate()
         {
-            if (this._playerGroup.CalculateLength() == 0)
+            if (this._playerGroup.CalculateEntityCount() == 0)
             {
                 UIManager.Instance.QuestMenu.Hide();
                 return;
@@ -66,14 +66,14 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
             }
 
-            if (_doneGroup.CalculateLength() > 0)
+            if (_doneGroup.CalculateEntityCount() > 0)
                 UIManager.Instance.GameUIComponent.QuestDoneMark.SetActive(true);
             else
                 UIManager.Instance.GameUIComponent.QuestDoneMark.SetActive(false);
 
             if (UIManager.Instance.QuestMenu.IsVisible)
             {
-                if (_activeGroup.CalculateLength() == 0)
+                if (_activeGroup.CalculateEntityCount() == 0)
                 {
                     UIManager.Instance.QuestMenu.Hide();
                     return;

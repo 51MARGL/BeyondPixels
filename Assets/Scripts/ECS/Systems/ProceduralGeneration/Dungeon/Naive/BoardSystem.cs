@@ -19,10 +19,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             public BoardComponent Board;
 
             [WriteOnly]
-            public NativeQueue<RoomComponent>.Concurrent Rooms;
+            public NativeQueue<RoomComponent>.ParallelWriter Rooms;
 
             [WriteOnly]
-            public NativeQueue<CorridorComponent>.Concurrent Corridors;
+            public NativeQueue<CorridorComponent>.ParallelWriter Corridors;
 
             [DeallocateOnJobCompletion]
             [ReadOnly]
@@ -520,8 +520,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         inputDeps = new CreateRoomsAndCorridorsJob
                         {
                             Board = board,
-                            Rooms = this.RoomsQueue.ToConcurrent(),
-                            Corridors = this.CorridorsQueue.ToConcurrent(),
+                            Rooms = this.RoomsQueue.AsParallelWriter(),
+                            Corridors = this.CorridorsQueue.AsParallelWriter(),
                             FirstCorridors = firstCorridors,
                             RoomCount = roomCount / 4,
                             RandomSeed = random.NextInt()

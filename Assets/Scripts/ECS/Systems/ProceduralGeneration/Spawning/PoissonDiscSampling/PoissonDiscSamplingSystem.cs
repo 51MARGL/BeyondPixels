@@ -13,7 +13,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private struct GenerateSamplesJob : IJobForEach<PoissonDiscSamplingComponent>
         {
             [WriteOnly]
-            public NativeQueue<SampleComponent>.Concurrent ResultQueue;
+            public NativeQueue<SampleComponent>.ParallelWriter ResultQueue;
 
             [ReadOnly]
             [DeallocateOnJobCompletion]
@@ -300,7 +300,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
             var generateSamplesJobHandle = new GenerateSamplesJob
             {
-                ResultQueue = this.SamplesQueue.ToConcurrent(),
+                ResultQueue = this.SamplesQueue.AsParallelWriter(),
                 Cells = this._cellGroup.ToComponentDataArray<PoissonCellComponent>(Allocator.TempJob),
                 Radiuses = this._radiusGroup.ToComponentDataArray<PoissonRadiusComponent>(Allocator.TempJob),
                 RandomSeed = random.NextInt()

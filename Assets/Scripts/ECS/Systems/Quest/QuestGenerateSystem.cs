@@ -110,7 +110,7 @@ namespace BeyondPixels.ECS.Systems.Quest
 
         protected override void OnUpdate()
         {
-            if (this._generateGroup.CalculateLength() == 0)
+            if (this._generateGroup.CalculateEntityCount() == 0)
                 return;
 
             var allowedArray = this._quests.ToList();

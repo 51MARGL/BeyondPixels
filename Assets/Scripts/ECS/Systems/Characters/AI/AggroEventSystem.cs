@@ -23,7 +23,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
         protected override void OnUpdate()
         {
-            var senderTargetSet = new NativeHashMap<Entity, Entity>(this._targetGroup.CalculateLength(), Allocator.Temp);
+            var senderTargetSet = new NativeHashMap<Entity, Entity>(this._targetGroup.CalculateEntityCount(), Allocator.Temp);
             this.Entities.With(this._targetGroup).ForEach((Entity eventEntity, ref CollisionInfo collisionInfo) =>
             {
                 switch (collisionInfo.EventType)

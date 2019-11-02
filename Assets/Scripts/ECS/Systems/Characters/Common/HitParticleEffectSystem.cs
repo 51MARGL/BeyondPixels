@@ -35,10 +35,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         }
         protected override void OnUpdate()
         {
-            if (this._damageGroup.CalculateLength() == 0)
+            if (this._damageGroup.CalculateEntityCount() == 0)
                 return;
 
-            var positions = new NativeArray<PositionComponent>(this._damageGroup.CalculateLength(), Allocator.TempJob);
+            var positions = new NativeArray<PositionComponent>(this._damageGroup.CalculateEntityCount(), Allocator.TempJob);
 
             var k = 0;
             this.Entities.With(this._damageGroup).ForEach((Entity damageEntity, ref FinalDamageComponent damageComponent, ref CollisionInfo collisionInfo) =>

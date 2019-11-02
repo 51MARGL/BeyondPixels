@@ -60,7 +60,7 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected override void OnUpdate()
         {
-            if (this._cutsceneGroup.CalculateLength() > 0)
+            if (this._cutsceneGroup.CalculateEntityCount() > 0)
             {
                 UIManager.Instance.CloseAllMenus();
                 return;

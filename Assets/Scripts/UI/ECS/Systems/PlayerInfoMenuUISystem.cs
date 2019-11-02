@@ -64,7 +64,7 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected override void OnUpdate()
         {
-            if (this._playerGroup.CalculateLength() == 0)
+            if (this._playerGroup.CalculateEntityCount() == 0)
                 this._inventoryInitialized = false;
 
             this.Entities.With(this._playerGroup).ForEach((Entity playerEntity,
@@ -108,7 +108,7 @@ namespace BeyondPixels.UI.ECS.Systems
                     this.SetUpEquipedGearButtons(infoMenuComponent.GearGroup, this._equipedItemsGroup, playerEntity);
 
                     var inventoryGroup = infoMenuComponent.InventoryGroup;
-                    var itemCount = this._itemsGroup.CalculateLength();
+                    var itemCount = this._itemsGroup.CalculateEntityCount();
 
                     this.SetUpInventoryItems(inventoryGroup, itemCount, playerEntity);
                 }

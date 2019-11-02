@@ -33,7 +33,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
 
         protected override void OnUpdate()
         {
-            if (this._saveGameGroup.CalculateLength() > 0)
+            if (this._saveGameGroup.CalculateEntityCount() > 0)
                 return;
 
             this.Entities.With(this._sceneSwitchGroup).ForEach((Entity entity, ref SceneLoadComponent sceneLoadComponent) =>
@@ -46,7 +46,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 SceneFadeManager.Instance.Animator.SetTrigger("FadeOut");
                 Time.timeScale = 1f;
             });
-            if (this._sceneSwitchGroup.CalculateLength() > 0)
+            if (this._sceneSwitchGroup.CalculateEntityCount() > 0)
             {
                 var entityArray = this.EntityManager.GetAllEntities(Allocator.TempJob);
                 for (var i = 0; i < entityArray.Length; i++)

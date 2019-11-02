@@ -22,7 +22,7 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnUpdate()
         {
-            if (this._syncGroup.CalculateLength() > 0)
+            if (this._syncGroup.CalculateEntityCount() > 0)
             {
                 var gameObjects = Object.FindObjectsOfType<GameObjectEntity>();
                 this.Entities.With(this._syncGroup).ForEach((Entity entity, ref SyncDestroyedComponent syncComponent) =>

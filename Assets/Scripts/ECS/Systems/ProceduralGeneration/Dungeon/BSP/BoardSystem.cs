@@ -60,7 +60,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         private struct FindCorridorsForLevelJob : IJobParallelFor
         {
             [WriteOnly]
-            public NativeQueue<CorridorComponent>.Concurrent Corridors;
+            public NativeQueue<CorridorComponent>.ParallelWriter Corridors;
 
             [ReadOnly]
             public NativeArray<NodeComponent> TreeArray;
@@ -404,7 +404,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                         var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
                         this.TreeArray = bspTree.ToNativeArray();
                         this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
-                        var concurrentQueue = this.CorridorsQueue.ToConcurrent();
+                        var concurrentQueue = this.CorridorsQueue.AsParallelWriter();
 
                         inputDeps = new CreateRoomsJob
                         {

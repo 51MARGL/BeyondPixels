@@ -175,12 +175,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            if (this._boardSpawnInitGroup.CalculateLength() > 0)
+            if (this._boardSpawnInitGroup.CalculateEntityCount() > 0)
                 return this.SetupValidationGrid(inputDeps);
 
-            if (this._boardSpawnReadyGroup.CalculateLength() > 0)
+            if (this._boardSpawnReadyGroup.CalculateEntityCount() > 0)
             {
-                if (this._samplesGroup.CalculateLength() > 0)
+                if (this._samplesGroup.CalculateEntityCount() > 0)
                 {
                     var samplesArray = this._samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
                     var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);

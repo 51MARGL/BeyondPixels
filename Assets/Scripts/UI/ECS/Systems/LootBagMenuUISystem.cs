@@ -69,7 +69,7 @@ namespace BeyondPixels.UI.ECS.Systems
                 if (lootMenuComponent.IsVisible)
                 {
                     var inventoryGroup = lootMenuComponent.LootGroup;
-                    var itemCount = this._itemsGroup.CalculateLength();
+                    var itemCount = this._itemsGroup.CalculateEntityCount();
                     this.SetUpInventoryItems(inventoryGroup, itemCount, bagEntity);
                 }
             });

@@ -211,7 +211,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             public NativeArray<TileComponent> RoomTiles;
 
             [WriteOnly]
-            public NativeQueue<CorridorComponent>.Concurrent Corridors;
+            public NativeQueue<CorridorComponent>.ParallelWriter Corridors;
 
             [ReadOnly]
             public NativeList<RoomComponent> Rooms;
@@ -323,7 +323,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             public NativeArray<TileComponent> RoomTiles;
 
             [WriteOnly]
-            public NativeQueue<CorridorComponent>.Concurrent Corridors;
+            public NativeQueue<CorridorComponent>.ParallelWriter Corridors;
 
             [ReadOnly]
             public NativeList<RoomComponent> Rooms;
@@ -806,7 +806,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
 
                         var roomCount = this.RoomList.Length;
                         var roomsChunkSize = 5;
-                        var concurrentQueue = this.CorridorsQueue.ToConcurrent();
+                        var concurrentQueue = this.CorridorsQueue.AsParallelWriter();
                         var connectedRoomsTable = new NativeArray<int>(roomCount * roomCount, Allocator.TempJob);
 
                         for (var roomIndex = 0; roomIndex < roomCount; roomIndex++)

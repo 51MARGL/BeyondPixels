@@ -111,7 +111,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                     this.PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
                 tiles.Dispose();
             });
-            if (this._boardReadyGroup.CalculateLength() > 0 && !this.playerInstantiated)
+            if (this._boardReadyGroup.CalculateEntityCount() > 0 && !this.playerInstantiated)
             {
                 this.SpawnPlayer(PlayerPosition);
                 this.playerInstantiated = true;

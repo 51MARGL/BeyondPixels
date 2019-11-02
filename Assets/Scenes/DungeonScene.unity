@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -498,41 +499,6 @@ PrefabInstance:
     - target: {fileID: 4743808404562030, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.Switch
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.BSP.BoardWidth
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.BSP.BoardHeight
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.CellularAutomaton.BoardHeight
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.CellularAutomaton.BoardWidth
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.Naive.BoardWidth
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 114048909886926788, guid: 2882e04b896970846a2e681c9eb9a26c,
-        type: 3}
-      propertyPath: DungeonGenerators.BSP.MinRoomSize
-      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2882e04b896970846a2e681c9eb9a26c, type: 3}

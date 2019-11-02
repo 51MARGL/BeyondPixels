@@ -39,7 +39,7 @@ namespace BeyondPixels.ECS.Systems.Items
 
         protected override void OnUpdate()
         {
-            if (this._dropGroup.CalculateLength() == 0)
+            if (this._dropGroup.CalculateEntityCount() == 0)
                 return;
 
             var dropChunks = this._dropGroup.CreateArchetypeChunkArray(Allocator.TempJob);

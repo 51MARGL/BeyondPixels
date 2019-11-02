@@ -6,7 +6,7 @@ TextureImporter:
       213: 21300000
     second: enemy-ghost-hited_0
   externalObjects: {}
-  serializedVersion: 9
+  serializedVersion: 10
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0

@@ -29,7 +29,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
 
         protected override void OnUpdate()
         {
-            if (this._boardGroup.CalculateLength() == 0)
+            if (this._boardGroup.CalculateEntityCount() == 0)
                 return;
 
             this.DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));

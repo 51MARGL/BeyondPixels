@@ -29,7 +29,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
         }
         protected override void OnUpdate()
         {
-            if (this._characterGroup.CalculateLength() != 0)
+            if (this._characterGroup.CalculateEntityCount() != 0)
             {
                 var positions = this._characterGroup.ToComponentDataArray<PositionComponent>(Allocator.TempJob);
 
