@@ -42,7 +42,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var index = sceneLoadComponent.SceneIndex;                
                 SceneFadeManager.Instance.OnFadeOutEvent += () =>
                 {
-                    SceneFadeManager.Instance.StartCoroutine(this.LoadYourAsyncScene(index));
+                    SceneFadeManager.Instance.StartCoroutine(this.LoadSceneAsync(index));
                 };
                 SceneFadeManager.Instance.Animator.SetTrigger("FadeOut");
                 Time.timeScale = 1f;
@@ -56,7 +56,7 @@ namespace BeyondPixels.ECS.Systems.Scenes
             }
         }
 
-        protected IEnumerator LoadYourAsyncScene(int index)
+        protected IEnumerator LoadSceneAsync(int index)
         {
             var asyncLoad = SceneManager.LoadSceneAsync(index, LoadSceneMode.Single);
             asyncLoad.allowSceneActivation = false;
