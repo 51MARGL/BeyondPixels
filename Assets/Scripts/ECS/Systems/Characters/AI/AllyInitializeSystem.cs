@@ -79,7 +79,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 this.PostUpdateCommands.AddComponent(entity, new WeaponComponent
                 {
                     DamageValue = allyInitializeComponent.WeaponDamage,
-                    AttackRange = allyInitializeComponent.AttackRange,
+                    MeleeAttackRange = allyInitializeComponent.MeleeAttackRange,
                     CoolDown = allyInitializeComponent.AttackCoolDown
                 });
                 this.PostUpdateCommands.AddComponent(entity, new IdleStateComponent

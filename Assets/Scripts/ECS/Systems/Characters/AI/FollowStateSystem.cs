@@ -1,8 +1,8 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.Objects;
-
+using BeyondPixels.ECS.Components.Spells;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -14,7 +14,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     public class FollowStateSystem : ComponentSystem
     {
         private EntityQuery _followGroup;
-        private EntityQuery _targetGroup;
+        private EntityQuery _activeSpellGroup;
 
         protected override void OnCreate()
         {
@@ -27,7 +27,18 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 },
                 None = new ComponentType[]
                 {
-                    typeof(AttackStateComponent)
+                    typeof(AttackStateComponent), typeof(SpellCastingComponent)
+                }
+            });
+            this._activeSpellGroup = this.GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[] {
+                    ComponentType.ReadOnly<ActiveSpellComponent>()
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<CoolDownComponent>(),
+                    ComponentType.ReadOnly<InstantiateSpellComponent>()
                 }
             });
         }
@@ -41,8 +52,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                                 ref WeaponComponent weaponComponent,
                                                 ref PositionComponent positionComponent) =>
             {
-                if (!EntityManager.Exists(followStateComponent.Target)
-                    || EntityManager.HasComponent<InCutsceneComponent>(followStateComponent.Target))
+                if (!this.EntityManager.Exists(followStateComponent.Target)
+                    || this.EntityManager.HasComponent<InCutsceneComponent>(followStateComponent.Target))
                 {
                     this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(entity);
                     return;
@@ -50,35 +61,66 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
 
                 var currentPosition = positionComponent.CurrentPosition;
                 var targetPosition = this.EntityManager.GetComponentData<PositionComponent>(followStateComponent.Target).CurrentPosition;
-
                 var distance = math.distance(targetPosition, currentPosition);
-                if (distance <= weaponComponent.AttackRange)
+
+                var curr = new Vector3(currentPosition.x, currentPosition.y, 0);
+                var dest = new Vector3(targetPosition.x, targetPosition.y, 0);
+                navMeshAgent.nextPosition = curr;
+                navMeshAgent.SetDestination(dest);
+
+                if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
                     movementComponent.Direction = float2.zero;
                 else
-                {
-                    var curr = new Vector3(currentPosition.x, currentPosition.y, 0);
-                    var dest = new Vector3(targetPosition.x, targetPosition.y, 0);
-                    navMeshAgent.nextPosition = curr;
-                    navMeshAgent.SetDestination(dest);
+                    movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
 
-                    if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
-                        movementComponent.Direction = float2.zero;
-                    else
-                        movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                if (distance <= weaponComponent.MeleeAttackRange)
+                {
+                    var currentTime = Time.time;
+                    movementComponent.Direction = float2.zero;
+
+                    if (currentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
+                    {
+                        movementComponent.Direction = targetPosition - currentPosition;
+                        followStateComponent.LastTimeAttacked = currentTime;
+                        this.PostUpdateCommands.AddComponent(entity,
+                            new AttackStateComponent
+                            {
+                                StartedAt = currentTime,
+                                Target = followStateComponent.Target
+                            });
+                    }
                 }
-
-                var currentTime = Time.time;
-                if (distance <= weaponComponent.AttackRange
-                    && currentTime - followStateComponent.LastTimeAttacked > weaponComponent.CoolDown)
+                else if (distance <= weaponComponent.SpellAttackRange)
                 {
-                    movementComponent.Direction = targetPosition - currentPosition; ;
-                    followStateComponent.LastTimeAttacked = currentTime;
-                    this.PostUpdateCommands.AddComponent(entity,
-                        new AttackStateComponent
+                    var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+                    if (random.NextInt(0, 100) < 80)
+                        return;
+
+                    using (var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob))
+                    using (var spellComponents = this._activeSpellGroup.ToComponentDataArray<ActiveSpellComponent>(Allocator.TempJob))
+                    {
+                        var spellList = new NativeList<(Entity entity, ActiveSpellComponent component)>(Allocator.TempJob);
+                        for (var sI = 0; sI < spellEntities.Length; sI++)
                         {
-                            StartedAt = currentTime,
-                            Target = followStateComponent.Target
-                        });
+                            if (spellComponents[sI].Owner == entity)
+                            {
+                                spellList.Add((spellEntities[sI], spellComponents[sI]));
+                            }
+                        }
+                        if (spellList.Length > 0)
+                        {
+                            var index = random.NextInt(0, spellList.Length);
+                            movementComponent.Direction = float2.zero;
+
+                            this.PostUpdateCommands.AddComponent(entity, new SpellCastingComponent
+                            {
+                                SpellIndex = spellList[index].component.SpellIndex,
+                                ActiveSpell = spellList[index].entity,
+                                StartedAt = Time.time
+                            });
+                        }
+                        spellList.Dispose();
+                    }
                 }
             });
         }

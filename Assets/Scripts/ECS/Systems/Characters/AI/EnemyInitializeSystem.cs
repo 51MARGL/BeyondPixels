@@ -3,6 +3,7 @@ using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
+using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.ECS.Systems.Items;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -70,8 +71,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 this.PostUpdateCommands.AddComponent(entity, new WeaponComponent
                 {
                     DamageValue = enemyInitializeComponent.WeaponDamage,
-                    AttackRange = enemyInitializeComponent.AttackRange,
-                    CoolDown = enemyInitializeComponent.AttackCoolDown
+                    MeleeAttackRange = enemyInitializeComponent.MeleeAttackRange,
+                    CoolDown = enemyInitializeComponent.AttackCoolDown,
+                    SpellAttackRange = enemyInitializeComponent.SpellAttackRange
                 });
                 this.PostUpdateCommands.AddComponent(entity, new IdleStateComponent
                 {
@@ -83,103 +85,120 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 });
                 Object.Destroy(enemyInitializeComponent);
 
-                #region statsInit
-                var lvlComponent = statsInitializeComponent.LevelComponent;
-                lvlComponent.CurrentLevel = playerLvlComponent.CurrentLevel == 1 ? 1 :
-                                                random.NextInt(playerLvlComponent.CurrentLevel,
-                                                               playerLvlComponent.CurrentLevel + 3);
+                var lvlComponent = InitializeStats(entity, statsInitializeComponent, ref random, playerLvlComponent);
 
-                var healthStatComponent = statsInitializeComponent.HealthStatComponent;
-                var attackStatComponent = statsInitializeComponent.AttackStatComponent;
-                var defenceStatComponent = statsInitializeComponent.DefenceStatComponent;
-                var magicStatComponent = statsInitializeComponent.MagicStatComponent;
+                this.InitializeRandomItems(entity, ref random, lvlComponent);
 
-                this.InitializeRandomStats(lvlComponent.CurrentLevel, ref random, ref healthStatComponent,
-                                    ref attackStatComponent, ref defenceStatComponent, ref magicStatComponent);
-
-                this.PostUpdateCommands.AddComponent(entity, lvlComponent);
-                this.PostUpdateCommands.AddComponent(entity, healthStatComponent);
-                this.PostUpdateCommands.AddComponent(entity, attackStatComponent);
-                this.PostUpdateCommands.AddComponent(entity, defenceStatComponent);
-                this.PostUpdateCommands.AddComponent(entity, magicStatComponent);
-                this.PostUpdateCommands.AddComponent(entity, statsInitializeComponent.XPRewardComponent);
-                this.PostUpdateCommands.AddComponent(entity, new AdjustStatsComponent());
-                Object.Destroy(statsInitializeComponent);
-                #endregion
-
-                #region items
-                if (random.NextInt(0, 100) > 25)
+                #region spellInit
+                var spellEntity = this.PostUpdateCommands.CreateEntity();
+                this.PostUpdateCommands.AddComponent(spellEntity, new ActiveSpellComponent
                 {
-                    var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
-                    this.PostUpdateCommands.AddComponent(weaponEntity, new PickedUpComponent
-                    {
-                        Owner = entity
-                    });
-                    this.PostUpdateCommands.AddComponent(weaponEntity, new EquipedComponent());
-                }
-                if (random.NextInt(0, 100) > 25)
-                {
-                    var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
-                    this.PostUpdateCommands.AddComponent(spellBookEntity, new PickedUpComponent
-                    {
-                        Owner = entity
-                    });
-                    this.PostUpdateCommands.AddComponent(spellBookEntity, new EquipedComponent());
-                }
-                if (random.NextInt(0, 100) > 25)
-                {
-                    var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
-                    this.PostUpdateCommands.AddComponent(helmetEntity, new PickedUpComponent
-                    {
-                        Owner = entity
-                    });
-                    this.PostUpdateCommands.AddComponent(helmetEntity, new EquipedComponent());
-                }
-                if (random.NextInt(0, 100) > 25)
-                {
-                    var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
-                    this.PostUpdateCommands.AddComponent(chestEntity, new PickedUpComponent
-                    {
-                        Owner = entity
-                    });
-                    this.PostUpdateCommands.AddComponent(chestEntity, new EquipedComponent());
-                }
-                if (random.NextInt(0, 100) > 25)
-                {
-                    var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
-                    this.PostUpdateCommands.AddComponent(bootsEntity, new PickedUpComponent
-                    {
-                        Owner = entity
-                    });
-                    this.PostUpdateCommands.AddComponent(bootsEntity, new EquipedComponent());
-                }
-                if (random.NextInt(0, 100) > 75)
-                {
-                    var randomCount = random.NextInt(1, 3);
-                    for (var i = 0; i < randomCount; i++)
-                    {
-                        var foodEntity = ItemFactory.GetRandomFood(ref random, this.PostUpdateCommands);
-                        this.PostUpdateCommands.AddComponent(foodEntity, new PickedUpComponent
-                        {
-                            Owner = entity
-                        });
-                    }
-                }
-                if (random.NextInt(0, 100) > 75)
-                {
-                    var randomCount = random.NextInt(1, 3);
-                    for (var i = 0; i < randomCount; i++)
-                    {
-                        var potionEntity = ItemFactory.GetHealthPotion(ref random, this.PostUpdateCommands);
-                        this.PostUpdateCommands.AddComponent(potionEntity, new PickedUpComponent
-                        {
-                            Owner = entity
-                        });
-                    }
-                }
-                this.PostUpdateCommands.AddComponent(entity, new ApplyInitialHealthModifierComponent());
+                    Owner = entity,
+                    ActionIndex = 1,
+                    SpellIndex = 0
+                });
                 #endregion
             });
+        }
+
+        private LevelComponent InitializeStats(Entity entity, StatsInitializeComponent statsInitializeComponent, ref Unity.Mathematics.Random random, LevelComponent playerLvlComponent)
+        {
+            var lvlComponent = statsInitializeComponent.LevelComponent;
+            lvlComponent.CurrentLevel = playerLvlComponent.CurrentLevel == 1 ? 1 :
+                                            random.NextInt(playerLvlComponent.CurrentLevel,
+                                                           playerLvlComponent.CurrentLevel + 3);
+
+            var healthStatComponent = statsInitializeComponent.HealthStatComponent;
+            var attackStatComponent = statsInitializeComponent.AttackStatComponent;
+            var defenceStatComponent = statsInitializeComponent.DefenceStatComponent;
+            var magicStatComponent = statsInitializeComponent.MagicStatComponent;
+
+            this.InitializeRandomStats(lvlComponent.CurrentLevel, ref random, ref healthStatComponent,
+                                ref attackStatComponent, ref defenceStatComponent, ref magicStatComponent);
+
+            this.PostUpdateCommands.AddComponent(entity, lvlComponent);
+            this.PostUpdateCommands.AddComponent(entity, healthStatComponent);
+            this.PostUpdateCommands.AddComponent(entity, attackStatComponent);
+            this.PostUpdateCommands.AddComponent(entity, defenceStatComponent);
+            this.PostUpdateCommands.AddComponent(entity, magicStatComponent);
+            this.PostUpdateCommands.AddComponent(entity, statsInitializeComponent.XPRewardComponent);
+            this.PostUpdateCommands.AddComponent(entity, new AdjustStatsComponent());
+            Object.Destroy(statsInitializeComponent);
+            return lvlComponent;
+        }
+
+        private void InitializeRandomItems(Entity entity, ref Unity.Mathematics.Random random, LevelComponent lvlComponent)
+        {
+            if (random.NextInt(0, 100) > 25)
+            {
+                var weaponEntity = ItemFactory.GetRandomWeapon(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
+                this.PostUpdateCommands.AddComponent(weaponEntity, new PickedUpComponent
+                {
+                    Owner = entity
+                });
+                this.PostUpdateCommands.AddComponent(weaponEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 25)
+            {
+                var spellBookEntity = ItemFactory.GetRandomMagicWeapon(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
+                this.PostUpdateCommands.AddComponent(spellBookEntity, new PickedUpComponent
+                {
+                    Owner = entity
+                });
+                this.PostUpdateCommands.AddComponent(spellBookEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 25)
+            {
+                var helmetEntity = ItemFactory.GetRandomHelmet(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
+                this.PostUpdateCommands.AddComponent(helmetEntity, new PickedUpComponent
+                {
+                    Owner = entity
+                });
+                this.PostUpdateCommands.AddComponent(helmetEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 25)
+            {
+                var chestEntity = ItemFactory.GetRandomChest(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
+                this.PostUpdateCommands.AddComponent(chestEntity, new PickedUpComponent
+                {
+                    Owner = entity
+                });
+                this.PostUpdateCommands.AddComponent(chestEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 25)
+            {
+                var bootsEntity = ItemFactory.GetRandomBoots(lvlComponent.CurrentLevel, ref random, this.PostUpdateCommands);
+                this.PostUpdateCommands.AddComponent(bootsEntity, new PickedUpComponent
+                {
+                    Owner = entity
+                });
+                this.PostUpdateCommands.AddComponent(bootsEntity, new EquipedComponent());
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var randomCount = random.NextInt(1, 3);
+                for (var i = 0; i < randomCount; i++)
+                {
+                    var foodEntity = ItemFactory.GetRandomFood(ref random, this.PostUpdateCommands);
+                    this.PostUpdateCommands.AddComponent(foodEntity, new PickedUpComponent
+                    {
+                        Owner = entity
+                    });
+                }
+            }
+            if (random.NextInt(0, 100) > 75)
+            {
+                var randomCount = random.NextInt(1, 3);
+                for (var i = 0; i < randomCount; i++)
+                {
+                    var potionEntity = ItemFactory.GetHealthPotion(ref random, this.PostUpdateCommands);
+                    this.PostUpdateCommands.AddComponent(potionEntity, new PickedUpComponent
+                    {
+                        Owner = entity
+                    });
+                }
+            }
+            this.PostUpdateCommands.AddComponent(entity, new ApplyInitialHealthModifierComponent());
         }
 
         private void InitializeRandomStats(int currentLevel, ref Unity.Mathematics.Random random,

@@ -116,6 +116,9 @@ namespace BeyondPixels.UI.ECS.Systems
 
                 this.Entities.With(this._activeSpellGroup).ForEach((Entity spellEntity, ref ActiveSpellComponent activeSpellComponent) =>
                 {
+                    if (activeSpellComponent.Owner != playerEntity)
+                        return;
+
                     var playerUISpellButtonsGroup = uiComponent.SpellButtonsGroup;
                     var button = playerUISpellButtonsGroup.ActionButtons[activeSpellComponent.ActionIndex - 1];
                     var spell = spellBook.Spells[activeSpellComponent.SpellIndex];
