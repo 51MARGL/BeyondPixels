@@ -6,5 +6,6 @@ namespace BeyondPixels.ECS.Components.Characters.AI
     {
         public Entity Target;
         public float LastTimeAttacked;
+        public float LastTimeSpellChecked;
     }
 }

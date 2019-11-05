@@ -95,7 +95,14 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 }
                 else if (distance <= weaponComponent.SpellAttackRange)
                 {
-                    if (this._random.NextInt(0, 100) < 90)
+                    var currentTime = Time.time;
+
+                    if (currentTime - followStateComponent.LastTimeSpellChecked < 2f)
+                        return;
+
+                    followStateComponent.LastTimeSpellChecked = currentTime;
+
+                    if (this._random.NextInt(0, 100) < 75)
                         return;
 
                     using (var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob))
