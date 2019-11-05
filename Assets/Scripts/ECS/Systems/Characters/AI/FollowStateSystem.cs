@@ -15,9 +15,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     {
         private EntityQuery _followGroup;
         private EntityQuery _activeSpellGroup;
+        private Unity.Mathematics.Random _random;
 
         protected override void OnCreate()
         {
+            this._random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+
             this._followGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
@@ -92,8 +95,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 }
                 else if (distance <= weaponComponent.SpellAttackRange)
                 {
-                    var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
-                    if (random.NextInt(0, 100) < 80)
+                    if (this._random.NextInt(0, 100) < 90)
                         return;
 
                     using (var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob))
@@ -109,7 +111,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                         }
                         if (spellList.Length > 0)
                         {
-                            var index = random.NextInt(0, spellList.Length);
+                            var index = this._random.NextInt(0, spellList.Length);
                             movementComponent.Direction = float2.zero;
 
                             this.PostUpdateCommands.AddComponent(entity, new SpellCastingComponent

@@ -11,9 +11,12 @@ namespace BeyondPixels.ECS.Systems.Items
     {
         private EntityQuery _dropGroup;
         private EntityQuery _lootGroup;
+        private Unity.Mathematics.Random _random;
 
         protected override void OnCreate()
         {
+            this._random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+
             this._dropGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
@@ -42,7 +45,6 @@ namespace BeyondPixels.ECS.Systems.Items
                 return;
 
             var dropChunks = this._dropGroup.CreateArchetypeChunkArray(Allocator.TempJob);
-            var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
 
             for (var c = 0; c < dropChunks.Length; c++)
             {
@@ -54,7 +56,7 @@ namespace BeyondPixels.ECS.Systems.Items
                         var ownerEntity = entities[i];
                         this.Entities.With(this._lootGroup).ForEach((Entity itemEntity, ref PickedUpComponent pickedUpComponent) =>
                         {
-                            if (pickedUpComponent.Owner == ownerEntity && random.NextInt(0, 100) < 85)
+                            if (pickedUpComponent.Owner == ownerEntity && _random.NextInt(0, 100) < 85)
                                 this.PostUpdateCommands.AddComponent(itemEntity, new DestroyComponent());
                         });
                     }
