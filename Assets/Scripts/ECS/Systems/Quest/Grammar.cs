@@ -13,20 +13,20 @@ namespace BeyondPixels.ECS.Systems.Quest
         public string StartTerminal;
         public Rule[] Rules;
 
+        private Random _random = new Random((uint)System.Guid.NewGuid().GetHashCode());
+
         public string GenerateRandomText()
         {
-            return ProductString(this.StartTerminal);
+            return this.ProductString(this.StartTerminal);
         }
 
         public string GenerateRandomText(string start)
         {
-            return ProductString(start);
+            return this.ProductString(start);
         }
 
         private string ProductString(string start)
         {
-            var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
-
             while (this.TerminalAlphabet.Any(t => start.Contains(t)))
             {
                 var terminal = Regex.Match(start, "{[^{}]+}").Value;
@@ -40,12 +40,12 @@ namespace BeyondPixels.ECS.Systems.Quest
                     var range = rule.LeftSide.Substring(1, rule.LeftSide.Length - 2)
                         .Split('-').Select(r => int.Parse(r)).ToArray();
 
-                    var number = random.NextInt(range[0], range[1]);
+                    var number = this._random.NextInt(range[0], range[1]);
                     start = start.Replace(terminal, "[" + number.ToString() + "]");
                 }
                 else
                 {
-                    start = start.Replace(terminal, rule.Products[random.NextInt(0, rule.Products.Length)]);
+                    start = start.Replace(terminal, rule.Products[this._random.NextInt(0, rule.Products.Length)]);
                 }
             }
 

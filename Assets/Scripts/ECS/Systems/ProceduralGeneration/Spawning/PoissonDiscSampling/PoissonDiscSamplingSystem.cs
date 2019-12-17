@@ -146,7 +146,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                 for (var y = startY; y < endY; y++)
                     for (var x = startX; x < endX; x++)
-                        this.RemoveFromValid(new int2(x,y), validCellList);
+                        this.RemoveFromValid(new int2(x, y), validCellList);
             }
 
             private NativeArray<PoissonCellComponent> GetCellsByRequestID(int id, int2 gridSize)
@@ -272,9 +272,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;
         private EntityQuery _cellGroup;
         private EntityQuery _radiusGroup;
+        private Unity.Mathematics.Random _random;
 
         protected override void OnCreate()
         {
+            this._random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+
             this._endFrameBarrier = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
             this._cellGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -296,14 +299,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var random = new Random((uint)System.Guid.NewGuid().GetHashCode());
-
             var generateSamplesJobHandle = new GenerateSamplesJob
             {
                 ResultQueue = this.SamplesQueue.AsParallelWriter(),
                 Cells = this._cellGroup.ToComponentDataArray<PoissonCellComponent>(Allocator.TempJob),
                 Radiuses = this._radiusGroup.ToComponentDataArray<PoissonRadiusComponent>(Allocator.TempJob),
-                RandomSeed = random.NextInt()
+                RandomSeed = this._random.NextInt()
             }.Schedule(this, inputDeps);
 
             var createResponseJobHandle = new CreateResponseJob

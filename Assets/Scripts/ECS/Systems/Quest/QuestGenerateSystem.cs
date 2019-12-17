@@ -7,7 +7,6 @@ using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.SceneBootstraps;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Quest
@@ -18,9 +17,12 @@ namespace BeyondPixels.ECS.Systems.Quest
         private EntityQuery _generateGroup;
         private EntityQuery _activeGroup;
         private string[] _quests;
+        private Unity.Mathematics.Random _random;
 
         protected override void OnCreate()
         {
+            this._random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+
             if (this.Grammar == null)
             {
                 this._quests = new[] {
@@ -132,7 +134,7 @@ namespace BeyondPixels.ECS.Systems.Quest
             });
 
             var entities = this._generateGroup.ToEntityArray(Allocator.TempJob);
-            for (int i = 0; i < entities.Length; i++)
+            for (var i = 0; i < entities.Length; i++)
             {
                 var questText = string.Empty;
                 if (allowedArray.Count == this._quests.Length)
@@ -142,8 +144,7 @@ namespace BeyondPixels.ECS.Systems.Quest
                 }
                 else if (allowedArray.Count > 0)
                 {
-                    var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
-                    questText = this.Grammar.GenerateRandomText(allowedArray[random.NextInt(0, allowedArray.Count)]);
+                    questText = this.Grammar.GenerateRandomText(allowedArray[this._random.NextInt(0, allowedArray.Count)]);
                 }
 
                 var quest = this.CreateQuestEntity(ref questText, allowedArray);
@@ -188,7 +189,8 @@ namespace BeyondPixels.ECS.Systems.Quest
                     break;
             }
 
-            this.PostUpdateCommands.AddComponent(questEntity, new LevelComponent {
+            this.PostUpdateCommands.AddComponent(questEntity, new LevelComponent
+            {
                 CurrentLevel = 1
             });
             return questObj;

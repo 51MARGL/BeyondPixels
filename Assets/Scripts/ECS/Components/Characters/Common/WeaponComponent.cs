@@ -5,7 +5,10 @@ namespace BeyondPixels.ECS.Components.Characters.Common
     public struct WeaponComponent : IComponentData
     {
         public int DamageValue;
-        public float AttackRange;
+        public float MeleeAttackRange;
         public float CoolDown;
+        public float SpellAttackRange;
+        public float SpellCheckFrequency;
+        public float SpellCastChance;
     }
 }

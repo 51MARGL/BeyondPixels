@@ -17,9 +17,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
         private EntityQuery _tilesGroup;
         private EntityQuery _boardGroup;
         private EntityQuery _boardReadyGroup;
+        private Unity.Mathematics.Random _random;
 
         protected override void OnCreate()
         {
+            this._random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+
             this._tilesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
@@ -65,10 +68,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 PlayerPosition = float3.zero;
 
                 var boardSize = finalBoardComponent.Size;
-                var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
                 var tiles = this._tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.TempJob);
-                var bottom = random.NextBool();
-                var left = random.NextBool();
+                var bottom = this._random.NextBool();
+                var left = this._random.NextBool();
                 var startX = 3;
                 var endX = boardSize.x - 3;
                 var startY = 3;

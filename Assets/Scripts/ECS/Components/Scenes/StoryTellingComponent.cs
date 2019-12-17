@@ -36,7 +36,7 @@ namespace BeyondPixels.ECS.Components.Scenes
                     if (Enum.TryParse<KeyBindName>(keyBind, out var bindName))
                     {
                         var value = SettingsManager.Instance.GetKeyBindValue(bindName);
-                        text = text.Replace(matches[mI].Value, value.ToString().Replace("Alpha", ""));
+                        text = text.Replace($"[{matches[mI].Value}]", value.ToString().Replace("Alpha", ""));
                     }
                 }
                 this.Sentences.Enqueue(text);

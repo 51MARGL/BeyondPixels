@@ -11,9 +11,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
     public class InspectStateSystem : ComponentSystem
     {
         private EntityQuery _inspectGroup;
+        private Unity.Mathematics.Random _random;
 
         protected override void OnCreate()
         {
+            this._random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
+
             this._inspectGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
@@ -36,14 +39,13 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                                 ref PositionComponent positionComponent,
                                                 ref InspectStateComponent inspectStateComponent) =>
             {
-                var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
                 var currentTime = Time.time;
-                if (currentTime - inspectStateComponent.StartedAt < random.NextInt(10, 30) / 10f)
+                if (currentTime - inspectStateComponent.StartedAt < this._random.NextInt(10, 30) / 10f)
                 {
                     if (inspectStateComponent.InspectDirection.Equals(float2.zero))
                     {
                         inspectStateComponent.InspectDirection =
-                            new float2(random.NextFloat(-20, 20), random.NextFloat(-20, 20));
+                            new float2(this._random.NextFloat(-20, 20), this._random.NextFloat(-20, 20));
 
                         var curr = new Vector3(positionComponent.CurrentPosition.x, positionComponent.CurrentPosition.y, 0);
                         var dest = curr +

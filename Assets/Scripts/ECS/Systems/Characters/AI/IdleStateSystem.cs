@@ -23,8 +23,8 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                 [ReadOnly] ref IdleStateComponent idleStateComponent,
                                 [ReadOnly] ref PositionComponent positionComponent)
             {
-                var random = new System.Random((int)this.CurrentTime + index);
-                if (this.CurrentTime - idleStateComponent.StartedAt < random.Next(10, 50) / 10f)
+                var random = new Unity.Mathematics.Random((uint)index + 1);
+                if (this.CurrentTime - idleStateComponent.StartedAt < random.NextInt(10, 50) / 10f)
                     return;
 
                 this.CommandBuffer.RemoveComponent(index, entity, typeof(IdleStateComponent));

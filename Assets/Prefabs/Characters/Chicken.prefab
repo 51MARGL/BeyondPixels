@@ -125,6 +125,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -255,7 +256,8 @@ MonoBehaviour:
   WeaponDamage: 15
   BaseHealth: 100
   AttackCoolDown: 3
-  AttackRange: 1
+  MeleeAttackRange: 0.9
+  SpellAttackRange: 2
 --- !u!114 &994760250139303242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,6 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25e587682d3bceb4aa6c818944e186b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TargetCoolDown: 1
 --- !u!1 &8369842100214089509
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,6 +376,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
