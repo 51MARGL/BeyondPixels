@@ -10,5 +10,7 @@ namespace BeyondPixels.ECS.Components.Characters.AI
         public float AttackCoolDown;
         public float MeleeAttackRange;
         public float SpellAttackRange;
+        public float SpellCheckFrequency;
+        public float SpellCastChance;
     }
 }

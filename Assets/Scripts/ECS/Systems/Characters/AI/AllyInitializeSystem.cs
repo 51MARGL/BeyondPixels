@@ -80,7 +80,10 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 {
                     DamageValue = allyInitializeComponent.WeaponDamage,
                     MeleeAttackRange = allyInitializeComponent.MeleeAttackRange,
-                    CoolDown = allyInitializeComponent.AttackCoolDown
+                    CoolDown = allyInitializeComponent.AttackCoolDown,
+                    SpellAttackRange = allyInitializeComponent.SpellAttackRange,
+                    SpellCheckFrequency = allyInitializeComponent.SpellCheckFrequency,
+                    SpellCastChance = allyInitializeComponent.SpellCastChance
                 });
                 this.PostUpdateCommands.AddComponent(entity, new IdleStateComponent
                 {

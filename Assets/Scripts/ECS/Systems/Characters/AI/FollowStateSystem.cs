@@ -97,12 +97,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 {
                     var currentTime = Time.time;
 
-                    if (currentTime - followStateComponent.LastTimeSpellChecked < 2f)
+                    if (currentTime - followStateComponent.LastTimeSpellChecked < weaponComponent.SpellCheckFrequency)
                         return;
 
                     followStateComponent.LastTimeSpellChecked = currentTime;
 
-                    if (this._random.NextInt(0, 100) < 75)
+                    if (this._random.NextInt(0, 100) > weaponComponent.SpellCastChance)
                         return;
 
                     using (var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob))

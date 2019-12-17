@@ -8,5 +8,7 @@ namespace BeyondPixels.ECS.Components.Characters.Common
         public float MeleeAttackRange;
         public float CoolDown;
         public float SpellAttackRange;
+        public float SpellCheckFrequency;
+        public float SpellCastChance;
     }
 }

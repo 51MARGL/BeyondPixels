@@ -13,22 +13,18 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 {
     public class SpellCastingSystem : ComponentSystem
     {
-        private EntityQuery _playerCastingGroup;
+        private EntityQuery _castingGroup;
         private EntityQuery _activeSpellGroup;
 
         protected override void OnCreate()
         {
-            this._playerCastingGroup = this.GetEntityQuery(new EntityQueryDesc
+            this._castingGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[] {
                     ComponentType.ReadOnly<MagicStatComponent>(),
                     ComponentType.ReadOnly<CharacterComponent>(),
                     ComponentType.ReadOnly<SpellCastingComponent>()
-                },
-                Any = new ComponentType[] {
-                    ComponentType.ReadOnly<FollowStateComponent>(),
-                    ComponentType.ReadOnly<TargetComponent>()
-                },
+                }
             });
             this._activeSpellGroup = this.GetEntityQuery(new EntityQueryDesc
             {
@@ -45,7 +41,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
         protected override void OnUpdate()
         {
-            this.Entities.With(this._playerCastingGroup).ForEach((Entity entity,
+            this.Entities.With(this._castingGroup).ForEach((Entity entity,
                 ref SpellCastingComponent spellCastingComponent,
                 ref MagicStatComponent magicStatComponent) =>
             {

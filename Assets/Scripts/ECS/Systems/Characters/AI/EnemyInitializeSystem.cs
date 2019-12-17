@@ -73,7 +73,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     DamageValue = enemyInitializeComponent.WeaponDamage,
                     MeleeAttackRange = enemyInitializeComponent.MeleeAttackRange,
                     CoolDown = enemyInitializeComponent.AttackCoolDown,
-                    SpellAttackRange = enemyInitializeComponent.SpellAttackRange
+                    SpellAttackRange = enemyInitializeComponent.SpellAttackRange,
+                    SpellCheckFrequency = enemyInitializeComponent.SpellCheckFrequency,
+                    SpellCastChance = enemyInitializeComponent.SpellCastChance
                 });
                 this.PostUpdateCommands.AddComponent(entity, new IdleStateComponent
                 {
