@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
+using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
 
 using Unity.Entities;
@@ -40,8 +41,10 @@ namespace BeyondPixels.ColliderEvents
                         new SpellCollisionComponent
                         {
                             Target = targetComponent.Target,
+                            SpellEntity = spellEntity,
+                            DestroyOnImpact = entityManager.HasComponent<DestroyOnImpactComponent>(spellEntity) ? 1 : 0
                         });
-                this.totalTime = 0;
+                this.totalTime = 0;                
             }
         }
 

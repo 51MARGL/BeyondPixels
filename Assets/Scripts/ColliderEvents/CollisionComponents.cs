@@ -24,6 +24,8 @@ namespace BeyondPixels.ColliderEvents
     public struct SpellCollisionComponent : IComponentData
     {
         public Entity Target;
+        public Entity SpellEntity;
+        public int DestroyOnImpact;
     }
     public struct WeaponCollisionComponent : IComponentData
     {

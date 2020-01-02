@@ -20,6 +20,7 @@ namespace BeyondPixels.ECS.Components.Spells
             public string Name;
             public string Description;
 
+            public float ThrowSpeed;
             public float CastTime;
             public float Duration;
             public float CoolDown;
@@ -29,6 +30,7 @@ namespace BeyondPixels.ECS.Components.Spells
             public bool LockOnTarget;
             public bool SelfTarget;
             public bool TargetRequired;
+            public bool Throwable;            
         }
     }
 }

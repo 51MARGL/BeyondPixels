@@ -80,7 +80,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     {
                         Owner = entity,
                         ActionIndex = i + 1,
-                        SpellIndex = i
+                        SpellIndex = i + 1
                     });
                 }
                 #endregion

@@ -1,6 +1,6 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
-
+using BeyondPixels.ECS.Components.Objects;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -62,6 +62,11 @@ namespace BeyondPixels.ECS.Systems.Common
                                     DamageType = damageComponent.DamageType,
                                     DamageAmount = damageComponent.DamageOnImpact
                                 });
+
+                        if (spellCollisionComponent.DestroyOnImpact == 1)
+                        {
+                            this.CommandBuffer.AddComponent(index, spellCollisionComponent.SpellEntity, new DestroyComponent());
+                        }
                         break;
                     case EventType.TriggerStay:
                         newEntity = this.CommandBuffer.CreateEntity(index);
