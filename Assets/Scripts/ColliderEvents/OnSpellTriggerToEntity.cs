@@ -45,6 +45,18 @@ namespace BeyondPixels.ColliderEvents
                             DestroyOnImpact = entityManager.HasComponent<DestroyOnImpactComponent>(spellEntity) ? 1 : 0
                         });
                 this.totalTime = 0;                
+            } 
+            else if (collider.gameObject.CompareTag("Wall"))
+            {
+                var entityManager = World.Active.EntityManager;
+                var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
+                if (!entityManager.Exists(spellEntity))
+                    return;
+
+                if (entityManager.HasComponent<ThrowOnTargetComponent>(spellEntity))
+                {
+                    entityManager.AddComponentData(spellEntity, new DestroyComponent());
+                }
             }
         }
 

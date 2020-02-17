@@ -35,25 +35,54 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
         }
         protected override void OnUpdate()
         {
-            if (this._damageGroup.CalculateEntityCount() == 0)
+            var count = this._damageGroup.CalculateEntityCount();
+            if (count == 0)
+            {
                 return;
+            }
 
-            var positions = new NativeArray<PositionComponent>(this._damageGroup.CalculateEntityCount(), Allocator.TempJob);
+            var positions = new NativeArray<PositionComponent>(count, Allocator.TempJob);
+            var senders = new NativeArray<Entity>(count, Allocator.TempJob);
+            var damageTypes = new NativeArray<DamageType>(count, Allocator.TempJob);
 
             var k = 0;
             this.Entities.With(this._damageGroup).ForEach((Entity damageEntity, ref FinalDamageComponent damageComponent, ref CollisionInfo collisionInfo) =>
             {
                 if (damageComponent.DamageAmount > 0)
-                    positions[k++] = EntityManager.GetComponentData<PositionComponent>(collisionInfo.Target);
+                {
+                    positions[k] = this.EntityManager.GetComponentData<PositionComponent>(collisionInfo.Target);
+                    senders[k] = collisionInfo.Sender;
+                    damageTypes[k++] = damageComponent.DamageType;
+                }
             });
 
             for (var i = 0; i < k; i++)
             {
-                GameObject.Instantiate(PrefabManager.Instance.BloodSplashPrefab,
-                                       new float3(positions[i].CurrentPosition.x, positions[i].CurrentPosition.y, -1),
-                                       Quaternion.identity);
+                var senderPosition = this.EntityManager.GetComponentData<PositionComponent>(senders[i]);
+                var destination = positions[i].CurrentPosition;
+                if (damageTypes[i] != DamageType.Weapon)
+                {
+                    destination.y += 0.25f;
+                }
+
+                var obj = GameObject.Instantiate(PrefabManager.Instance.BloodSplashPrefab,
+                                        new float3(destination.x, destination.y, 0f),
+                                        Quaternion.identity);
+
+                obj.transform.right = Vector3.down;
+
+                if (this.EntityManager.Exists(senders[i]))
+                {
+                    if (damageTypes[i] == DamageType.Weapon)
+                    {
+                        obj.transform.right = obj.transform.position -
+                            new Vector3(senderPosition.CurrentPosition.x, senderPosition.CurrentPosition.y, 0f);
+                    }
+                }
             }
             positions.Dispose();
+            senders.Dispose();
+            damageTypes.Dispose();
         }
     }
 }

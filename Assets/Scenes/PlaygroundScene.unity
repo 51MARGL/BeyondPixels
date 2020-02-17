@@ -63096,6 +63096,11 @@ PrefabInstance:
       propertyPath: MovementSpeed
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114609599059052646, guid: 12905d7000e10494f8cc8200dea4849b,
+        type: 3}
+      propertyPath: BaseHealth
+      value: 500
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12905d7000e10494f8cc8200dea4849b, type: 3}
 --- !u!1001 &1756627259
@@ -64309,23 +64314,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7135779718213204338, guid: fed4b60f14e673e43b641da19ab68524,
         type: 3}
-      propertyPath: Spells.Array.data[3].Duration
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7135779718213204338, guid: fed4b60f14e673e43b641da19ab68524,
-        type: 3}
-      propertyPath: Spells.Array.data[3].CastTime
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7135779718213204338, guid: fed4b60f14e673e43b641da19ab68524,
-        type: 3}
-      propertyPath: Spells.Array.data[3].CoolDown
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7135779718213204338, guid: fed4b60f14e673e43b641da19ab68524,
-        type: 3}
       propertyPath: Spells.Array.data[3].ThrowSpeed
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fed4b60f14e673e43b641da19ab68524, type: 3}

@@ -53,10 +53,7 @@ namespace BeyondPixels.ECS.Systems.Spells
                     movementComponent.Direction = float2.zero;
                 }
 
-                var velocity = math.normalize(movementComponent.Direction) *
-                        movementComponent.Speed;
-
-                transform.position += new Vector3(velocity.x, velocity.y, 0f) * Time.deltaTime;
+                transform.right = new Vector3(movementComponent.Direction.x, movementComponent.Direction.y, 0f);
             });
         }
     }

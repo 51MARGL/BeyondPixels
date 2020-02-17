@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 95065102599205238}
   - component: {fileID: 114671597409067244}
   - component: {fileID: 114303189919281398}
+  - component: {fileID: 8020465433347707940}
   m_Layer: 8
   m_Name: FireRingSpell 1
   m_TagString: Spell
@@ -50,6 +51,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -154,6 +156,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fc5c3c72ba386b44986273d95020c57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!50 &8020465433347707940
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1323627655978938}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 0.0001
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &1642243477808368
 GameObject:
   m_ObjectHideFlags: 0
@@ -193,8 +216,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642243477808368}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 2
+  m_Shape: 0
   m_Color: {r: 1, g: 0.752602, b: 0, a: 1}
   m_Intensity: 2
   m_Range: 5
