@@ -58,7 +58,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
             for (var i = 0; i < k; i++)
             {
-                var senderPosition = this.EntityManager.GetComponentData<PositionComponent>(senders[i]);
+                var senderPosition = float2.zero;
+                if (this.EntityManager.Exists(senders[i]))
+                {
+                    senderPosition = this.EntityManager.GetComponentData<PositionComponent>(senders[i]).CurrentPosition;
+                }
+
                 var destination = positions[i].CurrentPosition;
                 if (damageTypes[i] != DamageType.Weapon)
                 {
@@ -71,13 +76,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
                 obj.transform.right = Vector3.down;
 
-                if (this.EntityManager.Exists(senders[i]))
+                if (damageTypes[i] == DamageType.Weapon && !senderPosition.Equals(float2.zero))
                 {
-                    if (damageTypes[i] == DamageType.Weapon)
-                    {
-                        obj.transform.right = obj.transform.position -
-                            new Vector3(senderPosition.CurrentPosition.x, senderPosition.CurrentPosition.y, 0f);
-                    }
+                    obj.transform.right = obj.transform.position -
+                        new Vector3(senderPosition.x, senderPosition.y, 0f);
                 }
             }
             positions.Dispose();

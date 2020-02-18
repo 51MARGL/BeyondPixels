@@ -129,7 +129,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6402c94c5726c154691fac3eff4188c7, type: 2}
+  - {fileID: 2100000, guid: 1975df8f2967b3341aecaac6282d9d39, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -258,6 +258,8 @@ MonoBehaviour:
   AttackCoolDown: 3
   MeleeAttackRange: 0.9
   SpellAttackRange: 2
+  SpellCheckFrequency: 0
+  SpellCastChance: 0
 --- !u!114 &994760250139303242
 MonoBehaviour:
   m_ObjectHideFlags: 0

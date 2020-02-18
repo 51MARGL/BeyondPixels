@@ -28,7 +28,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1569921786264124, guid: 0c20c54040f9cc546872c76f1574c27c, type: 3}
       propertyPath: m_Name
-      value: DirectionalLightOnStart
+      value: DirectionalLightOnStart Variant
       objectReference: {fileID: 0}
     - target: {fileID: 4387913876996614, guid: 0c20c54040f9cc546872c76f1574c27c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -75,6 +75,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 108350318633420164, guid: 0c20c54040f9cc546872c76f1574c27c,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 34773312590045214, guid: 0c20c54040f9cc546872c76f1574c27c,
+        type: 3}
+      propertyPath: m_LightOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 34773312590045214, guid: 0c20c54040f9cc546872c76f1574c27c,
         type: 3}
       propertyPath: m_Intensity
       value: 0.5

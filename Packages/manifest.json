@@ -12,6 +12,7 @@
     "com.unity.ide.rider": "1.0.8",
     "com.unity.ide.visualstudio": "1.0.11",
     "com.unity.ide.vscode": "1.0.7",
+    "com.unity.render-pipelines.universal": "7.0.0",
     "com.unity.test-framework": "1.0.17",
     "com.unity.test-framework.performance": "1.2.5-preview",
     "com.unity.textmeshpro": "2.0.1",

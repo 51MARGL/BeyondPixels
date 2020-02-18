@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 6250254475546219725, guid: 51e431f8966d5a54c955c60a070b4a3b,
         type: 3}
       propertyPath: m_Name
-      value: BloodDecals (1)
+      value: BloodDecals Variant 1
       objectReference: {fileID: 0}
     - target: {fileID: 6248361325850456491, guid: 51e431f8966d5a54c955c60a070b4a3b,
         type: 3}

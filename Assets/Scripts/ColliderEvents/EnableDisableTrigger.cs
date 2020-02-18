@@ -3,6 +3,7 @@
 using Unity.Entities;
 
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 
 namespace BeyondPixels.ColliderEvents
 {
@@ -28,7 +29,7 @@ namespace BeyondPixels.ColliderEvents
                 });
             }
             else if (collider.CompareTag("Light"))
-                collider.GetComponent<Light>().enabled = true;
+                collider.GetComponent<Light2D>().enabled = true;
         }
 
         private void OnTriggerExit2D(Collider2D collider)
@@ -51,7 +52,7 @@ namespace BeyondPixels.ColliderEvents
                 });
             }
             else if (collider.CompareTag("Light"))
-                collider.GetComponent<Light>().enabled = false;
+                collider.GetComponent<Light2D>().enabled = false;
         }
     }
 }
