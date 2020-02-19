@@ -7,130 +7,65 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 310711406105402089, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: m_Name
-      value: enemyGhostGreen Variant
-      objectReference: {fileID: 0}
-    - target: {fileID: 314436702185187613, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 314436702185187613, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 486037235637895065, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841066, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.14880791
+      value: 0.12125573
       objectReference: {fileID: 0}
-    - target: {fileID: 486037235637895065, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841066, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.4245283
+      value: 0.4811321
       objectReference: {fileID: 0}
-    - target: {fileID: 486037235637895065, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841066, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.11013707
+      value: 0.06127626
       objectReference: {fileID: 0}
-    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: MovementSpeed
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: MaxHealth
       value: 20
       objectReference: {fileID: 0}
-    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: WeaponDamage
       value: 8
       objectReference: {fileID: 0}
-    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackCoolDown
-      value: 2
+      value: 2.5
       objectReference: {fileID: 0}
-    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: AttackRange
-      value: 0.9
+      propertyPath: MovementSpeed
+      value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: BaseHealth
+      propertyPath: MaxHealth
       value: 20
       objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: HealthStatComponent.CurrentValue
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: HealthStatComponent.PerLevelValue
+      propertyPath: WeaponDamage
       value: 8
       objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: AttackStatComponent.CurrentValue
-      value: 2
+      propertyPath: AttackCoolDown
+      value: 1.5
       objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: DefenceStatComponent.CurrentValue
+      propertyPath: AttackRange
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: HealthStatComponent.BaseValue
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: AttackStatComponent.BaseValue
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: DefenceStatComponent.BaseValue
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: MagicStatComponent.CurrentValue
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: MagicStatComponent.BaseValue
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: XPReawardComponent.XPAmount
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: XPRewardComponent.XPAmount
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: HealthStatComponent.PerPointValue
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841198, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: m_Name
-      value: enemyGhostGreen Variant
       objectReference: {fileID: 0}
     - target: {fileID: 309658852677841162, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
@@ -197,6 +132,26 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 309658852677841168, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_Name
+      value: enemyGhostGreen Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 309658852677841198, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_Name
+      value: enemyGhostGreen Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 309658852677841236, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 309658852677841236, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 309658852677841237, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_Color.r
@@ -212,80 +167,125 @@ PrefabInstance:
       propertyPath: m_Color.b
       value: 0.32013172
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: MovementSpeed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: MaxHealth
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: WeaponDamage
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841080, guid: c402636d0ea6df84490f5cb75078f516,
-        type: 3}
-      propertyPath: AttackCoolDown
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841168, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 310711406105402089, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_Name
       value: enemyGhostGreen Variant
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841236, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 314436702185187613, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_LocalScale.x
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841236, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 314436702185187613, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: m_LocalScale.y
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841066, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: m_Color.r
-      value: 0.12125573
+      propertyPath: HealthStatComponent.CurrentValue
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841066, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: m_Color.g
-      value: 0.4811321
+      propertyPath: HealthStatComponent.PerLevelValue
+      value: 8
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841066, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
-      propertyPath: m_Color.b
-      value: 0.06127626
+      propertyPath: AttackStatComponent.CurrentValue
+      value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: DefenceStatComponent.CurrentValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: HealthStatComponent.BaseValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: AttackStatComponent.BaseValue
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: DefenceStatComponent.BaseValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: MagicStatComponent.CurrentValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: MagicStatComponent.BaseValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: XPReawardComponent.XPAmount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: XPRewardComponent.XPAmount
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 405056648633241558, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: HealthStatComponent.PerPointValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: MovementSpeed
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: MaxHealth
       value: 20
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: WeaponDamage
       value: 8
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackCoolDown
-      value: 1.5
+      value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 309658852677841116, guid: c402636d0ea6df84490f5cb75078f516,
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
         type: 3}
       propertyPath: AttackRange
-      value: 1
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 421946139725085139, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: BaseHealth
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 486037235637895065, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.14880791
+      objectReference: {fileID: 0}
+    - target: {fileID: 486037235637895065, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.4245283
+      objectReference: {fileID: 0}
+    - target: {fileID: 486037235637895065, guid: c402636d0ea6df84490f5cb75078f516,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.11013707
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c402636d0ea6df84490f5cb75078f516, type: 3}
