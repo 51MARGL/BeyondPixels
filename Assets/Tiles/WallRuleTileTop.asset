@@ -19,7 +19,8 @@ MonoBehaviour:
   - m_Neighbors: 0200000001000000000000000100000001000000000000000100000000000000
     m_Sprites:
     - {fileID: -2599681536383460382, guid: b6434bdb9cdea154a91bcbe75e170534, type: 3}
-    m_GameObject: {fileID: 0}
+    m_GameObject: {fileID: 2133724499842497136, guid: 0d8dd7369ee07454981efa34f8f59762,
+      type: 3}
     m_AnimationSpeed: 1
     m_PerlinScale: 0.5
     m_RuleTransform: 0
@@ -29,7 +30,8 @@ MonoBehaviour:
   - m_Neighbors: 0000000001000000020000000100000001000000000000000100000000000000
     m_Sprites:
     - {fileID: -4570104441738109162, guid: 862e726d66e2dcd46b888114315562d9, type: 3}
-    m_GameObject: {fileID: 0}
+    m_GameObject: {fileID: 2133724499842497136, guid: 0d8dd7369ee07454981efa34f8f59762,
+      type: 3}
     m_AnimationSpeed: 1
     m_PerlinScale: 0.5
     m_RuleTransform: 0
@@ -39,7 +41,8 @@ MonoBehaviour:
   - m_Neighbors: 0000000002000000000000000100000001000000000000000100000000000000
     m_Sprites:
     - {fileID: 9211288180345645061, guid: 3294aba3f1917ff45a88851722b031bf, type: 3}
-    m_GameObject: {fileID: 0}
+    m_GameObject: {fileID: 2133724499842497136, guid: 0d8dd7369ee07454981efa34f8f59762,
+      type: 3}
     m_AnimationSpeed: 1
     m_PerlinScale: 0.5
     m_RuleTransform: 0
@@ -50,7 +53,8 @@ MonoBehaviour:
     m_Sprites:
     - {fileID: 8308649136730802503, guid: 883937b77f3b9be4898601f7f22a0bf9, type: 3}
     - {fileID: 5280570245468861790, guid: f7a37980467118b4d8f3fc6a6d8de75b, type: 3}
-    m_GameObject: {fileID: 0}
+    m_GameObject: {fileID: 1464134115885522972, guid: 822d3eb1bf1b29b408378ea91c43558e,
+      type: 3}
     m_AnimationSpeed: 1
     m_PerlinScale: 0.75
     m_RuleTransform: 0
@@ -61,7 +65,8 @@ MonoBehaviour:
     m_Sprites:
     - {fileID: 733139793885897087, guid: 80479ab30bcb0a043b8c57c01dc975ce, type: 3}
     - {fileID: 7762448873910638972, guid: f05b2c9855104d04c9df624b091978ed, type: 3}
-    m_GameObject: {fileID: 0}
+    m_GameObject: {fileID: 44993923748799079, guid: 71b7f3371cc3fce4a94d664a6bfb1ec3,
+      type: 3}
     m_AnimationSpeed: 1
     m_PerlinScale: 0.75
     m_RuleTransform: 0
