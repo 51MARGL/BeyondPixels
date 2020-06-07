@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+
 using static BeyondPixels.UI.ECS.Components.GameUIComponent;
 
 namespace BeyondPixels.UI.ECS.Components

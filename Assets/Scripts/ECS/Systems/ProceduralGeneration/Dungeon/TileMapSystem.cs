@@ -1,7 +1,7 @@
-﻿using System.Collections;
-
-using BeyondPixels.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+
+using System.Collections;
 
 using Unity.Collections;
 using Unity.Entities;
@@ -61,7 +61,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
             this.Entities.With(this._tilemapGroup).ForEach((Entity entity, Transform transform, DungeonTileMapComponent tilemapComponent) =>
             {
                 if (tilemapComponent.tileSpawnRoutine != null)
+                {
                     return;
+                }
 
                 var tilesArray = this._tilesGroup.ToComponentDataArray<FinalTileComponent>(Allocator.Persistent);
 
@@ -95,6 +97,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 var xRigth = centerX + i > boardSize.x - 1 ? boardSize.x - 1 : centerX + i; ;
 
                 if (xLeft >= 0 && xRigth < boardSize.x)
+                {
                     for (int x = xLeft, iterationCounter = 0; x <= xRigth; x++, iterationCounter++)
                     {
                         var tile = tilesArray[yTop * boardSize.x + x];
@@ -121,8 +124,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
                     }
+                }
 
                 if (yBottom >= 0 && yTop < boardSize.y)
+                {
                     for (int y = yBottom, iterationCounter = 0; y <= yTop; y++, iterationCounter++)
                     {
                         var tile = tilesArray[y * boardSize.x + xLeft];
@@ -149,10 +154,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                             tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                         }
                     }
+                }
+
                 yield return null;
             }
 
             if (boardSize.y % 2 == 0)
+            {
                 for (var x = 0; x < boardSize.x; x++)
                 {
                     var tile = tilesArray[0 * boardSize.x + x];
@@ -167,8 +175,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                         tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                     }
                 }
+            }
 
             if (boardSize.x % 2 == 0)
+            {
                 for (var y = 0; y < boardSize.y; y++)
                 {
                     var tile = tilesArray[y * boardSize.x];
@@ -183,6 +193,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                         tilemapComponent.TilemapWallsTop.SetTile(new Vector3Int(tile.Position.x, tile.Position.y, 0), tilemapComponent.WallTileTop);
                     }
                 }
+            }
+
             yield return null;
 
             //hide skybox

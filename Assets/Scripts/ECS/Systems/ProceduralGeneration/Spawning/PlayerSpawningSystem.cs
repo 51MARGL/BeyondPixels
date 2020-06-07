@@ -1,8 +1,9 @@
-﻿using System;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.SceneBootstraps;
+
+using System;
 
 using Unity.Collections;
 using Unity.Entities;
@@ -99,7 +100,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                 }
 
                 for (var y = startY; yCond(y, endY); y += yStep)
+                {
                     for (var x = startX; xCond(x, endX); x += xStep)
+                    {
                         if (tiles[y * boardSize.x + x].TileType == TileType.Floor
                             && tiles[(y + 1) * boardSize.x + x].TileType == TileType.Wall
                             && tiles[(y + 1) * boardSize.x + (x + 1)].TileType == TileType.Wall
@@ -107,10 +110,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
                             && tiles[y * boardSize.x + (x + 1)].TileType == TileType.Floor
                             && tiles[y * boardSize.x + (x - 1)].TileType == TileType.Floor
                             && tiles[(y - 1) * boardSize.x + x].TileType == TileType.Floor)
+                        {
                             PlayerPosition = new float3(x + 0.5f, y + 1.75f, 0);
+                        }
+                    }
+                }
 
                 if (!PlayerPosition.Equals(float3.zero))
+                {
                     this.PostUpdateCommands.AddComponent(entity, new PlayerSpawnedComponent());
+                }
+
                 tiles.Dispose();
             });
             if (this._boardReadyGroup.CalculateEntityCount() > 0 && !this.playerInstantiated)

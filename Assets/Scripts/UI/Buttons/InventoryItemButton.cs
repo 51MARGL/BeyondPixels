@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-
+﻿
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.UI.ECS.Components;
+
 using Unity.Entities;
-using Unity.Mathematics;
+
 using UnityEngine.EventSystems;
 
 namespace BeyondPixels.UI.Buttons
@@ -49,6 +47,6 @@ namespace BeyondPixels.UI.Buttons
                     break;
             }
             UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), btnDesc);
-        }        
+        }
     }
 }

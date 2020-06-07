@@ -1,12 +1,9 @@
-﻿using System;
-using System.IO;
-using BeyondPixels.ECS.Components.Game;
+﻿using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.ECS.Components.Scenes;
-using BeyondPixels.ECS.Systems.SaveGame;
+
 using Unity.Entities;
 
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace BeyondPixels.ECS.Systems.Game
@@ -19,7 +16,7 @@ namespace BeyondPixels.ECS.Systems.Game
         {
             this._startGroup = this.GetEntityQuery(new EntityQueryDesc
             {
-                All = new ComponentType[]
+                All = new ComponentType[] 
                 {
                     typeof(StartNewGameComponent)
                 }

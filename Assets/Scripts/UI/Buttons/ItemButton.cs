@@ -1,10 +1,14 @@
-﻿using System;
+﻿using BeyondPixels.ECS.Components.Items;
+
+using System;
 using System.Linq;
 using System.Text;
-using BeyondPixels.ECS.Components.Items;
+
 using TMPro;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -158,7 +162,9 @@ namespace BeyondPixels.UI.Buttons
             {
                 sb.Append(" (");
                 if (difference > 0)
+                {
                     sb.Append("+");
+                }
 
                 sb.Append($"{difference})");
             }

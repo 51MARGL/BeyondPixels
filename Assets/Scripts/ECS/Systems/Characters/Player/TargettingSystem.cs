@@ -1,7 +1,7 @@
-﻿using System.Linq;
-
-using BeyondPixels.ECS.Components.Characters.Common;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+
+using System.Linq;
 
 using Unity.Entities;
 using Unity.Mathematics;
@@ -20,9 +20,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(InputComponent), typeof(PlayerComponent), typeof(PositionComponent)
-                }
+}
             });
         }
 
@@ -31,7 +31,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             this.Entities.With(this._playerGroup).ForEach((Entity entity, ref InputComponent inputComponent, ref PositionComponent positionComponent) =>
             {
                 if (Camera.main == null)
+                {
                     return;
+                }
 
                 if (inputComponent.MouseButtonClicked == 1
                      && !EventSystem.current.IsPointerOverGameObject())
@@ -44,27 +46,34 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     {
                         var targetPosition = new float2(raycastHit.transform.position.x, raycastHit.transform.position.y);
                         if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                        {
                             return;
+                        }
 
                         var targetEntity = (raycastHit.transform.GetComponent<GameObjectEntity>()
                                             ?? raycastHit.transform.GetComponentInParent<GameObjectEntity>()).Entity;
 
                         if (!this.EntityManager.HasComponent<TargetComponent>(entity))
+                        {
                             this.PostUpdateCommands.AddComponent(entity,
                                 new TargetComponent
                                 {
                                     Target = targetEntity
                                 });
+                        }
                         else
+                        {
                             this.PostUpdateCommands.SetComponent(entity,
                                 new TargetComponent
                                 {
                                     Target = targetEntity
                                 });
+                        }
                     }
                     else if (this.EntityManager.HasComponent<TargetComponent>(entity))
+                    {
                         this.PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
-
+                    }
                 }
                 else if (inputComponent.SelectTargetButtonPressed == 1)
                 {
@@ -94,7 +103,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                             {
                                 var targetPosition = new float2(collider.transform.position.x, collider.transform.position.y);
                                 if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                                {
                                     continue;
+                                }
 
                                 var targetEntity = (collider.GetComponent<GameObjectEntity>()
                                             ?? collider.GetComponentInParent<GameObjectEntity>()).Entity;
@@ -117,7 +128,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                             {
                                 var targetPosition = new float2(collider.transform.position.x, collider.transform.position.y);
                                 if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                                {
                                     continue;
+                                }
 
                                 var targetEntity = (collider.GetComponent<GameObjectEntity>()
                                                ?? collider.GetComponentInParent<GameObjectEntity>()).Entity;
@@ -147,7 +160,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     var targetPosition = this.EntityManager.GetComponentData<PositionComponent>(targetComponent.Target);
 
                     if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition.CurrentPosition))
+                    {
                         this.PostUpdateCommands.RemoveComponent<TargetComponent>(entity);
+                    }
                 }
             });
         }
@@ -161,8 +176,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                             distance, wallLayer);
 
             foreach (var hit in hits)
+            {
                 if (hit.transform.tag == "Wall")
+                {
                     return false;
+                }
+            }
 
             return true;
         }

@@ -19,7 +19,9 @@ namespace BeyondPixels.ColliderEvents
                 var entityManager = World.Active.EntityManager;
                 var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(spellEntity))
+                {
                     return;
+                }
 
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                              typeof(SpellCollisionComponent),
@@ -44,14 +46,16 @@ namespace BeyondPixels.ColliderEvents
                             SpellEntity = spellEntity,
                             DestroyOnImpact = entityManager.HasComponent<DestroyOnImpactComponent>(spellEntity) ? 1 : 0
                         });
-                this.totalTime = 0;                
-            } 
+                this.totalTime = 0;
+            }
             else if (collider.gameObject.CompareTag("Wall"))
             {
                 var entityManager = World.Active.EntityManager;
                 var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(spellEntity))
+                {
                     return;
+                }
 
                 if (entityManager.HasComponent<ThrowOnTargetComponent>(spellEntity))
                 {
@@ -70,7 +74,9 @@ namespace BeyondPixels.ColliderEvents
                     var entityManager = World.Active.EntityManager;
                     var spellEntity = this.GetComponent<GameObjectEntity>().Entity;
                     if (!entityManager.Exists(spellEntity))
+                    {
                         return;
+                    }
 
                     var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                                  typeof(SpellCollisionComponent),

@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Game;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Game

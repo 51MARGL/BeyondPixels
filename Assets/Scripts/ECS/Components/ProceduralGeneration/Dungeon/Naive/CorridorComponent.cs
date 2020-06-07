@@ -15,9 +15,15 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
             get
             {
                 if (this.Direction == Direction.Up || this.Direction == Direction.Down)
+                {
                     return this.StartX;
+                }
+
                 if (this.Direction == Direction.Left)
+                {
                     return this.StartX + this.Length - 1;
+                }
+
                 return this.StartX - this.Length + 1;
             }
         }
@@ -28,9 +34,15 @@ namespace BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.Naive
             get
             {
                 if (this.Direction == Direction.Left || this.Direction == Direction.Right)
+                {
                     return this.StartY;
+                }
+
                 if (this.Direction == Direction.Up)
+                {
                     return this.StartY + this.Length - 1;
+                }
+
                 return this.StartY - this.Length + 1;
             }
         }

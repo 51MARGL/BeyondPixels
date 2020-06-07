@@ -22,12 +22,12 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     ComponentType.ReadOnly(typeof(MovementComponent)),
                     typeof(UnityEngine.Transform),
                     typeof(SpellCastingComponent),
                     typeof(TargetComponent)
-                }
+}
             });
         }
 
@@ -35,20 +35,26 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
         {
             this.Entities.With(this._group).ForEach((Entity entity, Transform transform, ref SpellCastingComponent spellCastingComponent, ref TargetComponent targetComponent) =>
             {
-                if (!EntityManager.Exists(targetComponent.Target))
+                if (!this.EntityManager.Exists(targetComponent.Target))
+                {
                     return;
+                }
 
                 var spell = SpellBookManagerComponent.Instance.SpellBook.Spells[spellCastingComponent.SpellIndex];
                 if (spell.TargetRequired)
                 {
-                    var targetPosition = EntityManager.GetComponentObject<Transform>(targetComponent.Target).position;
+                    var targetPosition = this.EntityManager.GetComponentObject<Transform>(targetComponent.Target).position;
                     var direction = targetPosition - transform.position;
                     var scale = math.abs(transform.localScale.x);
 
                     if (direction.x < 0f)
+                    {
                         transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
+                    }
                     else if (direction.x > 0f)
+                    {
                         transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
+                    }
                 }
             });
         }

@@ -19,11 +19,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     ComponentType.ReadOnly(typeof(MovementComponent)),
                     typeof(UnityEngine.Transform),
                     typeof(UnityEngine.Rigidbody2D)
-                }
+}
             });
         }
 
@@ -41,9 +41,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
                     var scale = math.abs(transform.localScale.x);
                     if (velocity.x < 0f)
+                    {
                         transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
+                    }
                     else if (velocity.x > 0f)
+                    {
                         transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
+                    }
                 }
 
                 rigidbody.velocity = velocity;

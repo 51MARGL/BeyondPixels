@@ -8,47 +8,52 @@ namespace UnityEngine.AI
     public class NavMeshModifier : MonoBehaviour
     {
         [SerializeField]
-        bool m_OverrideArea;
-        public bool overrideArea { get { return m_OverrideArea; } set { m_OverrideArea = value; } }
+        private bool m_OverrideArea;
+        public bool overrideArea { get => this.m_OverrideArea; set => this.m_OverrideArea = value; }
 
         [SerializeField]
-        int m_Area;
-        public int area { get { return m_Area; } set { m_Area = value; } }
+        private int m_Area;
+        public int area { get => this.m_Area; set => this.m_Area = value; }
 
         [SerializeField]
-        bool m_IgnoreFromBuild;
-        public bool ignoreFromBuild { get { return m_IgnoreFromBuild; } set { m_IgnoreFromBuild = value; } }
+        private bool m_IgnoreFromBuild;
+        public bool ignoreFromBuild { get => this.m_IgnoreFromBuild; set => this.m_IgnoreFromBuild = value; }
 
         // List of agent types the modifier is applied for.
         // Special values: empty == None, m_AffectedAgents[0] =-1 == All.
         [SerializeField]
-        List<int> m_AffectedAgents = new List<int>(new int[] { -1 });    // Default value is All
+        private readonly List<int> m_AffectedAgents = new List<int>(new int[] { -1 });    // Default value is All
 
-        static readonly List<NavMeshModifier> s_NavMeshModifiers = new List<NavMeshModifier>();
+        private static readonly List<NavMeshModifier> s_NavMeshModifiers = new List<NavMeshModifier>();
 
-        public static List<NavMeshModifier> activeModifiers
-        {
-            get { return s_NavMeshModifiers; }
-        }
+        public static List<NavMeshModifier> activeModifiers => s_NavMeshModifiers;
 
-        void OnEnable()
+        private void OnEnable()
         {
             if (!s_NavMeshModifiers.Contains(this))
+            {
                 s_NavMeshModifiers.Add(this);
+            }
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             s_NavMeshModifiers.Remove(this);
         }
 
         public bool AffectsAgentType(int agentTypeID)
         {
-            if (m_AffectedAgents.Count == 0)
+            if (this.m_AffectedAgents.Count == 0)
+            {
                 return false;
-            if (m_AffectedAgents[0] == -1)
+            }
+
+            if (this.m_AffectedAgents[0] == -1)
+            {
                 return true;
-            return m_AffectedAgents.IndexOf(agentTypeID) != -1;
+            }
+
+            return this.m_AffectedAgents.IndexOf(agentTypeID) != -1;
         }
     }
 }

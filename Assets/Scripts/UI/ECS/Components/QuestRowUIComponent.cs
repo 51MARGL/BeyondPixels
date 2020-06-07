@@ -1,11 +1,15 @@
-﻿using System;
-using System.Text;
-using BeyondPixels.ECS.Components.Characters.Level;
+﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.UI.Buttons;
+
+using System;
+using System.Text;
+
 using TMPro;
+
 using Unity.Entities;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 

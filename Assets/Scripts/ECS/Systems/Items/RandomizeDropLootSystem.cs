@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Collections;
 using Unity.Entities;
 
@@ -42,7 +43,9 @@ namespace BeyondPixels.ECS.Systems.Items
         protected override void OnUpdate()
         {
             if (this._dropGroup.CalculateEntityCount() == 0)
+            {
                 return;
+            }
 
             var dropChunks = this._dropGroup.CreateArchetypeChunkArray(Allocator.TempJob);
 
@@ -51,15 +54,19 @@ namespace BeyondPixels.ECS.Systems.Items
                 var chunk = dropChunks[c];
                 var entities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
                 if (entities.Length > 0)
+                {
                     for (var i = 0; i < chunk.Count; i++)
                     {
                         var ownerEntity = entities[i];
                         this.Entities.With(this._lootGroup).ForEach((Entity itemEntity, ref PickedUpComponent pickedUpComponent) =>
                         {
-                            if (pickedUpComponent.Owner == ownerEntity && _random.NextInt(0, 100) < 85)
+                            if (pickedUpComponent.Owner == ownerEntity && this._random.NextInt(0, 100) < 85)
+                            {
                                 this.PostUpdateCommands.AddComponent(itemEntity, new DestroyComponent());
+                            }
                         });
                     }
+                }
             }
             dropChunks.Dispose();
         }

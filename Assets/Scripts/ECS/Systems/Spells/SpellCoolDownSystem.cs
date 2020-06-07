@@ -22,7 +22,9 @@ namespace BeyondPixels.ECS.Systems.Spells
             {
                 coolDownComponent.CoolDownTime -= this.DeltaTime;
                 if (coolDownComponent.CoolDownTime < 0)
+                {
                     this.CommandBuffer.RemoveComponent<CoolDownComponent>(index, entity);
+                }
             }
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;

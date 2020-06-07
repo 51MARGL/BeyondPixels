@@ -40,19 +40,25 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                  EnemyUIComponent enemyUIComponent) =>
             {
                 if (Camera.main == null)
+                {
                     return;
+                }
 
                 // if object is vissible by main camera
                 if (GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(Camera.main),
                                                     spriteRenderer.bounds))
                 {
                     if (!enemyUIComponent.Canvas.enabled)
+                    {
                         enemyUIComponent.Canvas.enabled = true;
+                    }
                 }
                 else
                 {
                     if (enemyUIComponent.Canvas.enabled)
+                    {
                         enemyUIComponent.Canvas.enabled = false;
+                    }
                 }
 
                 if (enemyUIComponent.Canvas.enabled)
@@ -60,9 +66,13 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                     //Canvas scale
                     var currentLocalScale = enemyUIComponent.Canvas.transform.localScale;
                     if (enemyUIComponent.transform.localScale.x < 0 && enemyUIComponent.Canvas.transform.localScale.x > 0)
+                    {
                         enemyUIComponent.Canvas.transform.localScale = new Vector3(-math.abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
+                    }
                     else if (enemyUIComponent.transform.localScale.x > 0 && enemyUIComponent.Canvas.transform.localScale.x < 0)
+                    {
                         enemyUIComponent.Canvas.transform.localScale = new Vector3(math.abs(currentLocalScale.x), currentLocalScale.y, currentLocalScale.z);
+                    }
 
                     // Heatlh 
                     var currentHealth = healthComponent.CurrentValue;
@@ -79,9 +89,13 @@ namespace BeyondPixels.UI.ECS.Systems.UI
                     this.Entities.With(this._playerGroup).ForEach((Entity playerEntity, ref TargetComponent targetComponent) =>
                     {
                         if (targetComponent.Target == entity)
+                        {
                             enemyUIComponent.TargettingCircle.SetActive(true);
+                        }
                         else
+                        {
                             enemyUIComponent.TargettingCircle.SetActive(false);
+                        }
                     });
                 }
             });

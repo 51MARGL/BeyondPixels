@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-
-using BeyondPixels.ECS.Components.Characters.Common;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Components.SaveGame;
+
+using System.Collections.Generic;
 
 using Unity.Entities;
 
@@ -21,9 +21,9 @@ namespace BeyondPixels.ECS.Systems.SaveGame
             this._saveGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(SaveGameComponent)
-                }
+}
             });
         }
 
@@ -50,6 +50,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                         ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
                     {
                         if (pickedUpComponent.Owner == playerEntity)
+                        {
                             playerData.ItemDataList.Add(new ItemData
                             {
                                 IsEquiped = this.EntityManager.HasComponent<EquipedComponent>(itemEntity),
@@ -67,6 +68,7 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                                                   this.EntityManager.GetComponentData<MagicStatModifierComponent>(itemEntity) :
                                                   new MagicStatModifierComponent(),
                             });
+                        }
                     });
 
                     playerData.QuestDataList = new List<QuestData>();
@@ -79,22 +81,24 @@ namespace BeyondPixels.ECS.Systems.SaveGame
                             QuestComponent = questComponent,
                             LevelComponent = this.EntityManager.GetComponentData<LevelComponent>(questEntity),
                             XPRewardComponent = this.EntityManager.GetComponentData<XPRewardComponent>(questEntity),
-                            IsDone = EntityManager.HasComponent<QuestDoneComponent>(questEntity),
-                            IsInvestigateQuest = EntityManager.HasComponent<InvestigateQuestComponent>(questEntity),
-                            IsDefeatQuest = EntityManager.HasComponent<DefeatQuestComponent>(questEntity),
-                            IsLevelUpQuest = EntityManager.HasComponent<LevelUpQuestComponent>(questEntity),
-                            IsLootQuest = EntityManager.HasComponent<LootQuestComponent>(questEntity),
-                            IsReleaseQuest = EntityManager.HasComponent<ReleaseQuestComponent>(questEntity),
-                            IsSpendQuest = EntityManager.HasComponent<SpendSkillPointQuestComponent>(questEntity),
+                            IsDone = this.EntityManager.HasComponent<QuestDoneComponent>(questEntity),
+                            IsInvestigateQuest = this.EntityManager.HasComponent<InvestigateQuestComponent>(questEntity),
+                            IsDefeatQuest = this.EntityManager.HasComponent<DefeatQuestComponent>(questEntity),
+                            IsLevelUpQuest = this.EntityManager.HasComponent<LevelUpQuestComponent>(questEntity),
+                            IsLootQuest = this.EntityManager.HasComponent<LootQuestComponent>(questEntity),
+                            IsReleaseQuest = this.EntityManager.HasComponent<ReleaseQuestComponent>(questEntity),
+                            IsSpendQuest = this.EntityManager.HasComponent<SpendSkillPointQuestComponent>(questEntity),
                             IsPickUpQuest = this.EntityManager.HasComponent<PickUpQuestComponent>(questEntity),
                             PickUpQuestComponent = this.EntityManager.HasComponent<PickUpQuestComponent>(questEntity) ?
                                                     this.EntityManager.GetComponentData<PickUpQuestComponent>(questEntity) :
-                                                    new PickUpQuestComponent()                            
+                                                    new PickUpQuestComponent()
                         });
                     });
                 });
                 if (playerData != null)
+                {
                     SaveGameManager.SaveData(playerData);
+                }
 
                 this.PostUpdateCommands.DestroyEntity(entity);
             });

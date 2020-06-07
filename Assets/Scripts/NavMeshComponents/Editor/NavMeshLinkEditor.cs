@@ -5,33 +5,31 @@ namespace UnityEditor.AI
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(NavMeshLink))]
-    class NavMeshLinkEditor : Editor
+    internal class NavMeshLinkEditor : Editor
     {
-        SerializedProperty m_AgentTypeID;
-        SerializedProperty m_Area;
-        SerializedProperty m_CostModifier;
-        SerializedProperty m_AutoUpdatePosition;
-        SerializedProperty m_Bidirectional;
-        SerializedProperty m_EndPoint;
-        SerializedProperty m_StartPoint;
-        SerializedProperty m_Width;
+        private SerializedProperty m_AgentTypeID;
+        private SerializedProperty m_Area;
+        private SerializedProperty m_CostModifier;
+        private SerializedProperty m_AutoUpdatePosition;
+        private SerializedProperty m_Bidirectional;
+        private SerializedProperty m_EndPoint;
+        private SerializedProperty m_StartPoint;
+        private SerializedProperty m_Width;
+        private static int s_SelectedID;
+        private static int s_SelectedPoint = -1;
+        private static Color s_HandleColor = new Color(255f, 167f, 39f, 210f) / 255;
+        private static Color s_HandleColorDisabled = new Color(255f * 0.75f, 167f * 0.75f, 39f * 0.75f, 100f) / 255;
 
-        static int s_SelectedID;
-        static int s_SelectedPoint = -1;
-
-        static Color s_HandleColor = new Color(255f, 167f, 39f, 210f) / 255;
-        static Color s_HandleColorDisabled = new Color(255f * 0.75f, 167f * 0.75f, 39f * 0.75f, 100f) / 255;
-
-        void OnEnable()
+        private void OnEnable()
         {
-            m_AgentTypeID = serializedObject.FindProperty("m_AgentTypeID");
-            m_Area = serializedObject.FindProperty("m_Area");
-            m_CostModifier = serializedObject.FindProperty("m_CostModifier");
-            m_AutoUpdatePosition = serializedObject.FindProperty("m_AutoUpdatePosition");
-            m_Bidirectional = serializedObject.FindProperty("m_Bidirectional");
-            m_EndPoint = serializedObject.FindProperty("m_EndPoint");
-            m_StartPoint = serializedObject.FindProperty("m_StartPoint");
-            m_Width = serializedObject.FindProperty("m_Width");
+            this.m_AgentTypeID = this.serializedObject.FindProperty("m_AgentTypeID");
+            this.m_Area = this.serializedObject.FindProperty("m_Area");
+            this.m_CostModifier = this.serializedObject.FindProperty("m_CostModifier");
+            this.m_AutoUpdatePosition = this.serializedObject.FindProperty("m_AutoUpdatePosition");
+            this.m_Bidirectional = this.serializedObject.FindProperty("m_Bidirectional");
+            this.m_EndPoint = this.serializedObject.FindProperty("m_EndPoint");
+            this.m_StartPoint = this.serializedObject.FindProperty("m_StartPoint");
+            this.m_Width = this.serializedObject.FindProperty("m_Width");
 
             s_SelectedID = 0;
             s_SelectedPoint = -1;
@@ -39,17 +37,17 @@ namespace UnityEditor.AI
             NavMeshVisualizationSettings.showNavigation++;
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             NavMeshVisualizationSettings.showNavigation--;
         }
 
-        static Matrix4x4 UnscaledLocalToWorldMatrix(Transform t)
+        private static Matrix4x4 UnscaledLocalToWorldMatrix(Transform t)
         {
             return Matrix4x4.TRS(t.position, t.rotation, Vector3.one);
         }
 
-        void AlignTransformToEndPoints(NavMeshLink navLink)
+        private void AlignTransformToEndPoints(NavMeshLink navLink)
         {
             var mat = UnscaledLocalToWorldMatrix(navLink.transform);
 
@@ -73,19 +71,19 @@ namespace UnityEditor.AI
 
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
+            this.serializedObject.Update();
 
-            NavMeshComponentsGUIUtility.AgentTypePopup("Agent Type", m_AgentTypeID);
+            NavMeshComponentsGUIUtility.AgentTypePopup("Agent Type", this.m_AgentTypeID);
             EditorGUILayout.Space();
 
-            EditorGUILayout.PropertyField(m_StartPoint);
-            EditorGUILayout.PropertyField(m_EndPoint);
+            EditorGUILayout.PropertyField(this.m_StartPoint);
+            EditorGUILayout.PropertyField(this.m_EndPoint);
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(EditorGUIUtility.labelWidth);
             if (GUILayout.Button("Swap"))
             {
-                foreach (NavMeshLink navLink in targets)
+                foreach (NavMeshLink navLink in this.targets)
                 {
                     var tmp = navLink.startPoint;
                     navLink.startPoint = navLink.endPoint;
@@ -95,36 +93,36 @@ namespace UnityEditor.AI
             }
             if (GUILayout.Button("Align Transform"))
             {
-                foreach (NavMeshLink navLink in targets)
+                foreach (NavMeshLink navLink in this.targets)
                 {
                     Undo.RecordObject(navLink.transform, "Align Transform to End Points");
                     Undo.RecordObject(navLink, "Align Transform to End Points");
-                    AlignTransformToEndPoints(navLink);
+                    this.AlignTransformToEndPoints(navLink);
                 }
                 SceneView.RepaintAll();
             }
             GUILayout.EndHorizontal();
             EditorGUILayout.Space();
 
-            EditorGUILayout.PropertyField(m_Width);
-            EditorGUILayout.PropertyField(m_CostModifier);
-            EditorGUILayout.PropertyField(m_AutoUpdatePosition);
-            EditorGUILayout.PropertyField(m_Bidirectional);
+            EditorGUILayout.PropertyField(this.m_Width);
+            EditorGUILayout.PropertyField(this.m_CostModifier);
+            EditorGUILayout.PropertyField(this.m_AutoUpdatePosition);
+            EditorGUILayout.PropertyField(this.m_Bidirectional);
 
-            NavMeshComponentsGUIUtility.AreaPopup("Area Type", m_Area);
+            NavMeshComponentsGUIUtility.AreaPopup("Area Type", this.m_Area);
 
-            serializedObject.ApplyModifiedProperties();
+            this.serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
         }
 
-        static Vector3 CalcLinkRight(NavMeshLink navLink)
+        private static Vector3 CalcLinkRight(NavMeshLink navLink)
         {
             var dir = navLink.endPoint - navLink.startPoint;
             return (new Vector3(-dir.z, 0.0f, dir.x)).normalized;
         }
 
-        static void DrawLink(NavMeshLink navLink)
+        private static void DrawLink(NavMeshLink navLink)
         {
             var right = CalcLinkRight(navLink);
             var rad = navLink.width * 0.5f;
@@ -136,14 +134,18 @@ namespace UnityEditor.AI
         }
 
         [DrawGizmo(GizmoType.Selected | GizmoType.Active | GizmoType.Pickable)]
-        static void RenderBoxGizmo(NavMeshLink navLink, GizmoType gizmoType)
+        private static void RenderBoxGizmo(NavMeshLink navLink, GizmoType gizmoType)
         {
             if (!EditorApplication.isPlaying)
+            {
                 navLink.UpdateLink();
+            }
 
             var color = s_HandleColor;
             if (!navLink.enabled)
+            {
                 color = s_HandleColorDisabled;
+            }
 
             var oldColor = Gizmos.color;
             var oldMatrix = Gizmos.matrix;
@@ -160,13 +162,15 @@ namespace UnityEditor.AI
         }
 
         [DrawGizmo(GizmoType.NotInSelectionHierarchy | GizmoType.Pickable)]
-        static void RenderBoxGizmoNotSelected(NavMeshLink navLink, GizmoType gizmoType)
+        private static void RenderBoxGizmoNotSelected(NavMeshLink navLink, GizmoType gizmoType)
         {
             if (NavMeshVisualizationSettings.showNavigation > 0)
             {
                 var color = s_HandleColor;
                 if (!navLink.enabled)
+                {
                     color = s_HandleColorDisabled;
+                }
 
                 var oldColor = Gizmos.color;
                 var oldMatrix = Gizmos.matrix;
@@ -185,9 +189,11 @@ namespace UnityEditor.AI
 
         public void OnSceneGUI()
         {
-            var navLink = (NavMeshLink)target;
+            var navLink = (NavMeshLink)this.target;
             if (!navLink.enabled)
+            {
                 return;
+            }
 
             var mat = UnscaledLocalToWorldMatrix(navLink.transform);
 
@@ -266,14 +272,16 @@ namespace UnityEditor.AI
         }
 
         [MenuItem("GameObject/AI/NavMesh Link", false, 2002)]
-        static public void CreateNavMeshLink(MenuCommand menuCommand)
+        public static void CreateNavMeshLink(MenuCommand menuCommand)
         {
             var parent = menuCommand.context as GameObject;
-            GameObject go = NavMeshComponentsGUIUtility.CreateAndSelectGameObject("NavMesh Link", parent);
+            var go = NavMeshComponentsGUIUtility.CreateAndSelectGameObject("NavMesh Link", parent);
             go.AddComponent<NavMeshLink>();
             var view = SceneView.lastActiveSceneView;
             if (view != null)
+            {
                 view.MoveToView(go.transform);
+            }
         }
     }
 }

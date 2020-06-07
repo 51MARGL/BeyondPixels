@@ -19,10 +19,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(HealthComponent),
                     typeof(PositionComponent), typeof(KilledComponent)
-                }
+}
             });
         }
 

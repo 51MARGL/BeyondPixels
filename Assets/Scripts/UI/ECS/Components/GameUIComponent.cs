@@ -1,6 +1,6 @@
-﻿using System;
+﻿using BeyondPixels.UI.Buttons;
 
-using BeyondPixels.UI.Buttons;
+using System;
 
 using TMPro;
 

@@ -21,11 +21,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                                 [ReadOnly] ref CharacterComponent evadeComponent)
             {
                 if (input.AttackButtonPressed == 1)
+                {
                     this.CommandBuffer.AddComponent(index, entity,
                         new AttackComponent
                         {
                             CurrentComboIndex = 0
                         });
+                }
             }
         }
 
@@ -42,7 +44,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             {
                 // hard coded number of attacks
                 if (input.AttackButtonPressed == 1)
+                {
                     attackComponent.CurrentComboIndex = (attackComponent.CurrentComboIndex + 1) % 2;
+                }
             }
         }
 

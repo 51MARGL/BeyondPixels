@@ -1,7 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
+
 using Unity.Entities;
 
 using UnityEngine;

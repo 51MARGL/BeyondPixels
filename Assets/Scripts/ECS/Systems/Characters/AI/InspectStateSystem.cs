@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.AI;
 using BeyondPixels.ECS.Components.Characters.Common;
+
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -57,9 +58,13 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     }
 
                     if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
+                    {
                         movementComponent.Direction = float2.zero;
+                    }
                     else
+                    {
                         movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                    }
                 }
                 else
                 {

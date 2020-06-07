@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -36,12 +37,14 @@ namespace BeyondPixels.ECS.Systems.Spells
                     var entities = chunk.GetNativeArray(this.EntityType);
                     var positionComponents = chunk.GetNativeArray(this.PositionComponentType);
                     for (var i = 0; i < chunk.Count; i++)
+                    {
                         if (entities[i] == this.TargetRequiredComponents[index].Target)
                         {
                             transform.position =
                                 new Vector3(positionComponents[i].CurrentPosition.x,
                                             positionComponents[i].CurrentPosition.y, 0f);
                         }
+                    }
                 }
             }
         }

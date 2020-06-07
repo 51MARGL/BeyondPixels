@@ -15,9 +15,9 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             this._targetGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(CollisionInfo), typeof(AggroRangeCollisionComponent)
-                }
+}
             });
         }
 
@@ -30,14 +30,19 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 {
                     case EventType.TriggerEnter:
                         if (!this.EntityManager.HasComponent<FollowStateComponent>(collisionInfo.Sender))
+                        {
                             senderTargetSet.TryAdd(collisionInfo.Sender, collisionInfo.Target);
+                        }
+
                         break;
                     case EventType.TriggerExit:
                         if (this.EntityManager.HasComponent<FollowStateComponent>(collisionInfo.Sender))
                         {
                             var followStateComponent = this.EntityManager.GetComponentData<FollowStateComponent>(collisionInfo.Sender);
                             if (followStateComponent.Target == collisionInfo.Target)
+                            {
                                 this.PostUpdateCommands.RemoveComponent<FollowStateComponent>(collisionInfo.Sender);
+                            }
                         }
                         break;
                 }
@@ -50,10 +55,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 for (var i = 0; i < keys.Length; i++)
                 {
                     if (senderTargetSet.TryGetValue(keys[i], out var target))
+                    {
                         this.PostUpdateCommands.AddComponent(keys[i], new FollowStateComponent
                         {
                             Target = target
                         });
+                    }
                 }
             }
             senderTargetSet.Dispose();

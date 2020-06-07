@@ -9,7 +9,9 @@ namespace BeyondPixels.ColliderEvents
         protected virtual void OnTriggerEnter2D(Collider2D collider)
         {
             if (collider.gameObject.CompareTag("Player"))
+            {
                 this.GameObject.SetActive(false);
+            }
         }
     }
 }

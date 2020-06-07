@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -18,7 +19,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                                   + magicStatComponent.PerPointValue
                                   * (magicStatComponent.PointsSpent - 1);
                 if (magicStatComponent.CurrentValue != properValue)
+                {
                     magicStatComponent.CurrentValue = properValue;
+                }
             }
         }
 

@@ -54,6 +54,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             {
                 var cellList = new NativeList<PoissonCellComponent>(Allocator.Temp);
                 for (var y = 0; y < boardSize.y; y++)
+                {
                     for (var x = 0; x < boardSize.x; x++)
                     {
                         var validationIndex = this.GetValidationIndex(y * boardSize.x + x, boardSize, radius);
@@ -64,6 +65,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                             RequestID = SystemRequestID
                         });
                     }
+                }
 
                 return cellList;
             }
@@ -81,7 +83,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     && this.Tiles[(tile.Position.y + 1) * boardSize.x + tile.Position.x].TileType == TileType.Wall
                     && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x + 1].TileType == TileType.Wall
                     && this.Tiles[tile.Position.y * boardSize.x + tile.Position.x - 1].TileType == TileType.Wall)
+                {
                     return -1;
+                }
 
                 return -2;
             }
@@ -104,7 +108,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
             public void Execute(Entity entity, int index, [ReadOnly] ref SampleComponent sampleComponent)
             {
                 if (sampleComponent.RequestID == SystemRequestID)
+                {
                     this.CommandBuffer.DestroyEntity(index, entity);
+                }
             }
         }
 
@@ -159,7 +165,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             if (this._boardSpawnInitGroup.CalculateEntityCount() > 0)
+            {
                 return this.SetupValidationGrid(inputDeps);
+            }
 
             if (this._boardSpawnReadyGroup.CalculateEntityCount() > 0)
             {
@@ -168,8 +176,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                     var samplesArray = this._samplesGroup.ToComponentDataArray<SampleComponent>(Allocator.TempJob);
                     var samplesList = new NativeList<SampleComponent>(Allocator.TempJob);
                     for (var i = 0; i < samplesArray.Length; i++)
+                    {
                         if (samplesArray[i].RequestID == SystemRequestID)
+                        {
                             samplesList.Add(samplesArray[i]);
+                        }
+                    }
 
                     var tagBoardDoneJobHandle = new TagBoardDoneJob
                     {
@@ -185,7 +197,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
 
                     inputDeps.Complete();
                     for (var i = 0; i < samplesList.Length; i++)
+                    {
                         this.InstantiateExit(samplesList[i].Position);
+                    }
 
                     samplesArray.Dispose();
                     samplesList.Dispose();
@@ -214,8 +228,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning.PoissonDiscSamp
                 new Vector3(position.x + 0.5f, position.y + 0.75f, 0), Quaternion.identity);
 
             var entity = exit.GetComponent<GameObjectEntity>().Entity;
-            EntityManager.AddComponentData(entity, new LevelExitComponent());
-            EntityManager.AddComponentData(entity, new PositionComponent {
+            this.EntityManager.AddComponentData(entity, new LevelExitComponent());
+            this.EntityManager.AddComponentData(entity, new PositionComponent
+            {
                 CurrentPosition = position,
                 InitialPosition = position
             });

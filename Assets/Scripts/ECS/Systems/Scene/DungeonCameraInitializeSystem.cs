@@ -21,13 +21,13 @@ namespace BeyondPixels.ECS.Systems.Scenes
             this._boardCameraGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(FinalBoardComponent)
-                },
+},
                 None = new ComponentType[]
-                {
+{
                     typeof(BoardCameraInitializedComponent)
-                }
+}
             });
         }
 

@@ -13,9 +13,9 @@ namespace BeyondPixels.ECS.Systems.SaveGame
             this._deleteGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(DeleteSaveComponent)
-                }
+}
             });
         }
 

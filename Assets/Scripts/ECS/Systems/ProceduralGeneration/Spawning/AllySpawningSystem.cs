@@ -19,9 +19,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning
             this._spawnGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(SpawnAllyComponent)
-                }
+}
             });
         }
 

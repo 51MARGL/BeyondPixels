@@ -13,13 +13,17 @@ namespace BeyondPixels.ColliderEvents
         {
             var entityManager = World.Active.EntityManager;
             if (!entityManager.Exists(this.GetComponentInParent<GameObjectEntity>().Entity))
+            {
                 return;
+            }
 
             if (collider.CompareTag("Enemy") || collider.CompareTag("Ally"))
             {
                 var target = collider.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(target) || !entityManager.HasComponent<Disabled>(target))
+                {
                     return;
+                }
 
                 var eventEntity = entityManager.CreateEntity(typeof(EntityEnableComponent));
 
@@ -29,20 +33,26 @@ namespace BeyondPixels.ColliderEvents
                 });
             }
             else if (collider.CompareTag("Light"))
+            {
                 collider.GetComponent<Light2D>().enabled = true;
+            }
         }
 
         private void OnTriggerExit2D(Collider2D collider)
         {
             var entityManager = World.Active.EntityManager;
             if (!entityManager.Exists(this.GetComponentInParent<GameObjectEntity>().Entity))
+            {
                 return;
+            }
 
             if (collider.CompareTag("Enemy") || collider.CompareTag("Ally"))
             {
                 var target = collider.GetComponent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(target) || entityManager.HasComponent<Disabled>(target))
+                {
                     return;
+                }
 
                 var eventEntity = entityManager.CreateEntity(typeof(EntityDisableComponent));
 
@@ -52,7 +62,9 @@ namespace BeyondPixels.ColliderEvents
                 });
             }
             else if (collider.CompareTag("Light"))
+            {
                 collider.GetComponent<Light2D>().enabled = false;
+            }
         }
     }
 }

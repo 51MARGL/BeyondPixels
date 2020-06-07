@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using BeyondPixels.ECS.Components.Scenes;
+﻿using BeyondPixels.ECS.Components.Scenes;
+
 using Unity.Entities;
 
 namespace BeyondPixels.UI.ECS.Systems

@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Systems.Objects;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;

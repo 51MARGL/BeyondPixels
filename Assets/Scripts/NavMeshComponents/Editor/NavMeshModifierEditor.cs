@@ -4,46 +4,46 @@ namespace UnityEditor.AI
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(NavMeshModifier))]
-    class NavMeshModifierEditor : Editor
+    internal class NavMeshModifierEditor : Editor
     {
-        SerializedProperty m_AffectedAgents;
-        SerializedProperty m_Area;
-        SerializedProperty m_IgnoreFromBuild;
-        SerializedProperty m_OverrideArea;
+        private SerializedProperty m_AffectedAgents;
+        private SerializedProperty m_Area;
+        private SerializedProperty m_IgnoreFromBuild;
+        private SerializedProperty m_OverrideArea;
 
-        void OnEnable()
+        private void OnEnable()
         {
-            m_AffectedAgents = serializedObject.FindProperty("m_AffectedAgents");
-            m_Area = serializedObject.FindProperty("m_Area");
-            m_IgnoreFromBuild = serializedObject.FindProperty("m_IgnoreFromBuild");
-            m_OverrideArea = serializedObject.FindProperty("m_OverrideArea");
+            this.m_AffectedAgents = this.serializedObject.FindProperty("m_AffectedAgents");
+            this.m_Area = this.serializedObject.FindProperty("m_Area");
+            this.m_IgnoreFromBuild = this.serializedObject.FindProperty("m_IgnoreFromBuild");
+            this.m_OverrideArea = this.serializedObject.FindProperty("m_OverrideArea");
 
             NavMeshVisualizationSettings.showNavigation++;
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             NavMeshVisualizationSettings.showNavigation--;
         }
 
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
+            this.serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_IgnoreFromBuild);
+            EditorGUILayout.PropertyField(this.m_IgnoreFromBuild);
 
-            EditorGUILayout.PropertyField(m_OverrideArea);
-            if (m_OverrideArea.boolValue)
+            EditorGUILayout.PropertyField(this.m_OverrideArea);
+            if (this.m_OverrideArea.boolValue)
             {
                 EditorGUI.indentLevel++;
-                NavMeshComponentsGUIUtility.AreaPopup("Area Type", m_Area);
+                NavMeshComponentsGUIUtility.AreaPopup("Area Type", this.m_Area);
                 EditorGUI.indentLevel--;
             }
 
-            NavMeshComponentsGUIUtility.AgentMaskPopup("Affected Agents", m_AffectedAgents);
+            NavMeshComponentsGUIUtility.AgentMaskPopup("Affected Agents", this.m_AffectedAgents);
             EditorGUILayout.Space();
 
-            serializedObject.ApplyModifiedProperties();
+            this.serializedObject.ApplyModifiedProperties();
         }
     }
 }

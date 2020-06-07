@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Entities;
 
 namespace BeyondPixels.UI.ECS.Components

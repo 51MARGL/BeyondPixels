@@ -21,12 +21,12 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     ComponentType.ReadOnly(typeof(MovementComponent)),
                     typeof(UnityEngine.Transform),
                     typeof(SpellCastingComponent),
                     typeof(FollowStateComponent)
-                }
+}
             });
         }
 
@@ -37,16 +37,22 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                                                     ref FollowStateComponent followStateComponent) =>
             {
                 if (!this.EntityManager.Exists(followStateComponent.Target))
+                {
                     return;
-                
+                }
+
                 var targetPosition = this.EntityManager.GetComponentObject<Transform>(followStateComponent.Target).position;
                 var direction = targetPosition - transform.position;
                 var scale = math.abs(transform.localScale.x);
 
                 if (direction.x < 0f)
+                {
                     transform.localScale = new Vector3(-scale, transform.localScale.y, transform.localScale.z);
+                }
                 else if (direction.x > 0f)
+                {
                     transform.localScale = new Vector3(scale, transform.localScale.y, transform.localScale.z);
+                }
             });
         }
     }

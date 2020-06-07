@@ -25,7 +25,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         {
             var nodesArray = new NativeArray<NodeComponent>((int)math.pow(2, this.Height) - 1, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             for (var i = 0; i < nodesArray.Length; i++)
+            {
                 nodesArray[i] = new NodeComponent { IsNull = 1 };
+            }
 
             this.MapToArray(this.Root, nodesArray, 0);
             return nodesArray;
@@ -34,13 +36,20 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
         private void MapToArray(BSPNode node, NativeArray<NodeComponent> array, int index)
         {
             if (node == null)
+            {
                 return;
+            }
 
             array[index] = node.NodeComponent;
             if (node.LeftChild != null)
+            {
                 this.MapToArray(node.LeftChild, array, 2 * index + 1);
+            }
+
             if (node.RightChild != null)
+            {
                 this.MapToArray(node.RightChild, array, 2 * index + 2);
+            }
         }
 
         public class BSPNode
@@ -58,7 +67,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             public int TreeHeight()
             {
                 return 1 + math.max(this.LeftChild?.TreeHeight() ?? 0,
-                                    this.RightChild?.TreeHeight() ?? 0);
+               this.RightChild?.TreeHeight() ?? 0);
             }
 
             public void SplitNode(ref Random random)
@@ -74,11 +83,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
 
                 bool splitHorizontal;
                 if (rectBounds.w / (float)rectBounds.z > 1)
+                {
                     splitHorizontal = false;
+                }
                 else if (rectBounds.z / (float)rectBounds.w >= 1)
+                {
                     splitHorizontal = true;
+                }
                 else
+                {
                     splitHorizontal = random.NextBool();
+                }
 
                 if (splitHorizontal)
                 {

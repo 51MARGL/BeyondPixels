@@ -1,8 +1,6 @@
-﻿using BeyondPixels.ECS.Components.Characters.Level;
-using BeyondPixels.ECS.Components.Game;
-using BeyondPixels.ECS.Components.Items;
+﻿using BeyondPixels.ECS.Components.Game;
+
 using TMPro;
-using Unity.Entities;
 
 using UnityEngine;
 
@@ -22,7 +20,7 @@ namespace BeyondPixels.ColliderEvents
                 this.Canvas.enabled = true;
                 this.IsInside = true;
 
-                this.Text.text = "Press " 
+                this.Text.text = "Press "
                     + SettingsManager.Instance.GetKeyBindValue(KeyBindName.Use).ToString();
             }
         }

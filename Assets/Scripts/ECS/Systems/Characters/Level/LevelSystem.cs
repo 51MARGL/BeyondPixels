@@ -19,7 +19,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
                                 [ReadOnly] ref XPComponent xpComponent)
             {
                 if (xpComponent.CurrentXP >= levelComponent.NextLevelXP)
+                {
                     this.CommandBuffer.AddComponent(index, entity, new LevelUpComponent());
+                }
             }
         }
 

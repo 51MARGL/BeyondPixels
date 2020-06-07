@@ -1,6 +1,7 @@
-﻿using System;
-using BeyondPixels.UI;
+﻿using BeyondPixels.UI;
 using BeyondPixels.Utilities;
+
+using System;
 
 using Unity.Entities;
 using Unity.Mathematics;

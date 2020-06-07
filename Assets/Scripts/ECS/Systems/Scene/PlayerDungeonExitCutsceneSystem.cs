@@ -59,7 +59,9 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 desiredPosition.y -= 1f;
 
                 if (!this.EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                {
                     this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                }
 
                 var movementComponent = this.EntityManager.GetComponentData<MovementComponent>(playerEntity);
                 if (math.abs(playerPosition.x - desiredPosition.x) > 0.1f
@@ -73,7 +75,9 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 this.PostUpdateCommands.SetComponent(playerEntity, movementComponent);
 
                 if (!director.enabled)
+                {
                     director.enabled = true;
+                }
 
                 void onStop(PlayableDirector aDirector)
                 {

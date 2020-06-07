@@ -1,4 +1,5 @@
 ﻿using System;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -18,7 +19,9 @@ namespace BeyondPixels.UI.Buttons
         public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)
+            {
                 this.OnSubmitEvent?.Invoke();
+            }
         }
 
         public virtual void OnCancel(BaseEventData eventData)
@@ -34,7 +37,9 @@ namespace BeyondPixels.UI.Buttons
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
             if (!EventSystem.current.alreadySelecting)
+            {
                 EventSystem.current.SetSelectedGameObject(this.gameObject);
+            }
         }
     }
 }

@@ -25,21 +25,27 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             {
                 var random = new Unity.Mathematics.Random((uint)index + 1);
                 if (this.CurrentTime - idleStateComponent.StartedAt < random.NextInt(10, 50) / 10f)
+                {
                     return;
+                }
 
                 this.CommandBuffer.RemoveComponent(index, entity, typeof(IdleStateComponent));
                 if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) < 1)
+                {
                     this.CommandBuffer.AddComponent(index, entity,
                         new InspectStateComponent
                         {
                             StartedAt = CurrentTime
                         });
+                }
                 else
+                {
                     this.CommandBuffer.AddComponent(index, entity,
                         new EvadeStateComponent
                         {
                             StartedAt = CurrentTime
                         });
+                }
             }
         }
 

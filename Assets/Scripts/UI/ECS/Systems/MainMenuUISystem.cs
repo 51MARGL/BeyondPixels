@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.UI.ECS.Components;
+
 using Unity.Entities;
 
 using UnityEngine;
@@ -69,7 +70,9 @@ namespace BeyondPixels.UI.ECS.Systems
             if (Input.GetKeyDown(KeyCode.Escape) && UIManager.Instance.MainMenu.InGameMenu)
             {
                 if (UIManager.Instance.CurrentYesNoDialog != null)
+                {
                     return;
+                }
 
                 if (UIManager.Instance.MainMenu.IgnoreEsc)
                 {

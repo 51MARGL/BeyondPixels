@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Spells;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -72,9 +73,13 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 navMeshAgent.SetDestination(dest);
 
                 if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
+                {
                     movementComponent.Direction = float2.zero;
+                }
                 else
+                {
                     movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                }
 
                 if (distance <= weaponComponent.MeleeAttackRange)
                 {
@@ -98,12 +103,16 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     var currentTime = Time.time;
 
                     if (currentTime - followStateComponent.LastTimeSpellChecked < weaponComponent.SpellCheckFrequency)
+                    {
                         return;
+                    }
 
                     followStateComponent.LastTimeSpellChecked = currentTime;
 
                     if (this._random.NextInt(0, 100) > weaponComponent.SpellCastChance)
+                    {
                         return;
+                    }
 
                     using (var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob))
                     using (var spellComponents = this._activeSpellGroup.ToComponentDataArray<ActiveSpellComponent>(Allocator.TempJob))

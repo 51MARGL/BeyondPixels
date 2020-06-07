@@ -1,7 +1,9 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.Quest;
+
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Systems
@@ -66,23 +68,27 @@ namespace BeyondPixels.UI.ECS.Systems
                 }
             }
 
-            if (_doneGroup.CalculateEntityCount() > 0)
+            if (this._doneGroup.CalculateEntityCount() > 0)
+            {
                 UIManager.Instance.GameUIComponent.QuestDoneMark.SetActive(true);
+            }
             else
+            {
                 UIManager.Instance.GameUIComponent.QuestDoneMark.SetActive(false);
+            }
 
             if (UIManager.Instance.QuestMenu.IsVisible)
             {
-                if (_activeGroup.CalculateEntityCount() == 0)
+                if (this._activeGroup.CalculateEntityCount() == 0)
                 {
                     UIManager.Instance.QuestMenu.Hide();
                     return;
                 }
 
                 var index = 0;
-                this.Entities.With(this._activeGroup).ForEach((Entity questEntity, 
+                this.Entities.With(this._activeGroup).ForEach((Entity questEntity,
                     QuestTextComponent questTextComponent, ref QuestComponent questComponent) =>
-                {                    
+                {
                     var row = UIManager.Instance.QuestMenu.QuestRows[index];
                     row.gameObject.SetActive(true);
                     row.QuestEntity = questEntity;
@@ -93,8 +99,10 @@ namespace BeyondPixels.UI.ECS.Systems
                     index++;
                 });
 
-                for (int i = index; i < UIManager.Instance.QuestMenu.QuestRows.Length; i++)
+                for (var i = index; i < UIManager.Instance.QuestMenu.QuestRows.Length; i++)
+                {
                     UIManager.Instance.QuestMenu.QuestRows[i].gameObject.SetActive(false);
+                }
             }
         }
     }

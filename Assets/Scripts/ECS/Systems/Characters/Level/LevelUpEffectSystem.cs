@@ -21,12 +21,13 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
             this._characterGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(LevelComponent), typeof(LevelUpComponent),
                     typeof(PositionComponent), typeof(PlayerComponent)
-                }
+}
             });
         }
+
         protected override void OnUpdate()
         {
             if (this._characterGroup.CalculateEntityCount() != 0)
@@ -34,9 +35,11 @@ namespace BeyondPixels.ECS.Systems.Characters.Level
                 var positions = this._characterGroup.ToComponentDataArray<PositionComponent>(Allocator.TempJob);
 
                 for (var i = 0; i < positions.Length; i++)
+                {
                     GameObject.Instantiate(PrefabManager.Instance.LevelUpEffectPrefab,
                                            new float3(positions[i].CurrentPosition.x, positions[i].CurrentPosition.y + 0.8f, 0),
                                            Quaternion.Euler(90, 0, 0));
+                }
 
                 positions.Dispose();
             }

@@ -1,7 +1,9 @@
-﻿using System.Linq;
-using BeyondPixels.ECS.Components.Game;
+﻿using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.Menus;
+
+using System.Linq;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +35,9 @@ namespace BeyondPixels.UI.ECS.Components
                 keyBindButton.OnSubmitEvent += () =>
                 {
                     if (this.PendingBindButton == null)
+                    {
                         this.SetKeyBind(keyBindButton);
+                    }
                 };
             }
 

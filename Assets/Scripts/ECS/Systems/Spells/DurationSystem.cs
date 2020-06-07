@@ -23,9 +23,13 @@ namespace BeyondPixels.ECS.Systems.Spells
                                 [ReadOnly] ref SpellComponent spellComponent)
             {
                 if (durationComponent.Duration < 0)
+                {
                     this.CommandBuffer.AddComponent(index, entity, new DestroyComponent());
+                }
                 else
+                {
                     durationComponent.Duration -= this.DeltaTime;
+                }
             }
         }
 

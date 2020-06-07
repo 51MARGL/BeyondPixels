@@ -45,7 +45,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
             this.Entities.With(this._playerCastGroup).ForEach((Entity playerEntity, ref InputComponent inputComponent) =>
             {
                 if (inputComponent.ActionButtonPressed == 0)
+                {
                     return;
+                }
 
                 var spellEntities = this._activeSpellGroup.ToEntityArray(Allocator.TempJob);
                 var spellComponents = this._activeSpellGroup.ToComponentDataArray<ActiveSpellComponent>(Allocator.TempJob);

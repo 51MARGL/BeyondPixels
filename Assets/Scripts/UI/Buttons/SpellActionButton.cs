@@ -1,13 +1,15 @@
-﻿using System;
-using System.Text;
-using BeyondPixels.ECS.Components.Characters.Stats;
+﻿using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.UI.ECS.Components;
+
+using System;
+using System.Text;
 
 using TMPro;
 
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -26,7 +28,9 @@ namespace BeyondPixels.UI.Buttons
             get
             {
                 if (this._spellIcon == null)
+                {
                     this._spellIcon = this.GetComponent<Image>();
+                }
 
                 return this._spellIcon;
             }
@@ -75,7 +79,7 @@ namespace BeyondPixels.UI.Buttons
                 var coolDown = math.max(3f, spell.CoolDown -
                             (spell.CoolDown / 500f * magicStatComponent.CurrentValue));
 
-                var damageOnImpact = spell.DamageOnImpact + 
+                var damageOnImpact = spell.DamageOnImpact +
                     (spell.DamageOnImpact / 100f * magicStatComponent.CurrentValue);
                 var damagePerSecond = spell.DamagePerSecond +
                     (spell.DamagePerSecond / 100f * magicStatComponent.CurrentValue);
@@ -96,7 +100,7 @@ namespace BeyondPixels.UI.Buttons
                     sb.Append(Environment.NewLine);
                 }
 
-                UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), "LMB: Cast"); 
+                UIManager.Instance.ShowTooltip(this.transform.position, header, sb.ToString(), "LMB: Cast");
             }
         }
 

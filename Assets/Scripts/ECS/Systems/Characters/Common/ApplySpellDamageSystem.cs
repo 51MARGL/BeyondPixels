@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ColliderEvents;
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -36,9 +37,14 @@ namespace BeyondPixels.ECS.Systems.Common
                     for (var i = 0; i < chunk.Count; i++)
                     {
                         if (entities[i] == collisionInfo.Target)
+                        {
                             targetType = characterComponents[i].CharacterType;
+                        }
+
                         if (entities[i] == collisionInfo.Sender)
+                        {
                             casterType = characterComponents[i].CharacterType;
+                        }
                     }
                 }
                 if ((targetType == casterType

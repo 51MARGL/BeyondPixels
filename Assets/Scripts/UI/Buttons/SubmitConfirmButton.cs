@@ -1,5 +1,7 @@
-﻿using System;
-using BeyondPixels.UI.ECS.Components;
+﻿using BeyondPixels.UI.ECS.Components;
+
+using System;
+
 using UnityEngine.EventSystems;
 
 namespace BeyondPixels.UI.Buttons
@@ -22,7 +24,9 @@ namespace BeyondPixels.UI.Buttons
             this.ConfirmDialog.OnCloseEvent += () =>
             {
                 if (!EventSystem.current.alreadySelecting)
+                {
                     EventSystem.current.SetSelectedGameObject(this.gameObject);
+                }
             };
 
             this.ConfirmDialog.Show();

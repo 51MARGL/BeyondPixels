@@ -19,14 +19,14 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
             this._evadeGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(MovementComponent), typeof(EvadeStateComponent),
                     typeof(PositionComponent), typeof(NavMeshAgent)
-                },
+},
                 None = new ComponentType[]
-                {
+{
                     typeof(AttackStateComponent), typeof(FollowStateComponent)
-                }
+}
             });
         }
 
@@ -40,14 +40,18 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 if (math.distance(positionComponent.CurrentPosition, positionComponent.InitialPosition) > 0.5f)
                 {
                     var curr = new Vector3(positionComponent.CurrentPosition.x, positionComponent.CurrentPosition.y, 0);
-                    var dest = new Vector3(positionComponent.InitialPosition.x, positionComponent.InitialPosition.y, 0);                    
+                    var dest = new Vector3(positionComponent.InitialPosition.x, positionComponent.InitialPosition.y, 0);
                     navMeshAgent.nextPosition = curr;
                     navMeshAgent.SetDestination(dest);
 
                     if (navMeshAgent.path.status != NavMeshPathStatus.PathComplete)
+                    {
                         movementComponent.Direction = float2.zero;
+                    }
                     else
+                    {
                         movementComponent.Direction = new float2(navMeshAgent.desiredVelocity.x, navMeshAgent.desiredVelocity.y);
+                    }
                 }
                 else
                 {

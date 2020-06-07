@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
+﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
 using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon.BSP;
 
 using Unity.Burst;
@@ -27,7 +25,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             public void Execute(int index)
             {
                 if (this.TreeArray[index].IsNull == 1 || this.TreeArray[index].IsLeaf == 0)
+                {
                     return;
+                }
 
                 var random = new Random((uint)(this.RandomSeed + index));
                 var node = this.TreeArray[index];
@@ -77,7 +77,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     || this.TreeArray[nodeIndex].IsLeaf == 1
                     || this.TreeArray[2 * nodeIndex + 1].IsNull == 1
                     || this.TreeArray[2 * nodeIndex + 2].IsNull == 1)
+                {
                     return;
+                }
 
                 var random = new Random((uint)(this.RandomSeed + index));
                 var leftRoomIndex = this.GetRoomIndex(2 * nodeIndex + 1, this.TreeArray.Length);
@@ -98,21 +100,31 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             public int GetRoomIndex(int index, int currentBest)
             {
                 if (index >= currentBest)
+                {
                     return currentBest;
+                }
 
                 var node = this.TreeArray[index];
                 if (node.IsLeaf == 1)
                 {
                     if (index < currentBest)
+                    {
                         return index;
+                    }
                     else
+                    {
                         return currentBest;
+                    }
                 }
                 if (this.TreeArray[2 * index + 1].IsNull == 0)
+                {
                     currentBest = this.GetRoomIndex(2 * index + 1, currentBest);
+                }
 
                 if (this.TreeArray[2 * index + 2].IsNull == 0)
+                {
                     currentBest = this.GetRoomIndex(2 * index + 2, currentBest);
+                }
 
                 return currentBest;
             }
@@ -129,8 +141,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             {
                 var index = 0;
                 while (this.CorridorsQueue.Count > 0)
+                {
                     if (this.CorridorsQueue.TryDequeue(out var corridor))
+                    {
                         this.CorridorsArray[index++] = corridor;
+                    }
+                }
             }
         }
 
@@ -158,26 +174,42 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 if (index % 2 == 0)
                 {
                     if (dx < 0)
+                    {
                         this.ConnectHorizontal(tileB.x, tileA.x, tileB.y);
+                    }
                     else
+                    {
                         this.ConnectHorizontal(tileA.x, tileB.x, tileA.y);
+                    }
 
                     if (dy < 0)
+                    {
                         this.ConnectVertical(tileB.y, tileA.y, tileB.x);
+                    }
                     else
+                    {
                         this.ConnectVertical(tileA.y, tileB.y, tileA.x);
+                    }
                 }
                 else
                 {
                     if (dy < 0)
+                    {
                         this.ConnectVertical(tileB.y, tileA.y, tileB.x);
+                    }
                     else
+                    {
                         this.ConnectVertical(tileA.y, tileB.y, tileA.x);
+                    }
 
                     if (dx < 0)
+                    {
                         this.ConnectHorizontal(tileB.x, tileA.x, tileB.y);
+                    }
                     else
+                    {
                         this.ConnectHorizontal(tileA.x, tileB.x, tileA.y);
+                    }
                 }
             }
 
@@ -217,7 +249,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             public void Execute(int index)
             {
                 if (this.TreeArray[index].IsNull == 1 || this.TreeArray[index].IsLeaf == 0)
+                {
                     return;
+                }
 
                 var currentRoom = this.TreeArray[index].Room;
                 for (var j = 0; j < currentRoom.Size.x; j++)
@@ -225,7 +259,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     var xCoord = currentRoom.X + j;
 
                     if (currentRoom.X == 0 || currentRoom.Y == 0)
+                    {
                         return;
+                    }
+
                     for (var k = 0; k < currentRoom.Size.y; k++)
                     {
                         var yCoord = currentRoom.Y + k;
@@ -254,7 +291,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 {
                     inconsistentTileDetected = false;
                     for (var y = 1; y < board.Size.y - 1; y++)
+                    {
                         for (var x = 1; x < board.Size.x - 1; x++)
+                        {
                             if (tiles[(y * tilesStride) + x] == TileType.Wall
                                 && ((tiles[(y * tilesStride) + x + 1] == TileType.Floor && tiles[(y * tilesStride) + x - 1] == TileType.Floor) // pattern -> -
                                     || (tiles[((y + 1) * tilesStride) + x] == TileType.Floor && tiles[((y - 1) * tilesStride) + x] == TileType.Floor) // pattern -> |
@@ -273,6 +312,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                                 tiles[(y * tilesStride) + x] = currentTile;
                                 inconsistentTileDetected = true;
                             }
+                        }
+                    }
                 }
             }
         }
@@ -299,6 +340,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                 if (this.IsBoardValid())
                 {
                     for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                    {
                         for (var x = 0; x < this.BoardComponent.Size.x; x++)
                         {
                             var entity = this.CommandBuffer.CreateEntity();
@@ -308,6 +350,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                                 Position = new int2(x, y)
                             });
                         }
+                    }
 
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
                     var finalBoardEntity = this.CommandBuffer.CreateEntity();
@@ -337,11 +380,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
             {
                 var freeTilesCount = 0;
                 for (var i = 0; i < this.Tiles.Length; i++)
+                {
                     if (this.Tiles[i] == TileType.Floor)
+                    {
                         freeTilesCount++;
+                    }
+                }
 
                 if (freeTilesCount < 50)
+                {
                     return false;
+                }
+
                 return true;
             }
         }
@@ -399,7 +449,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.BSP
                     {
                         this.Tiles = new NativeArray<TileType>(board.Size.x * board.Size.y, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                         for (var j = 0; j < this.Tiles.Length; j++)
+                        {
                             this.Tiles[j] = TileType.Wall;
+                        }
 
                         var bspTree = new BSPTree(board.Size.x, board.Size.y, board.MinRoomSize, ref random);
                         this.TreeArray = bspTree.ToNativeArray();

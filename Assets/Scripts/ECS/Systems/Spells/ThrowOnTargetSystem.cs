@@ -2,8 +2,10 @@
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Spells;
 using BeyondPixels.Utilities;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Spells
@@ -18,13 +20,13 @@ namespace BeyondPixels.ECS.Systems.Spells
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     ComponentType.ReadOnly(typeof(MovementComponent)),
                     typeof(PositionComponent),
                     typeof(ThrowOnTargetComponent),
                     typeof(TargetRequiredComponent),
                     typeof(Transform)
-                }
+}
             });
         }
 

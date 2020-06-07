@@ -3,9 +3,11 @@ using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.ECS.Components;
+
 using Unity.Entities;
 
 using UnityEngine;
+
 using static BeyondPixels.UI.ECS.Components.PlayerInfoMenuUIComponent;
 
 namespace BeyondPixels.UI.ECS.Systems

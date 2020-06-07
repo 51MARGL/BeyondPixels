@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using BeyondPixels.ECS.Components.Characters.Level;
+﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Game;
@@ -7,9 +6,13 @@ using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.ECS.Components;
+
+using System.Linq;
+
 using Unity.Entities;
 
 using UnityEngine;
+
 using static BeyondPixels.UI.ECS.Components.PlayerInfoMenuUIComponent;
 
 namespace BeyondPixels.UI.ECS.Systems
@@ -65,7 +68,9 @@ namespace BeyondPixels.UI.ECS.Systems
         protected override void OnUpdate()
         {
             if (this._playerGroup.CalculateEntityCount() == 0)
+            {
                 this._inventoryInitialized = false;
+            }
 
             this.Entities.With(this._playerGroup).ForEach((Entity playerEntity,
                 ref HealthStatComponent healthstatComponent,
@@ -128,9 +133,13 @@ namespace BeyondPixels.UI.ECS.Systems
                     this.LastItemsCount = -1;
 
                     if (eventComponent.MouseButton == 0)
+                    {
                         this.PostUpdateCommands.AddComponent(eventComponent.ItemEntity, new UseComponent());
+                    }
                     else if (eventComponent.MouseButton == 1)
+                    {
                         this.PostUpdateCommands.AddComponent(eventComponent.ItemEntity, new DestroyComponent());
+                    }
 
                     this.PostUpdateCommands.DestroyEntity(eventEntity);
                 });
@@ -164,12 +173,16 @@ namespace BeyondPixels.UI.ECS.Systems
             this.Entities.With(itemsGroup).ForEach((Entity itemEntity, ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
             {
                 if (pickedUpComponent.Owner != owner)
+                {
                     return;
+                }
 
                 var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
                 if (item.ItemType == ItemType.Gear)
+                {
                     this.SetUpGearButton(gearGroup.GearSlots.Where(slot => slot.GearType == item.GearType).First(),
                                          itemEntity, itemComponent);
+                }
             });
         }
 

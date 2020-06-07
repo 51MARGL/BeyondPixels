@@ -1,5 +1,7 @@
-﻿using System;
-using BeyondPixels.ECS.Components.Items;
+﻿using BeyondPixels.ECS.Components.Items;
+
+using System;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Components.Quest

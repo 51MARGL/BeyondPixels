@@ -7,6 +7,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 using UnityEngine;
+
 using static BeyondPixels.UI.ECS.Components.GameUIComponent;
 
 namespace BeyondPixels.UI.ECS.Systems

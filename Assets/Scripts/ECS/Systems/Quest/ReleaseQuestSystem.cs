@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Systems.ProceduralGeneration.Spawning;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Quest

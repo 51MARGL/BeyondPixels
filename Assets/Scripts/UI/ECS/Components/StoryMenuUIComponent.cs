@@ -1,8 +1,11 @@
-﻿using System.Collections;
-using BeyondPixels.ECS.Components.Scenes;
+﻿using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.Menus;
+
+using System.Collections;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,9 +62,13 @@ namespace BeyondPixels.UI.ECS.Components
                 this.CurrentSentence = this.StoryTellingComponent.Sentences.Dequeue();
 
                 if (this.CurrentSentence.Contains("Tip:"))
+                {
                     this.Background.color = new Color(0.3f, 0.3f, 0.3f);
+                }
                 else
+                {
                     this.Background.color = Color.black;
+                }
 
                 var chars = this.CurrentSentence.ToCharArray();
 

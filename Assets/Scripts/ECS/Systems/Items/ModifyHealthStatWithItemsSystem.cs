@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Systems.Characters.Stats;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -43,8 +44,12 @@ namespace BeyondPixels.ECS.Systems.Items
                     var itemComponents = chunk.GetNativeArray(this.ItemComponentType);
                     var pickedComponents = chunk.GetNativeArray(this.PickedUpComponentType);
                     for (var i = 0; i < chunk.Count; i++)
+                    {
                         if (pickedComponents[i].Owner == entity)
+                        {
                             modifier += modifierComponents[i].Value * itemComponents[i].Level;
+                        }
+                    }
                 }
 
                 var properValue = (statComponent.BaseValue
@@ -58,8 +63,9 @@ namespace BeyondPixels.ECS.Systems.Items
                         + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
 
                     if (healthComponent.CurrentValue > healthComponent.MaxValue)
+                    {
                         healthComponent.CurrentValue = healthComponent.MaxValue;
-
+                    }
                 }
             }
         }

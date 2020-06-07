@@ -1,5 +1,5 @@
 ﻿using Cinemachine;
-using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.Utilities

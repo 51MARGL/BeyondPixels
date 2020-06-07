@@ -16,22 +16,25 @@ namespace BeyondPixels.ECS.Systems.Objects
             this._particlesGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(ParticleSystem)
-                },
+},
                 None = new ComponentType[]
-                {
+{
                     typeof(DestroyComponent)
-                }
+}
             });
         }
+
         protected override void OnUpdate()
         {
             this.Entities.With(this._particlesGroup).ForEach((Entity entity, ParticleSystem particleSystem) =>
-            {
-                if (particleSystem != null && !particleSystem.IsAlive())
-                    this.PostUpdateCommands.AddComponent(entity, new DestroyComponent());
-            });
+           {
+               if (particleSystem != null && !particleSystem.IsAlive())
+               {
+                   this.PostUpdateCommands.AddComponent(entity, new DestroyComponent());
+               }
+           });
         }
     }
 }

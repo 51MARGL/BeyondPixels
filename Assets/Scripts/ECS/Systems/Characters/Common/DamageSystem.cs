@@ -2,11 +2,11 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Objects;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
-using Unity.Mathematics;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
 {
@@ -35,7 +35,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                     var entities = chunk.GetNativeArray(this.EntityType);
                     var healthComponents = chunk.GetNativeArray(this.HealthComponentType);
                     if (!chunk.Has(this.InCutsceneComponentType))
+                    {
                         for (var i = 0; i < chunk.Count; i++)
+                        {
                             if (entities[i] == collisionInfo.Target)
                             {
                                 var damageAmount = damageComponent.DamageAmount;
@@ -44,13 +46,19 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
 
                                 healthComponent.CurrentValue -= damageAmount;
                                 if (healthComponent.CurrentValue < 0)
+                                {
                                     healthComponent.CurrentValue = 0;
+                                }
                                 else if (healthComponent.CurrentValue > healthComponent.MaxValue)
+                                {
                                     healthComponent.CurrentValue = healthComponent.MaxValue;
+                                }
 
                                 healthComponents[i] = healthComponent;
                                 return;
                             }
+                        }
+                    }
                 }
             }
         }
@@ -63,7 +71,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                                 [ReadOnly] ref CollisionInfo collisionInfo,
                                 [ReadOnly] ref FinalDamageComponent damageComponent)
             {
-                CommandBuffer.DestroyEntity(index, entity);
+                this.CommandBuffer.DestroyEntity(index, entity);
             }
         }
 

@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using BeyondPixels.ECS.Components.Characters.Level;
+﻿using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.SceneBootstraps;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+
 using Unity.Collections;
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Quest
@@ -113,24 +116,43 @@ namespace BeyondPixels.ECS.Systems.Quest
         protected override void OnUpdate()
         {
             if (this._generateGroup.CalculateEntityCount() == 0)
+            {
                 return;
+            }
 
             var allowedArray = this._quests.ToList();
 
             this.Entities.With(this._activeGroup).ForEach((Entity activeEntity) =>
             {
                 if (this.EntityManager.HasComponent<DefeatQuestComponent>(activeEntity))
+                {
                     allowedArray.Remove("{Kill}");
+                }
+
                 if (this.EntityManager.HasComponent<PickUpQuestComponent>(activeEntity))
+                {
                     allowedArray.Remove("{Find}");
+                }
+
                 if (this.EntityManager.HasComponent<ReleaseQuestComponent>(activeEntity))
+                {
                     allowedArray.Remove("{Release}");
+                }
+
                 if (this.EntityManager.HasComponent<LootQuestComponent>(activeEntity))
+                {
                     allowedArray.Remove("{Loot}");
+                }
+
                 if (this.EntityManager.HasComponent<LevelUpQuestComponent>(activeEntity))
+                {
                     allowedArray.Remove("{LevelUp}");
+                }
+
                 if (this.EntityManager.HasComponent<SpendSkillPointQuestComponent>(activeEntity))
+                {
                     allowedArray.Remove("{SpendSkillPoint}");
+                }
             });
 
             var entities = this._generateGroup.ToEntityArray(Allocator.TempJob);
@@ -201,7 +223,10 @@ namespace BeyondPixels.ECS.Systems.Quest
             this.PostUpdateCommands.AddComponent(questEntity, new DefeatQuestComponent());
             var prTarget = this.AddProgressTarget(questEntity, ref template);
             if (prTarget > 1)
+            {
                 template += "s";
+            }
+
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
                 XPAmount = 7 * prTarget
@@ -215,7 +240,10 @@ namespace BeyondPixels.ECS.Systems.Quest
         {
             var prTarget = this.AddProgressTarget(questEntity, ref template);
             if (prTarget > 1)
+            {
                 template += "s";
+            }
+
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
                 XPAmount = 5 * prTarget
@@ -238,7 +266,10 @@ namespace BeyondPixels.ECS.Systems.Quest
             this.PostUpdateCommands.AddComponent(questEntity, new ReleaseQuestComponent());
             var prTarget = this.AddProgressTarget(questEntity, ref template);
             if (prTarget > 1)
+            {
                 template += "s";
+            }
+
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
                 XPAmount = 7 * prTarget
@@ -253,7 +284,10 @@ namespace BeyondPixels.ECS.Systems.Quest
             this.PostUpdateCommands.AddComponent(questEntity, new LootQuestComponent());
             var prTarget = this.AddProgressTarget(questEntity, ref template);
             if (prTarget > 1)
+            {
                 template += "s";
+            }
+
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
                 XPAmount = 5 * prTarget
@@ -268,7 +302,10 @@ namespace BeyondPixels.ECS.Systems.Quest
             this.PostUpdateCommands.AddComponent(questEntity, new LevelUpQuestComponent());
             var prTarget = this.AddProgressTarget(questEntity, ref template);
             if (prTarget > 1)
+            {
                 template += "s";
+            }
+
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
                 XPAmount = 10 * prTarget
@@ -283,7 +320,10 @@ namespace BeyondPixels.ECS.Systems.Quest
             this.PostUpdateCommands.AddComponent(questEntity, new SpendSkillPointQuestComponent());
             var prTarget = this.AddProgressTarget(questEntity, ref template);
             if (prTarget > 1)
+            {
                 template += "s";
+            }
+
             this.PostUpdateCommands.AddComponent(questEntity, new XPRewardComponent
             {
                 XPAmount = 5 * prTarget

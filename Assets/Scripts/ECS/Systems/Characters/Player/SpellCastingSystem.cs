@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
+
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -8,7 +9,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
     public class SpellCastingSystem : ComponentSystem
     {
         private EntityQuery _playerCastingGroup;
-        private EntityQuery _activeSpellGroup;
+        private readonly EntityQuery _activeSpellGroup;
 
         protected override void OnCreate()
         {
@@ -20,9 +21,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                     ComponentType.ReadOnly<SpellCastingComponent>()
                 },
                 None = new ComponentType[]
-                {
+{
                      ComponentType.ReadOnly<AttackComponent>()
-                }
+}
             });
         }
 

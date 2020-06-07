@@ -3,6 +3,7 @@ using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Scenes;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -16,10 +17,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
             this._group = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(HealthComponent), typeof(CharacterComponent),
                     typeof(PositionComponent), typeof(KilledComponent)
-                }
+}
             });
         }
 
@@ -36,8 +37,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                 else
                 {
                     this.PostUpdateCommands.AddComponent(entity, new DropLootComponent());
-                    if (EntityManager.HasComponent<XPRewardComponent>(entity))
+                    if (this.EntityManager.HasComponent<XPRewardComponent>(entity))
+                    {
                         this.PostUpdateCommands.AddComponent(entity, new CollectXPRewardComponent());
+                    }
                 }
             });
         }

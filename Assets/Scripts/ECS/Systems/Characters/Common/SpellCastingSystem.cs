@@ -7,6 +7,7 @@ using BeyondPixels.ECS.Components.Spells;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.Common
@@ -65,7 +66,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                                     (spellPrefab.CastTime / 500f * magicStatComponent.CurrentValue));
 
                             if (spellCastingComponent.StartedAt + castTime > Time.time)
+                            {
                                 break;
+                            }
 
                             var target = Entity.Null;
                             if (spellPrefab.SelfTarget)

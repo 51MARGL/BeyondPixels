@@ -27,7 +27,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
         protected override void OnUpdate()
         {
             if (this._boardGroup.CalculateEntityCount() == 0)
+            {
                 return;
+            }
 
             this.DeleteAllEntities(this._boardGroup.CreateArchetypeChunkArray(Allocator.TempJob));
             this.DeleteAllEntities(this._roomGroup.CreateArchetypeChunkArray(Allocator.TempJob));
@@ -44,7 +46,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 var entities = chunk.GetNativeArray(entityType);
 
                 for (var i = 0; i < chunk.Count; i++)
+                {
                     this.PostUpdateCommands.DestroyEntity(entities[i]);
+                }
             }
 
             chunks.Dispose();

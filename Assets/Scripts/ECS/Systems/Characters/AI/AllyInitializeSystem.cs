@@ -2,8 +2,10 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,18 +23,21 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                     typeof(AllyInitializeComponent), typeof(Transform), typeof(NavMeshAgent),
                 },
                 None = new ComponentType[]
-                {
+{
                     typeof(PositionComponent)
-                }
+}
             });
         }
+
         protected override void OnUpdate()
         {
             var random = new Unity.Mathematics.Random((uint)System.Guid.NewGuid().GetHashCode());
             var playerEntity = GameObject.FindGameObjectWithTag("Player").GetComponent<GameObjectEntity>().Entity;
 
             if (!this.EntityManager.HasComponent<LevelComponent>(playerEntity))
+            {
                 return;
+            }
 
             var playerLvlComponent = this.EntityManager.GetComponentData<LevelComponent>(playerEntity);
 
@@ -47,7 +52,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 navMeshAgent.updateUpAxis = false;
 
                 #region statsInit
-                int currLevel = playerLvlComponent.CurrentLevel == 1 ? 1 :
+                var currLevel = playerLvlComponent.CurrentLevel == 1 ? 1 :
                                     random.NextInt(playerLvlComponent.CurrentLevel,
                                                    playerLvlComponent.CurrentLevel + 3);
 

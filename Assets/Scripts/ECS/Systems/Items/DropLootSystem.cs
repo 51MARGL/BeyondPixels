@@ -2,8 +2,10 @@
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.SceneBootstraps;
+
 using Unity.Collections;
 using Unity.Entities;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Items
@@ -40,7 +42,9 @@ namespace BeyondPixels.ECS.Systems.Items
         protected override void OnUpdate()
         {
             if (this._dropGroup.CalculateEntityCount() == 0)
+            {
                 return;
+            }
 
             var dropChunks = this._dropGroup.CreateArchetypeChunkArray(Allocator.TempJob);
 
@@ -50,6 +54,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 var entities = chunk.GetNativeArray(this.GetArchetypeChunkEntityType());
                 var positionComponents = chunk.GetNativeArray(this.GetArchetypeChunkComponentType<PositionComponent>());
                 if (entities.Length > 0 && positionComponents.Length > 0)
+                {
                     for (var i = 0; i < chunk.Count; i++)
                     {
                         var ownerEntity = entities[i];
@@ -61,7 +66,9 @@ namespace BeyondPixels.ECS.Systems.Items
                             if (pickedUpComponent.Owner == ownerEntity)
                             {
                                 if (this.EntityManager.HasComponent<EquipedComponent>(itemEntity))
+                                {
                                     this.PostUpdateCommands.RemoveComponent<EquipedComponent>(itemEntity);
+                                }
 
                                 this.PostUpdateCommands.RemoveComponent<PickedUpComponent>(itemEntity);
 
@@ -87,6 +94,7 @@ namespace BeyondPixels.ECS.Systems.Items
                         }
                         itemsList.Dispose();
                     }
+                }
             }
             dropChunks.Dispose();
         }

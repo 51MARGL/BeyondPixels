@@ -32,18 +32,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var random = new Random((uint)(this.RandomSeed * (index + 1)));
                 for (var x = 0; x < this.TileStride; x++)
+                {
                     if (random.NextInt(0, 100) > this.RandomFillPercent)
+                    {
                         this.Tiles[index * this.TileStride + x] = new TileComponent
                         {
                             Position = new int2(x, index),
                             CurrentGenState = TileType.Floor
                         };
+                    }
                     else
+                    {
                         this.Tiles[index * this.TileStride + x] = new TileComponent
                         {
                             Position = new int2(x, index),
                             CurrentGenState = TileType.Wall
                         };
+                    }
+                }
             }
         }
 
@@ -72,18 +78,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var wallCount = 0;
                 for (var neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
+                {
                     for (var neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
                     {
                         var currIndex = neighbourY * this.TileStride + neighbourX;
                         if (currIndex >= 0 && currIndex < this.Tiles.Length)
                         {
                             if (neighbourX != gridX || neighbourY != gridY)
+                            {
                                 wallCount +=
                                     this.Tiles[currIndex].CurrentGenState == TileType.Floor ? 0 : 1;
+                            }
                         }
                         else
+                        {
                             wallCount++;
+                        }
                     }
+                }
 
                 return wallCount;
             }
@@ -124,6 +136,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 var roomTilesIndex = 0;
                 var roomsCounter = 0;
                 for (var y = 0; y < this.Board.Size.y; y++)
+                {
                     for (var x = 0; x < this.Board.Size.x; x++)
                     {
                         var currentTile = this.Tiles[y * this.Board.Size.x + x];
@@ -142,14 +155,17 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                             roomTilesIndex += tileCount;
                         }
                     }
+                }
             }
 
             private int AddRoomTiles(TileComponent startTile, NativeArray<int> flags, int roomTilesIndex, int tileStride)
             {
                 var currentIndex = 0;
 
-                var queue = new NativeList<TileComponent>(Allocator.Temp);
-                queue.Add(startTile);
+                var queue = new NativeList<TileComponent>(Allocator.Temp)
+                {
+                    startTile
+                };
 
                 while (queue.Length > 0)
                 {
@@ -157,6 +173,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     queue.RemoveAtSwapBack(queue.Length - 1);
 
                     for (var y = tile.Position.y - 1; y <= tile.Position.y + 1; y++)
+                    {
                         for (var x = tile.Position.x - 1; x <= tile.Position.x + 1; x++)
                         {
                             var currIndex = y * tileStride + x;
@@ -173,6 +190,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                                 }
                             }
                         }
+                    }
                 }
                 return currentIndex;
             }
@@ -181,18 +199,24 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var wallCount = 0;
                 for (var neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
+                {
                     for (var neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
                     {
                         var currIndex = neighbourY * tileStride + neighbourX;
                         if (currIndex >= 0 && currIndex < this.Tiles.Length)
                         {
                             if (neighbourX != gridX || neighbourY != gridY)
+                            {
                                 wallCount +=
                                     this.Tiles[currIndex].CurrentGenState == TileType.Floor ? 0 : 1;
+                            }
                         }
                         else
+                        {
                             wallCount++;
+                        }
                     }
+                }
 
                 return wallCount;
             }
@@ -236,6 +260,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 var y = offset / xSlice * this.SliceSize;
                 var x = (offset % ySlice) * this.SliceSize;
                 for (var i = 0; i < this.Rooms.Length; i++)
+                {
                     if (this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x >= x
                         && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.x <= x + this.SliceSize
                         && this.RoomTiles[this.Rooms[i].StartTileIndex].Position.y >= y
@@ -243,6 +268,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     {
                         roomsList.Add(this.Rooms[i]);
                     }
+                }
 
                 return roomsList;
             }
@@ -260,7 +286,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     for (var j = 0; j < rooms.Length; j++)
                     {
                         if (connectedRoomsTable[rooms[i].RoomArrayIndex * this.Rooms.Length + rooms[j].RoomArrayIndex] == 1)
+                        {
                             continue;
+                        }
 
                         for (var tileIndexA = 0; tileIndexA < rooms[i].TileCount; tileIndexA++)
                         {
@@ -293,19 +321,28 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (var i = 0; i < this.Rooms.Length; i++)
                 {
                     if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + i] == 1)
+                    {
                         for (var j = 0; j < this.Rooms.Length; j++)
+                        {
                             if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + j] == 1)
                             {
                                 connectedRoomsTable[i * this.Rooms.Length + j] = 1;
                                 connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
+                        }
+                    }
+
                     if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + i] == 1)
+                    {
                         for (var j = 0; j < this.Rooms.Length; j++)
+                        {
                             if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + j] == 1)
                             {
                                 connectedRoomsTable[i * this.Rooms.Length + j] = 1;
                                 connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
+                        }
+                    }
                 }
 
                 this.Corridors.Enqueue(new CorridorComponent
@@ -378,7 +415,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         for (var j = 0; j < connectedRoomList.Length; j++)
                         {
                             if (connectedRoomsTable[disconnectedRoomIndexList[i] * this.Rooms.Length + connectedRoomIndexList[j]] == 1)
+                            {
                                 continue;
+                            }
 
                             for (var tileIndexA = 0; tileIndexA < disconnectedRoomList[i].TileCount; tileIndexA++)
                             {
@@ -402,7 +441,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         }
                     }
                     if (possibleConFound)
+                    {
                         this.MarkRoomsConnection(connectedRoomsTable, bestRoomAIndex, bestRoomBIndex, bestTileA, bestTileB);
+                    }
                 }
             }
 
@@ -413,19 +454,28 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 for (var i = 0; i < this.Rooms.Length; i++)
                 {
                     if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + i] == 1)
+                    {
                         for (var j = 0; j < this.Rooms.Length; j++)
+                        {
                             if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + j] == 1)
                             {
                                 connectedRoomsTable[i * this.Rooms.Length + j] = 1;
                                 connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
+                        }
+                    }
+
                     if (connectedTableCopy[bestRoomBIndex * this.Rooms.Length + i] == 1)
+                    {
                         for (var j = 0; j < this.Rooms.Length; j++)
+                        {
                             if (connectedTableCopy[bestRoomAIndex * this.Rooms.Length + j] == 1)
                             {
                                 connectedRoomsTable[i * this.Rooms.Length + j] = 1;
                                 connectedRoomsTable[j * this.Rooms.Length + i] = 1;
                             }
+                        }
+                    }
                 }
 
                 this.Corridors.Enqueue(new CorridorComponent
@@ -447,8 +497,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var index = 0;
                 while (this.CorridorsQueue.Count > 0)
+                {
                     if (this.CorridorsQueue.TryDequeue(out var corridor))
+                    {
                         this.CorridorsArray[index++] = corridor;
+                    }
+                }
             }
         }
 
@@ -474,8 +528,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 var tileB = this.Corridors[index].End;
                 var line = this.GetLine(tileA, tileB);
                 for (var i = 0; i < line.Length; i++)
+                {
                     this.ClearPass(line[i], this.PassageRadius);
-
+                }
             }
 
             private NativeList<TileComponent> GetLine(TileComponent start, TileComponent end)
@@ -511,17 +566,26 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                     line.Add(this.Tiles[y * this.TileStride + x]);
 
                     if (inverted)
+                    {
                         y += step;
+                    }
                     else
+                    {
                         x += step;
+                    }
 
                     gradientAccumulation += shortest;
                     if (gradientAccumulation >= longest)
                     {
                         if (inverted)
+                        {
                             x += gradientStep;
+                        }
                         else
+                        {
                             y += gradientStep;
+                        }
+
                         gradientAccumulation -= longest;
                     }
                 }
@@ -532,6 +596,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             private void ClearPass(TileComponent tile, int radius)
             {
                 for (var x = -radius; x <= radius; x++)
+                {
                     for (var y = -radius; y <= radius; y++)
                     {
                         var drawX = tile.Position.x + x;
@@ -542,6 +607,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         this.Tiles[drawY * this.TileStride + drawX] = currTile;
 
                     }
+                }
             }
         }
 
@@ -614,7 +680,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 {
                     inconsistentTileDetected = false;
                     for (var y = 1; y < board.Size.y - 1; y++)
+                    {
                         for (var x = 1; x < board.Size.x - 1; x++)
+                        {
                             if (tiles[(y * tilesStride) + x].CurrentGenState == TileType.Wall
                                 && ((tiles[(y * tilesStride) + x + 1].CurrentGenState == TileType.Floor && tiles[(y * tilesStride) + x - 1].CurrentGenState == TileType.Floor) // pattern -> -
                                     || (tiles[((y + 1) * tilesStride) + x].CurrentGenState == TileType.Floor && tiles[((y - 1) * tilesStride) + x].CurrentGenState == TileType.Floor) // pattern -> |
@@ -633,6 +701,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                                 tiles[(y * tilesStride) + x] = currentTile;
                                 inconsistentTileDetected = true;
                             }
+                        }
+                    }
                 }
             }
         }
@@ -658,6 +728,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                 if (this.IsBoardValid())
                 {
                     for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                    {
                         for (var x = 0; x < this.BoardComponent.Size.x; x++)
                         {
                             var entity = this.CommandBuffer.CreateEntity();
@@ -667,6 +738,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                                 Position = new int2(x, y)
                             });
                         }
+                    }
 
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
                     var finalBoardEntity = this.CommandBuffer.CreateEntity();
@@ -698,11 +770,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
             {
                 var freeTilesCount = 0;
                 for (var i = 0; i < this.Tiles.Length; i++)
+                {
                     if (this.Tiles[i].CurrentGenState == TileType.Floor)
+                    {
                         freeTilesCount++;
+                    }
+                }
 
                 if (freeTilesCount < 50)
+                {
                     return false;
+                }
+
                 return true;
             }
         }
@@ -810,11 +889,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.CellularAutomato
                         var connectedRoomsTable = new NativeArray<int>(roomCount * roomCount, Allocator.TempJob);
 
                         for (var roomIndex = 0; roomIndex < roomCount; roomIndex++)
+                        {
                             connectedRoomsTable[roomIndex * roomCount + roomIndex] = 1;
+                        }
 
                         var sliceSize = 25;
 
-                        while (board.Size.x  / sliceSize >= 1 && board.Size.y / sliceSize >= 1)
+                        while (board.Size.x / sliceSize >= 1 && board.Size.y / sliceSize >= 1)
                         {
                             inputDeps = new FindClosestRoomsConnectionsJob
                             {

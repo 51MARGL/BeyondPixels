@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Items;
+
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -19,9 +20,9 @@ namespace BeyondPixels.ECS.Systems.Items
             this._playerGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(InputComponent), typeof(PlayerComponent), typeof(PositionComponent)
-                }
+}
             });
         }
 
@@ -30,7 +31,9 @@ namespace BeyondPixels.ECS.Systems.Items
             this.Entities.With(this._playerGroup).ForEach((Entity entity, ref InputComponent inputComponent, ref PositionComponent positionComponent) =>
             {
                 if (Camera.main == null)
+                {
                     return;
+                }
 
                 if (inputComponent.MouseButtonClicked == 1
                      && !EventSystem.current.IsPointerOverGameObject())
@@ -45,12 +48,17 @@ namespace BeyondPixels.ECS.Systems.Items
                         {
                             var targetPosition = new float2(hit.transform.position.x, hit.transform.position.y);
                             if (!this.InLineOfSigth(positionComponent.CurrentPosition, targetPosition))
+                            {
                                 return;
+                            }
 
                             var targetEntity = hit.transform.GetComponent<GameObjectEntity>().Entity;
 
                             if (!this.EntityManager.HasComponent<OpenLootBagComponent>(targetEntity))
+                            {
                                 this.PostUpdateCommands.AddComponent(targetEntity, new OpenLootBagComponent());
+                            }
+
                             return;
                         }
                     }
@@ -67,8 +75,12 @@ namespace BeyondPixels.ECS.Systems.Items
                                             distance, wallLayer);
 
             foreach (var hit in hits)
+            {
                 if (hit.transform.tag == "Wall")
+                {
                     return false;
+                }
+            }
 
             return true;
         }

@@ -22,25 +22,31 @@ namespace BeyondPixels.ECS.Systems.Characters.Player
                 }
             });
         }
+
         protected override void OnUpdate()
         {
             this.Entities.With(this._group).ForEach((Entity entity, Animator animatorComponent, ref AttackComponent attackComponent) =>
-            {
-                animatorComponent.ActivateLayer("AttackLayer");
+           {
+               animatorComponent.ActivateLayer("AttackLayer");
 
-                var attackTriggerName = "Attack" + (attackComponent.CurrentComboIndex + 1);
-                var attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
-                if (!animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsName(attackTriggerName))
-                    animatorComponent.SetTrigger(attackTriggerName);
+               var attackTriggerName = "Attack" + (attackComponent.CurrentComboIndex + 1);
+               var attackLayerIndex = animatorComponent.GetLayerIndex("AttackLayer");
+               if (!animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsName(attackTriggerName))
+               {
+                   animatorComponent.SetTrigger(attackTriggerName);
+               }
 
-                if (animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsTag("Finish"))
-                {
-                    foreach (var comboName in new[] { "Attack1", "Attack2" })
-                        animatorComponent.ResetTrigger(comboName);
-                    this.PostUpdateCommands.RemoveComponent<AttackComponent>(entity);
-                }
+               if (animatorComponent.GetCurrentAnimatorStateInfo(attackLayerIndex).IsTag("Finish"))
+               {
+                   foreach (var comboName in new[] { "Attack1", "Attack2" })
+                   {
+                       animatorComponent.ResetTrigger(comboName);
+                   }
 
-            });
+                   this.PostUpdateCommands.RemoveComponent<AttackComponent>(entity);
+               }
+
+           });
         }
     }
 }

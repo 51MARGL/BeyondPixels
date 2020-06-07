@@ -1,5 +1,7 @@
-﻿using System;
-using BeyondPixels.ECS.Components.Items;
+﻿using BeyondPixels.ECS.Components.Items;
+
+using System;
+
 using Unity.Collections;
 using Unity.Entities;
 
@@ -93,7 +95,7 @@ namespace BeyondPixels.ECS.Systems.Items
                 IconIndex = iconIndex,
                 Level = level
             });
-            commandBuffer.AddComponent(itemEntity, new MagicStatModifierComponent 
+            commandBuffer.AddComponent(itemEntity, new MagicStatModifierComponent
             {
                 Value = random.NextInt(1, 6)
             });
@@ -193,7 +195,7 @@ namespace BeyondPixels.ECS.Systems.Items
 
         private static void ShuffleStatsArray(NativeArray<WeaponStatsModifiers> array, ref Unity.Mathematics.Random random)
         {
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 var rIndex = random.NextInt(0, array.Length);
                 var tmp = array[rIndex];
@@ -206,7 +208,7 @@ namespace BeyondPixels.ECS.Systems.Items
         {
             var chance = 50;
             ShuffleStatsArray(randomStatModifiersArray, ref random);
-            for (int i = 0; i < randomStatModifiersArray.Length; i++)
+            for (var i = 0; i < randomStatModifiersArray.Length; i++)
             {
                 if (random.NextInt(0, 100) < chance)
                 {
@@ -240,7 +242,9 @@ namespace BeyondPixels.ECS.Systems.Items
                     }
                 }
                 else
+                {
                     return;
+                }
             }
         }
     }

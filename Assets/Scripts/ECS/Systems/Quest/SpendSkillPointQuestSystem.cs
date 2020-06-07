@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Systems.Characters.Stats;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Quest

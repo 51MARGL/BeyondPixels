@@ -2,11 +2,11 @@
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Systems.Characters.Stats;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
-using Unity.Mathematics;
 
 namespace BeyondPixels.ECS.Systems.Items
 {
@@ -42,15 +42,21 @@ namespace BeyondPixels.ECS.Systems.Items
                     var itemComponents = chunk.GetNativeArray(this.ItemComponentType);
                     var pickedComponents = chunk.GetNativeArray(this.PickedUpComponentType);
                     for (var i = 0; i < chunk.Count; i++)
+                    {
                         if (pickedComponents[i].Owner == entity)
+                        {
                             modifier += modifierComponents[i].Value * itemComponents[i].Level;
+                        }
+                    }
                 }
 
                 var properValue = (statComponent.BaseValue
                                   + statComponent.PerPointValue
                                   * (statComponent.PointsSpent - 1)) + modifier;
                 if (statComponent.CurrentValue != properValue)
+                {
                     statComponent.CurrentValue = properValue;
+                }
             }
         }
 
@@ -61,10 +67,10 @@ namespace BeyondPixels.ECS.Systems.Items
             this._gearGroup = this.GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
-                {
+{
                     typeof(ItemComponent), typeof(EquipedComponent),
                     typeof(PickedUpComponent), typeof(MagicStatModifierComponent)
-                }
+}
             });
         }
 

@@ -18,7 +18,9 @@ namespace BeyondPixels.ColliderEvents
                 var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
                 var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
                 if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+                {
                     return;
+                }
 
                 var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                              typeof(WeaponCollisionComponent),

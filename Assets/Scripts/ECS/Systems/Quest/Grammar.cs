@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+
 using Unity.Mathematics;
 
 namespace BeyondPixels.ECS.Systems.Quest

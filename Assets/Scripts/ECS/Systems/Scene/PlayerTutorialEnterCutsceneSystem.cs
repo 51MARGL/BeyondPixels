@@ -1,9 +1,5 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Player;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Dungeon;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning;
-using BeyondPixels.ECS.Components.ProceduralGeneration.Spawning.PoissonDiscSampling;
 using BeyondPixels.ECS.Components.Scenes;
-using BeyondPixels.SceneBootstraps;
 
 using Unity.Entities;
 
@@ -49,7 +45,9 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var rigidbody = player.GetComponent<Rigidbody2D>();
                 var director = TimelinesManagerComponent.Instance.Timelines.PlayerTutorialEnter;
                 if (!director.enabled)
+                {
                     director.enabled = true;
+                }
 
                 void onStop(PlayableDirector aDirector)
                 {
@@ -63,7 +61,10 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 this.cutsceneDone = false;
                 rigidbody.isKinematic = true;
                 if (!this.EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                {
                     this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                }
+
                 this.PostUpdateCommands.AddComponent(playerEntity, new PlayerEnterCutscenePlaying());
                 director.Play();
 

@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.SaveGame;
 using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.Menus;
+
 using UnityEngine;
 
 namespace BeyondPixels.UI.ECS.Components
@@ -25,7 +26,9 @@ namespace BeyondPixels.UI.ECS.Components
         public override void Hide()
         {
             if (!this.InGameMenu)
+            {
                 return;
+            }
 
             base.Hide();
             Time.timeScale = this.PrevTimeScale;

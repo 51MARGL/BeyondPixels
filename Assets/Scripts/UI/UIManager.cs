@@ -1,4 +1,5 @@
 ﻿using BeyondPixels.UI.ECS.Components;
+
 using UnityEngine;
 
 namespace BeyondPixels.UI
@@ -46,10 +47,13 @@ namespace BeyondPixels.UI
             this.ToolTip.ButtonsDescription.text = buttonsDescription;
 
             if (below)
+            {
                 this.ToolTip.GetComponent<RectTransform>().pivot = new Vector2(-0.025f, 1);
+            }
             else
+            {
                 this.ToolTip.GetComponent<RectTransform>().pivot = new Vector2(-0.025f, 0);
-
+            }
         }
 
         public void HideTooltip()

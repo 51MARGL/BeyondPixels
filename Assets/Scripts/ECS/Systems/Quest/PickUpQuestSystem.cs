@@ -1,6 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Systems.Items;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Quest
@@ -45,7 +46,9 @@ namespace BeyondPixels.ECS.Systems.Quest
 
                     var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
                     if (item.ItemType == questItemType)
+                    {
                         questComponent.CurrentProgress++;
+                    }
 
                     if (questComponent.CurrentProgress >= questComponent.ProgressTarget)
                     {

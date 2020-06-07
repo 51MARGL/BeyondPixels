@@ -1,6 +1,6 @@
-﻿using System;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
 
-using BeyondPixels.ECS.Components.Characters.Common;
+using System;
 
 using UnityEngine;
 
@@ -30,7 +30,7 @@ namespace BeyondPixels.ECS.Components.Spells
             public bool LockOnTarget;
             public bool SelfTarget;
             public bool TargetRequired;
-            public bool Throwable;            
+            public bool Throwable;
         }
     }
 }

@@ -12,8 +12,10 @@ namespace BeyondPixels.ColliderEvents
 
         protected virtual void OnTriggerEnter2D(Collider2D collider)
         {
-            if (Time.time - lastTargetLeft < TargetCoolDown)
+            if (Time.time - this.lastTargetLeft < this.TargetCoolDown)
+            {
                 return;
+            }
 
             var wallLayer = LayerMask.GetMask("World");
             var distance = math.distance(this.transform.position, collider.transform.position);
@@ -24,14 +26,18 @@ namespace BeyondPixels.ColliderEvents
             foreach (var hit in hits)
             {
                 if (hit.transform.tag == "Wall")
+                {
                     return;
+                }
             }
 
             var entityManager = World.Active.EntityManager;
             var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
             var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
             if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+            {
                 return;
+            }
 
             var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                          typeof(AggroRangeCollisionComponent));
@@ -45,12 +51,14 @@ namespace BeyondPixels.ColliderEvents
         }
 
         protected virtual void OnTriggerExit2D(Collider2D collider)
-        {           
+        {
             var entityManager = World.Active.EntityManager;
             var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
             var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
             if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+            {
                 return;
+            }
 
             var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo), typeof(AggroRangeCollisionComponent));
 
@@ -61,13 +69,15 @@ namespace BeyondPixels.ColliderEvents
                 EventType = EventType.TriggerExit
             });
 
-            lastTargetLeft = Time.time;
+            this.lastTargetLeft = Time.time;
         }
 
         protected virtual void OnTriggerStay2D(Collider2D collider)
         {
-            if (Time.time - lastTargetLeft < TargetCoolDown)
+            if (Time.time - this.lastTargetLeft < this.TargetCoolDown)
+            {
                 return;
+            }
 
             var wallLayer = LayerMask.GetMask("World");
             var distance = math.distance(this.transform.position, collider.transform.position);
@@ -78,14 +88,18 @@ namespace BeyondPixels.ColliderEvents
             foreach (var hit in hits)
             {
                 if (hit.transform.tag == "Wall")
+                {
                     return;
+                }
             }
 
             var entityManager = World.Active.EntityManager;
             var sender = this.GetComponentInParent<GameObjectEntity>().Entity;
             var target = collider.GetComponentInParent<GameObjectEntity>().Entity;
             if (!entityManager.Exists(sender) || !entityManager.Exists(target))
+            {
                 return;
+            }
 
             var eventEntity = entityManager.CreateEntity(typeof(CollisionInfo),
                                                          typeof(AggroRangeCollisionComponent));

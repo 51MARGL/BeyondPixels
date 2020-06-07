@@ -3,12 +3,8 @@ using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Player;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Spells;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Mathematics;
 
-using UnityEngine;
-using UnityEngine.AI;
+using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
 {
@@ -57,7 +53,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
                 {
                     this.PostUpdateCommands.RemoveComponent<SpellCastingComponent>(entity);
                     return;
-                }                
+                }
             });
         }
     }

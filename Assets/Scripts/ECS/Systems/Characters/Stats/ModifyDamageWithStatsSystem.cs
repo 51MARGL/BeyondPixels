@@ -29,6 +29,7 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
             this.Entities.With(this._group).ForEach((ref CollisionInfo collisionInfo, ref FinalDamageComponent finalDamageComponent) =>
             {
                 if (this.EntityManager.Exists(collisionInfo.Sender) && this.EntityManager.Exists(collisionInfo.Target))
+                {
                     switch (finalDamageComponent.DamageType)
                     {
                         case DamageType.Weapon:
@@ -44,11 +45,17 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                             var casterMagicModifier = finalDamageComponent.DamageAmount / 100f * casterMagicStatComponent.CurrentValue;
                             var targetMagicModifier = finalDamageComponent.DamageAmount / 100f * targetMagicStatComponent.CurrentValue;
                             if (collisionInfo.Sender == collisionInfo.Target)
+                            {
                                 finalDamageComponent.DamageAmount += casterMagicModifier;
+                            }
                             else
+                            {
                                 finalDamageComponent.DamageAmount += math.max(0, casterMagicModifier - targetMagicModifier);
+                            }
+
                             break;
                     }
+                }
             });
         }
     }

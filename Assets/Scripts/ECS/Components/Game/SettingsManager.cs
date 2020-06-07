@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Components.Game
@@ -68,7 +69,9 @@ namespace BeyondPixels.ECS.Components.Game
         public void SetResolution(int index)
         {
             if (index == -1)
+            {
                 index = this.Resolutions.Length - 1;
+            }
 
             var res = this.Resolutions[index];
             this.CurrentResolution = res;
@@ -78,7 +81,9 @@ namespace BeyondPixels.ECS.Components.Game
         public KeyCode GetKeyBindValue(KeyBindName bindName)
         {
             if (this.KeyBinds.TryGetValue(bindName, out var keyCode))
+            {
                 return keyCode;
+            }
 
             return KeyCode.None;
         }
@@ -86,7 +91,9 @@ namespace BeyondPixels.ECS.Components.Game
         public void SetKeyBind(KeyBindName bindName, KeyCode keyCode)
         {
             if (this.KeyBinds.ContainsValue(keyCode))
+            {
                 this.KeyBinds[this.KeyBinds.FirstOrDefault(b => b.Value == keyCode).Key] = KeyCode.None;
+            }
 
             this.KeyBinds[bindName] = keyCode;
         }
@@ -97,11 +104,13 @@ namespace BeyondPixels.ECS.Components.Game
             try
             {
                 if (File.Exists(this.SettingsFile))
+                {
                     using (var fileStream = new FileStream(this.SettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         var xs = new XmlSerializer(typeof(SettingsSerialized));
                         settings = (SettingsSerialized)xs.Deserialize(fileStream);
                     }
+                }
             }
             catch (Exception) { }
 
@@ -167,17 +176,23 @@ namespace BeyondPixels.ECS.Components.Game
                 Directory.CreateDirectory(this.SettingsFolder);
 
                 if (File.Exists(this.SettingsFile))
+                {
                     File.Move(this.SettingsFile, saveBckpPath);
+                }
 
                 using (var fileStream = new FileStream(this.SettingsFile, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
                     new XmlSerializer(typeof(SettingsSerialized)).Serialize(fileStream, settings);
+                }
 
                 File.Delete(saveBckpPath);
             }
             catch (Exception)
             {
                 if (File.Exists(saveBckpPath))
+                {
                     File.Move(saveBckpPath, this.SettingsFile);
+                }
             }
         }
     }

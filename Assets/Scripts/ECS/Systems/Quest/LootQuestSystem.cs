@@ -2,6 +2,7 @@
 using BeyondPixels.ECS.Components.Objects;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Systems.Items;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Quest

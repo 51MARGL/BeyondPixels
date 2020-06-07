@@ -1,10 +1,8 @@
 ﻿using BeyondPixels.ECS.Components.Game;
 using BeyondPixels.ECS.Components.Scenes;
 using BeyondPixels.UI.ECS.Components;
-using Unity.Entities;
 
-using UnityEngine;
-using UnityEngine.SceneManagement;
+using Unity.Entities;
 
 namespace BeyondPixels.UI.ECS.Systems
 {
@@ -46,8 +44,10 @@ namespace BeyondPixels.UI.ECS.Systems
                 {
                     UIManager.Instance.CloseAllMenus();
                     var canvas = UIManager.Instance.Canvas.transform;
-                    for (int i = 0; i < canvas.childCount; i++)
+                    for (var i = 0; i < canvas.childCount; i++)
+                    {
                         canvas.GetChild(i).gameObject.SetActive(false);
+                    }
 
                     gameOverMenu.Show();
                 }

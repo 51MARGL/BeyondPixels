@@ -1,7 +1,6 @@
 ﻿using BeyondPixels.UI.ECS.Components;
+
 using Unity.Entities;
-using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace BeyondPixels.UI.Buttons
 {

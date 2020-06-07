@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Quest;
+
 using Unity.Entities;
 
 namespace BeyondPixels.ECS.Systems.Quest
@@ -39,7 +40,9 @@ namespace BeyondPixels.ECS.Systems.Quest
                 this.Entities.With(this._questGroup).ForEach((Entity questEntity, ref QuestComponent questComponent) =>
                 {
                     if (type == CharacterType.Enemy)
+                    {
                         questComponent.CurrentProgress++;
+                    }
 
                     if (questComponent.CurrentProgress >= questComponent.ProgressTarget)
                     {

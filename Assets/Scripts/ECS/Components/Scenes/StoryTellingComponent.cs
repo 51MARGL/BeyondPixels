@@ -1,7 +1,9 @@
-﻿using System;
+﻿using BeyondPixels.ECS.Components.Game;
+
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using BeyondPixels.ECS.Components.Game;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Components.Scenes
@@ -12,11 +14,11 @@ namespace BeyondPixels.ECS.Components.Scenes
 
         [TextArea(1, 10)]
         [SerializeField]
-        private string[] _sentences = new string[0];
+        private readonly string[] _sentences = new string[0];
 
         [TextArea(1, 10)]
         [SerializeField]
-        private string[] _tips = new string[0];
+        private readonly string[] _tips = new string[0];
 
         public void Start()
         {
@@ -30,7 +32,7 @@ namespace BeyondPixels.ECS.Components.Scenes
             {
                 var text = this._tips[i];
                 var matches = Regex.Matches(text, @"{([^{}]+)}");
-                for (int mI = 0; mI < matches.Count; mI++)
+                for (var mI = 0; mI < matches.Count; mI++)
                 {
                     var keyBind = matches[mI].Groups[1].Value;
                     if (Enum.TryParse<KeyBindName>(keyBind, out var bindName))

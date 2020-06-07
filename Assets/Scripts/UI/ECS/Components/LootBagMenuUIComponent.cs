@@ -1,5 +1,7 @@
-﻿using System;
-using BeyondPixels.UI.Menus;
+﻿using BeyondPixels.UI.Menus;
+
+using System;
+
 using static BeyondPixels.UI.ECS.Components.PlayerInfoMenuUIComponent;
 
 namespace BeyondPixels.UI.ECS.Components

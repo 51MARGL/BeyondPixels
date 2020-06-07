@@ -1,10 +1,13 @@
-﻿using System;
-using BeyondPixels.ECS.Components.Items;
+﻿using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.UI.Buttons;
+
+using System;
+
 using Unity.Collections;
 using Unity.Entities;
 
 using UnityEngine;
+
 using static BeyondPixels.UI.ECS.Components.PlayerInfoMenuUIComponent;
 
 namespace BeyondPixels.UI.ECS.Systems
@@ -56,7 +59,9 @@ namespace BeyondPixels.UI.ECS.Systems
             this.Entities.With(this._itemsGroup).ForEach((Entity itemEntity, ref ItemComponent itemComponent, ref PickedUpComponent pickedUpComponent) =>
             {
                 if (pickedUpComponent.Owner != owner)
+                {
                     return;
+                }
 
                 itemCounter++;
                 var item = ItemsManagerComponent.Instance.ItemsStoreComponent.Items[itemComponent.StoreIndex];
@@ -140,15 +145,25 @@ namespace BeyondPixels.UI.ECS.Systems
                 this.LastOwnerEntity = owner;
 
                 for (var i = inventoryGroup.Grid.transform.childCount - 1; i >= 0; i--)
+                {
                     GameObject.Destroy(inventoryGroup.Grid.transform.GetChild(i).gameObject);
+                }
 
                 var itemsHashMap = new NativeMultiHashMap<int, ItemHashValue>(foodList.Length + potionList.Length + treasureList.Length, Allocator.Temp);
                 for (var i = 0; i < foodList.Length; i++)
+                {
                     itemsHashMap.Add(this.GetItemHash(foodList[i]), foodList[i]);
+                }
+
                 for (var i = 0; i < potionList.Length; i++)
+                {
                     itemsHashMap.Add(this.GetItemHash(potionList[i]), potionList[i]);
+                }
+
                 for (var i = 0; i < treasureList.Length; i++)
+                {
                     itemsHashMap.Add(this.GetItemHash(treasureList[i]), treasureList[i]);
+                }
 
                 if (itemsHashMap.Length > 0)
                 {
@@ -157,34 +172,55 @@ namespace BeyondPixels.UI.ECS.Systems
                     for (var keyI = 0; keyI < keysLength; keyI++)
                     {
                         if (!itemsHashMap.TryGetFirstValue(keys[keyI], out var hashValue, out iterator))
+                        {
                             continue;
+                        }
 
                         var button = this.AddInventoryButton(hashValue, inventoryGroup);
 
                         var itemsCount = 1;
                         while (itemsHashMap.TryGetNextValue(out hashValue, ref iterator))
+                        {
                             itemsCount++;
+                        }
 
                         if (itemsCount > 1)
+                        {
                             button.Amount.text = itemsCount.ToString();
+                        }
                         else
+                        {
                             button.Amount.text = string.Empty;
-
+                        }
                     }
                     keys.Dispose();
                 }
                 itemsHashMap.Dispose();
 
                 for (var i = 0; i < weaponList.Length; i++)
+                {
                     this.AddInventoryButton(weaponList[i], inventoryGroup);
+                }
+
                 for (var i = 0; i < magicWeaponList.Length; i++)
+                {
                     this.AddInventoryButton(magicWeaponList[i], inventoryGroup);
+                }
+
                 for (var i = 0; i < helmetList.Length; i++)
+                {
                     this.AddInventoryButton(helmetList[i], inventoryGroup);
+                }
+
                 for (var i = 0; i < chestList.Length; i++)
+                {
                     this.AddInventoryButton(chestList[i], inventoryGroup);
+                }
+
                 for (var i = 0; i < bootsList.Length; i++)
+                {
                     this.AddInventoryButton(bootsList[i], inventoryGroup);
+                }
             }
 
             foodList.Dispose();
@@ -201,7 +237,7 @@ namespace BeyondPixels.UI.ECS.Systems
 
         protected int GetItemHash(ItemHashValue hashValue)
         {
-            var item = 
+            var item =
                 ItemsManagerComponent.Instance.ItemsStoreComponent.Items[hashValue.ItemComponent.StoreIndex];
 
             return (item.Name + hashValue.ItemComponent.IconIndex).GetHashCode();

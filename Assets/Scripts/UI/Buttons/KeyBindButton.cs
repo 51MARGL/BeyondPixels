@@ -1,5 +1,7 @@
 ﻿using BeyondPixels.ECS.Components.Game;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 

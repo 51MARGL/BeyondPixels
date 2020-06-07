@@ -54,7 +54,9 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 var director = TimelinesManagerComponent.Instance.Timelines.PlayerDungeonEnter;
                 var levelEnter = GameObject.Instantiate(PrefabManager.Instance.DungeonLevelEnter, player.transform.position, Quaternion.identity);
                 if (!director.enabled)
+                {
                     director.enabled = true;
+                }
 
                 void onStop(PlayableDirector aDirector)
                 {
@@ -83,7 +85,10 @@ namespace BeyondPixels.ECS.Systems.Scenes
                 this.cutsceneDone = false;
                 rigidbody.isKinematic = true;
                 if (!this.EntityManager.HasComponent<InCutsceneComponent>(playerEntity))
+                {
                     this.PostUpdateCommands.AddComponent(playerEntity, new InCutsceneComponent());
+                }
+
                 this.PostUpdateCommands.AddComponent(playerEntity, new PlayerEnterCutscenePlaying());
                 director.Play();
                 this.PostUpdateCommands.AddComponent(boardEntity, new PlayerEnterCutsceneTriggeredComponent());

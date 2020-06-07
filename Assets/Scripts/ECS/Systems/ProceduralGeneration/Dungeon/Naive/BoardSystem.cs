@@ -106,13 +106,21 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     var centerX = (int)math.round(board.Size.x / 2f);
                     var centerY = (int)math.round(board.Size.y / 2f);
                     if (room.X > centerX && room.Y > centerY)
+                    {
                         direction = random.NextBool() ? Direction.Right : random.NextBool() ? Direction.Up : Direction.Down;
+                    }
                     else if (room.X < centerX && room.Y > centerY)
+                    {
                         direction = random.NextBool() ? Direction.Left : random.NextBool() ? Direction.Up : Direction.Down;
+                    }
                     else if (room.X > centerX && room.Y < centerY)
+                    {
                         direction = random.NextBool() ? Direction.Right : random.NextBool() ? Direction.Up : Direction.Down;
+                    }
                     else
+                    {
                         direction = random.NextBool() ? Direction.Left : random.NextBool() ? Direction.Up : Direction.Down;
+                    }
                 }
 
                 if (direction == oppositeDirection)
@@ -177,8 +185,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             {
                 var index = 0;
                 while (this.RoomsQueue.Count > 0)
+                {
                     if (this.RoomsQueue.TryDequeue(out var corridor))
+                    {
                         this.RoomsArray[index++] = corridor;
+                    }
+                }
             }
         }
 
@@ -193,8 +205,12 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             {
                 var index = 0;
                 while (this.CorridorsQueue.Count > 0)
+                {
                     if (this.CorridorsQueue.TryDequeue(out var corridor))
+                    {
                         this.CorridorsArray[index++] = corridor;
+                    }
+                }
             }
         }
 
@@ -220,7 +236,10 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     var xCoord = currentRoom.X + j;
 
                     if (currentRoom.X == 0 || currentRoom.Y == 0)
+                    {
                         return;
+                    }
+
                     for (var k = 0; k < currentRoom.Size.y; k++)
                     {
                         var yCoord = currentRoom.Y + k;
@@ -272,9 +291,13 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                     this.Tiles[(yCoord * this.TileStride) + xCoord] = TileType.Floor;
 
                     if (currentCorridor.Direction == Direction.Up || currentCorridor.Direction == Direction.Down)
+                    {
                         this.Tiles[(yCoord * this.TileStride) + xCoord - 1] = TileType.Floor;
+                    }
                     else
+                    {
                         this.Tiles[((yCoord - 1) * this.TileStride) + xCoord] = TileType.Floor;
+                    }
                 }
             }
         }
@@ -325,7 +348,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 {
                     inconsistentTileDetected = false;
                     for (var y = 1; y < board.Size.y - 1; y++)
+                    {
                         for (var x = 1; x < board.Size.x - 1; x++)
+                        {
                             if (tiles[(y * tilesStride) + x] == TileType.Wall
                                 && ((tiles[(y * tilesStride) + x + 1] == TileType.Floor && tiles[(y * tilesStride) + x - 1] == TileType.Floor) // pattern -> -
                                     || (tiles[((y + 1) * tilesStride) + x] == TileType.Floor && tiles[((y - 1) * tilesStride) + x] == TileType.Floor) // pattern -> |
@@ -344,6 +369,8 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                                 tiles[(y * tilesStride) + x] = currentTile;
                                 inconsistentTileDetected = true;
                             }
+                        }
+                    }
                 }
             }
         }
@@ -369,6 +396,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 {
                     var mapBounds = this.GetBounds();
                     for (var y = 0; y < mapBounds.z; y++)
+                    {
                         for (var x = 0; x < mapBounds.w; x++)
                         {
                             var entity = this.CommandBuffer.CreateEntity();
@@ -378,6 +406,7 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                                 Position = new int2(x, y)
                             });
                         }
+                    }
 
                     this.CommandBuffer.AddComponent(this.BoardEntity, new BoardReadyComponent());
                     var finalBoardEntity = this.CommandBuffer.CreateEntity();
@@ -412,20 +441,33 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                 var bounds = new int4(this.BoardComponent.Size.x, this.BoardComponent.Size.y, 0, 0);
 
                 for (var y = 0; y < this.BoardComponent.Size.y; y++)
+                {
                     for (var x = 0; x < this.TileStride; x++)
                     {
                         if (this.Tiles[y * this.TileStride + x] == TileType.Floor)
                         {
                             if (y > bounds.z)
+                            {
                                 bounds.z = y;
+                            }
+
                             if (y < bounds.y)
+                            {
                                 bounds.y = y;
+                            }
+
                             if (x > bounds.w)
+                            {
                                 bounds.w = x;
+                            }
+
                             if (x < bounds.x)
+                            {
                                 bounds.x = x;
+                            }
                         }
                     }
+                }
 
                 bounds.x = math.clamp(bounds.x - 2, 0, this.BoardComponent.Size.x);
                 bounds.y = math.clamp(bounds.y - 2, 0, this.BoardComponent.Size.y);
@@ -438,11 +480,18 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
             {
                 var freeTilesCount = 0;
                 for (var i = 0; i < this.Tiles.Length; i++)
+                {
                     if (this.Tiles[i] == TileType.Floor)
+                    {
                         freeTilesCount++;
+                    }
+                }
 
                 if (freeTilesCount < 50)
+                {
                     return false;
+                }
+
                 return true;
             }
         }
@@ -506,7 +555,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon.Naive
                         this.CorridorsQueue = new NativeQueue<CorridorComponent>(Allocator.TempJob);
                         var firstCorridors = new NativeArray<CorridorComponent>(4, Allocator.TempJob);
                         for (var j = 0; j < this.Tiles.Length; j++)
+                        {
                             this.Tiles[j] = TileType.Wall;
+                        }
 
                         // setup fist room and corridors to all 4 directions
                         var firstRoom = CreateRoom(board, ref random);

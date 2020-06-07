@@ -1,5 +1,6 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Stats;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -28,7 +29,10 @@ namespace BeyondPixels.ECS.Systems.Characters.Stats
                         + (healthComponent.BaseValue / 100f * properValue * math.log2(properValue));
 
                     if (healthComponent.CurrentValue == healthComponent.BaseValue)
+                    {
                         healthComponent.CurrentValue = healthValue;
+                    }
+
                     healthComponent.MaxValue = healthValue;
                 }
             }

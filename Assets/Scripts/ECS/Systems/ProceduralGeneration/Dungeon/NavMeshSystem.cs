@@ -56,7 +56,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
                 this.Entities.With(this._tilesGroup).ForEach((ref FinalTileComponent finalTileComponent) =>
                 {
                     if (finalTileComponent.TileType == TileType.Floor)
+                    {
                         return;
+                    }
 
                     var wall = Object.Instantiate(navMeshComponent.NavMeshWall, Vector3.zero,
                         Quaternion.identity, transform);
@@ -67,7 +69,9 @@ namespace BeyondPixels.ECS.Systems.ProceduralGeneration.Dungeon
 
                 var count = transform.childCount;
                 for (var i = 1; i < count; i++)
+                {
                     Object.Destroy(transform.GetChild(i).gameObject);
+                }
 
                 this.PostUpdateCommands.AddComponent(entity, new Disabled());
             });

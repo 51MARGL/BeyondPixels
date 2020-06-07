@@ -18,7 +18,9 @@ namespace BeyondPixels.ECS.Systems.Characters.Common
                                 [ReadOnly] ref CharacterComponent characterComponent)
             {
                 if (healthComponent.CurrentValue <= 0)
+                {
                     this.CommandBuffer.AddComponent(index, entity, new KilledComponent());
+                }
             }
         }
         private EndSimulationEntityCommandBufferSystem _endFrameBarrier;

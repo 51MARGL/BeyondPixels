@@ -1,6 +1,8 @@
-﻿using System;
-using BeyondPixels.UI.Buttons;
+﻿using BeyondPixels.UI.Buttons;
 using BeyondPixels.UI.Menus;
+
+using System;
+
 using TMPro;
 
 using UnityEngine;

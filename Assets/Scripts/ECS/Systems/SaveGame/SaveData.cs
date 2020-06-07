@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using BeyondPixels.ECS.Components.Characters.Common;
+﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Characters.Level;
 using BeyondPixels.ECS.Components.Characters.Stats;
 using BeyondPixels.ECS.Components.Items;
 using BeyondPixels.ECS.Components.Quest;
 using BeyondPixels.ECS.Components.SaveGame;
+
+using System;
+using System.Collections.Generic;
 
 namespace BeyondPixels.ECS.Systems.SaveGame
 {

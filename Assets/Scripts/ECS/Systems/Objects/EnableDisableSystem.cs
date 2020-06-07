@@ -1,10 +1,9 @@
 ﻿using BeyondPixels.ECS.Components.Characters.Common;
 using BeyondPixels.ECS.Components.Objects;
 
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Objects
@@ -34,15 +33,17 @@ namespace BeyondPixels.ECS.Systems.Objects
 
         protected override void OnUpdate()
         {
-            Entities.With(this._enableGroup).ForEach((Entity eventEntity, ref EntityEnableComponent entityEnableComponent) => {
+            this.Entities.With(this._enableGroup).ForEach((Entity eventEntity, ref EntityEnableComponent entityEnableComponent) =>
+            {
                 this.PostUpdateCommands.RemoveComponent<Disabled>(entityEnableComponent.Target);
                 this.PostUpdateCommands.DestroyEntity(eventEntity);
             });
-            Entities.With(this._disableGroup).ForEach((Entity eventEntity, ref EntityDisableComponent entityDisaleComponent) => {
-                if (EntityManager.HasComponent<MovementComponent>(entityDisaleComponent.Target))
+            this.Entities.With(this._disableGroup).ForEach((Entity eventEntity, ref EntityDisableComponent entityDisaleComponent) =>
+            {
+                if (this.EntityManager.HasComponent<MovementComponent>(entityDisaleComponent.Target))
                 {
-                    var movementComponent = EntityManager.GetComponentData<MovementComponent>(entityDisaleComponent.Target);
-                    var rigidBody = EntityManager.GetComponentObject<Rigidbody2D>(entityDisaleComponent.Target);
+                    var movementComponent = this.EntityManager.GetComponentData<MovementComponent>(entityDisaleComponent.Target);
+                    var rigidBody = this.EntityManager.GetComponentObject<Rigidbody2D>(entityDisaleComponent.Target);
                     rigidBody.velocity = Vector2.zero;
                     movementComponent.Direction = float2.zero;
                     this.PostUpdateCommands.SetComponent(entityDisaleComponent.Target, movementComponent);

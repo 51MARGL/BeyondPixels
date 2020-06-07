@@ -4,6 +4,7 @@ using BeyondPixels.Utilities;
 
 using Unity.Entities;
 using Unity.Mathematics;
+
 using UnityEngine;
 
 namespace BeyondPixels.ECS.Systems.Characters.AI
@@ -41,7 +42,7 @@ namespace BeyondPixels.ECS.Systems.Characters.AI
         {
             this.Entities.With(this._attackStartGroup).ForEach((Entity entity, Animator animatorComponent, ref MovementComponent movementComponent) =>
             {
-                
+
                 animatorComponent.ActivateLayer("AttackLayer");
                 animatorComponent.SetTrigger("Attack");
 
